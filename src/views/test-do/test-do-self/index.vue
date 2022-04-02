@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <div class="title">测试</div>
     <!-- ---------- -->
     <div class="test">
       <div class="progress" >
@@ -205,15 +204,6 @@ export default {
 .container{
   background-color: #F6F6F6;
   height: 100vh;
-  .title{
-    background-color: #FFFFFF;
-    height: 1.066667rem;
-    line-height: 1.066667rem;
-    color: #333333;
-    font-size: .426667rem;
-    text-align: center;
-    font-weight: 600;
-  }
   .test{
     padding: 0 .533333rem;
     text-align: center;
@@ -226,8 +216,12 @@ export default {
     }
     .question-box{
       background-color: #FFFFFF;
-      min-height: 14.506667rem;
+      height: 75vh;
+      overflow-y: scroll;
       border-radius: .266667rem;
+      &::-webkit-scrollbar {
+        display: none;
+      }
       .question{
         font-size: .533333rem;
         padding: .426667rem.32rem;
@@ -288,7 +282,7 @@ export default {
   .bnts{
     width: 100%;
     position: fixed;
-    bottom: 1.706667rem;
+    bottom: .5rem;
     display: flex;
     justify-content: center;
     .van-button{
