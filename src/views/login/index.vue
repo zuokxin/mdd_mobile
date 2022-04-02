@@ -80,13 +80,12 @@ export default {
       setTimeout(() => { this.countDown(time) }, 1000)
     },
     // 登录
-    async login () {
+    login () {
       const data = {
         username: this.username,
         smsCode: this.smsCode
       }
-      const res = await postUserLogin(data)
-      if (res.code === 0) {
+      postUserLogin(data).then(res => {
         if (this.$route.query.url) {
           this.$router.push({ path: this.$route.query.url, query: this.$route.query })
         } else {
@@ -94,9 +93,9 @@ export default {
         }
         sessionStorage.phone = res.data.phone
         res.data.openid && (sessionStorage.openid = res.data.openid) // 微信内授权状态
-      } else {
-        this.$toast(res.message)
-      }
+      }).catch(err => {
+        this.$toast(err.message)
+      })
     },
     // 链接
     skip (type) {

@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <div class="header"> 填写个人信息</div>
     <div class="main">
       <!-- --------------------------- -->
       <div class="title">姓名</div>
@@ -197,15 +196,6 @@ export default {
 <style lang="less" scoped>
 @import '../../../assets/style/reset-vant.less';
 .container{
-  .header{
-    height: 1.066667rem;
-    font-size: .426667rem;
-    color: #333333;
-    text-align: center;
-    font-weight: 600;
-    line-height: 1.066667rem;
-    border-bottom: 1px solid #D5D5D5;
-  }
   .main{
     padding: .8rem;
     .title{
