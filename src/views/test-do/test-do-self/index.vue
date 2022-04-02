@@ -1,0 +1,307 @@
+<template>
+  <div class="container">
+    <div class="title">测试</div>
+    <!-- ---------- -->
+    <div class="test">
+      <div class="progress" >
+        <div class="text" v-if="allData.showProgress">测试进度: {{allData.id + 1}} / {{allData.questionTotal}}</div>
+        <van-progress :percentage="process" stroke-width="5px" color="#34B7B9" v-if="allData.showProgress" :show-pivot="false" />
+      </div>
+      <div class="question-box">
+        <!-- {{end}}{{allData.id}} -->
+        <div class="question">{{allData.id + 1}}.{{allData.title}}</div>
+        <div  v-for="(it,index) in options" :key="index">
+          <div class="each-choice" @click="dispose(index)">
+            <span class="left-title">{{it.name}}</span>
+            <span class="right-choice">
+              <img class="uncheck" v-if="!it.checked" @click="dispose(index)" src="@/assets/uncheck.png">
+              <img class="check" v-else src="@/assets/checked.png">
+            </span>
+          </div>
+          <van-field class="each-comment" maxlength="100" @input="theInput(it.requiredComment)" type="textarea" v-if="it.requiredComment && it.checked" v-model="it.comment" placeholder="请输入具体原因"/>
+        </div>
+      </div>
+    </div>
+    <!-- ---------- -->
+    <div class="bnts" v-if="allData.title">
+      <van-button round block type="primary" :disabled="allData.id === 0" @click="prev">上一题</van-button>
+      <van-button round block type="primary" v-if="(allData.id + 1) !== allData.questionTotal" :disabled="!end" @click="next">下一题</van-button>
+      <van-button round block type="primary" v-else @click="finished" :disabled="!end">完成</van-button>
+    </div>
+  </div>
+</template>
+
+<script>
+import { getTableQues, postTableQues, postTableRes } from '@/api/modules/user'
+export default {
+  name: 'do-self',
+  data () {
+    return {
+      sessionId: '',
+      allData: {},
+      tableCode: '',
+      options: [],
+      end: false,
+      needSend: false
+    }
+  },
+  computed: {
+    process () {
+      const num = (this.allData.id + 1) / this.allData.questionTotal
+      const percentNum = (num * 100).toFixed(0)
+      return percentNum
+    }
+  },
+  mounted () {
+    this.sessionId = this.$route.query.sessionId
+    this.tableCode = this.$route.query.tableCode
+    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+      this.getQues()
+    } else {
+      this.$router.replace('/login')
+    }
+  },
+  methods: {
+    // 获取题目
+    async getQues (id) {
+      const data = {
+        sessionId: this.sessionId,
+        tableCode: this.tableCode,
+        questionId: id || this.allData.id
+      }
+      if (!id) {
+        delete data.questionId
+      }
+      const res = await getTableQues(data)
+      if (res.code === 0) {
+        this.needSend = false
+        this.end = false
+        this.allData = res.data
+        this.options = res.data.form.formItems[0].options
+        this.currentCheck()
+      }
+    },
+    // 检查是否可以下一题了
+    currentCheck (index) {
+      if (this.allData.form.formItems[0].type === 'radio') {
+        this.end = this.options.some(e => e.checked)
+      }
+      if (index >= 0) {
+        if (this.options[index].checked && this.options[index].commentIsNecessary) {
+          if (this.options[index].comment) {
+            this.end = true
+          } else {
+            this.end = false
+          }
+        }
+      }
+    },
+    // 处理选项
+    dispose (index) {
+      this.options.forEach((e, ind) => {
+        if (index === ind) {
+          e.checked = true
+        } else {
+          e.checked = false
+          e.comment = ''
+        }
+      })
+      this.currentCheck(index)
+      if (!this.options[index].commentIsNecessary) {
+        this.next()
+      } else {
+        this.needSend = true
+      }
+    },
+    // 文本内容
+    theInput (text) {
+      if (text) {
+        this.end = true
+      } else {
+        this.end = false
+      }
+    },
+    // 上一题
+    async prev () {
+      const data = {
+        questionId: this.allData.id - 1,
+        sessionId: this.sessionId,
+        tableCode: this.tableCode
+      }
+      const res = await getTableQues(data)
+      if (res.code === 0) {
+        this.end = false
+        this.allData = res.data
+        this.options = res.data.form.formItems[0].options
+        this.currentCheck()
+      } else {
+        this.$toast(res.message)
+      }
+    },
+    // 下一题
+    async next () {
+      this.allData.form.formItems[0].options = this.options
+      const data = {
+        id: this.allData.id,
+        sessionId: this.sessionId,
+        tableCode: this.tableCode,
+        form: this.allData.form
+      }
+      const res = await postTableQues(data)
+      if (res.code === 0) {
+        if ((this.allData.id + 1) !== this.allData.questionTotal) {
+          this.getQues(this.allData.id + 1)
+        }
+      } else {
+        this.$toast(res.message)
+      }
+    },
+    // 完成
+    async finished () {
+      if (this.needSend) {
+        this.allData.form.formItems[0].options = this.options
+        const data = {
+          id: this.allData.id,
+          sessionId: this.sessionId,
+          tableCode: this.tableCode,
+          form: this.allData.form
+        }
+        postTableQues(data).then(res => {
+          if (res.code === 0) {
+            const data = {
+              tableCode: this.tableCode,
+              sessionId: this.sessionId
+            }
+            postTableRes(data).then(resp => {
+              if (resp.code === 0) {
+                this.$router.repace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
+              } else {
+                this.$toast(resp.message)
+              }
+            })
+          } else {
+            this.$toast(res.message)
+          }
+        })
+      } else {
+        const data = {
+          tableCode: this.tableCode,
+          sessionId: this.sessionId
+        }
+        const res = await postTableRes(data)
+        if (res.code === 0) {
+          this.$router.push({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
+        } else {
+          this.$toast(res.message)
+        }
+      }
+    }
+  }
+}
+</script>
+
+<style lang="less" scoped>
+@import '../../../assets/style/reset-vant.less';
+.container{
+  background-color: #F6F6F6;
+  height: 100vh;
+  .title{
+    background-color: #FFFFFF;
+    height: 1.066667rem;
+    line-height: 1.066667rem;
+    color: #333333;
+    font-size: .426667rem;
+    text-align: center;
+    font-weight: 600;
+  }
+  .test{
+    padding: 0 .533333rem;
+    text-align: center;
+    .progress{
+      color: #000000;
+      padding: .426667rem .32rem;
+      .text{
+        margin-bottom: .266667rem;
+      }
+    }
+    .question-box{
+      background-color: #FFFFFF;
+      min-height: 14.506667rem;
+      border-radius: .266667rem;
+      .question{
+        font-size: .533333rem;
+        padding: .426667rem.32rem;
+        color: #000000;
+        font-weight: 600;
+        text-align: left;
+      }
+      .each-choice{
+        width: 7.066667rem;
+        min-height: 1.6rem;
+        border: 1px solid #D5D5D5;
+        margin-bottom: .426667rem;
+        border-radius: .426667rem;
+        box-sizing: border-box;
+        margin-left: auto;
+        margin-right: auto;
+        padding: .426667rem .533333rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .left-title{
+          width: 70%;
+          word-break: break-all;
+          word-wrap: break-word;
+          color: #000000;
+          text-align: left;
+          font-size: .373333rem;
+        }
+        .right-choice{
+          width: .746667rem;
+          height: .746667rem;
+          .uncheck{
+            width: .48rem;
+            height: .48rem;
+          }
+          .check{
+            width: .746667rem;
+            height: .746667rem;
+          }
+        }
+      }
+      .each-comment{
+        width: 7.066667rem;
+        height: 1.6rem;
+        border: 1px solid #F6F6F6;
+        background-color: #F6F6F6;
+        margin-bottom: .426667rem;
+        border-radius: .426667rem;
+        box-sizing: border-box;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .checked{
+        border: 1px solid @green;
+      }
+    }
+  }
+  .bnts{
+    width: 100%;
+    position: fixed;
+    bottom: 1.706667rem;
+    display: flex;
+    justify-content: center;
+    .van-button{
+      width: 2.88rem;
+      height: 1.066667rem;
+      background-color: @green;
+      border-color: @green;
+      margin: 0 .24rem;
+    }
+    .van-button--disabled{
+      background-color: #D5D5D5;
+      border-color: #D5D5D5;
+    }
+  }
+}
+</style>
