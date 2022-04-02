@@ -1,0 +1,21 @@
+.van-button--info {
+  background-color: #34B7B9;
+  border: 1px solid #34B7B9;
+  color: #fff;
+}
+.van-button--plain.van-button--info {
+  color: #34B7B9;
+  background-color: #fff;
+}
+.van-nav-bar .van-icon {
+  color: #333;
+  font-size: 0.533333rem;
+}
+.detail-dialog .van-dialog__message {
+  font-size: 0.4266667rem;
+  font-weight: 700;
+  color: #000000;
+}
+.detail-dialog .van-dialog__footer {
+  padding: 8px 119px 40px;
+}

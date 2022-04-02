@@ -1,0 +1,77 @@
+# How to use GitLab CI/CD for Vue.js
+# https://about.gitlab.com/blog/2017/09/12/vuejs-app-gitlab/
+
+# 默认配置，可以被各个 job 中覆盖
+default:
+  image: node:16-alpine
+  before_script:
+    - sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+    - apk add --no-cache make rsync openssh
+    # 准备 rsync 环境
+    - mkdir -p ~/.ssh
+    - echo "$PrivateKey" >> ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  tags:
+    - node
+  # 缓存 node_modules 目录，避免每次 build 重复安装
+  cache:
+    paths:
+      - node_modules/
+
+variables:
+  DeployDir: /opt/fubian/depression/public/h5/
+  # 机器信息
+  HostDev: 10.0.0.19
+  HostTest: 10.0.0.20
+  HostFB1: 47.117.134.30
+  HostFB2: 106.15.78.85
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - dist
+
+dev_deploy:
+  environment: dev
+  stage: deploy
+  script:
+    - rsync -zrv ./dist/* root@$HostDev:$DeployDir
+  rules:
+#     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#       when: manual
+    - if: $CI_COMMIT_BRANCH != "master"
+      when: manual
+  
+test_deploy:
+  environment: test
+  stage: deploy
+  script:
+    - rsync -zrv ./dist/* root@$HostTest:$DeployDir
+  when: manual
+
+fb1_deploy:
+  environment: prod
+  stage: deploy
+  script:
+    - rsync -zrv ./dist/* root@$HostFB1:$DeployDir
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: manual
+fb2_deploy:
+  environment: prod
+  stage: deploy
+  script:
+    - rsync -zrv ./dist/* root@$HostFB2:$DeployDir
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: manual
