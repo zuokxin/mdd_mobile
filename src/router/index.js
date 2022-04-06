@@ -40,6 +40,11 @@ const routes = [
     component: resolve => require(['../views/test-do/test-do-self/index.vue'], resolve)
   },
   {
+    path: '/test-report',
+    name: '测试-量表报告',
+    component: resolve => require(['../views/test-do/test-report/index.vue'], resolve)
+  },
+  {
     path: '/test-do-wait',
     name: '测试-等待',
     meta: { title: '测试' },

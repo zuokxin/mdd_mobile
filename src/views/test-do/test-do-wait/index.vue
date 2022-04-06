@@ -36,7 +36,8 @@ export default {
       if (res.code === 0) {
         if (res.data.reportAllCompleted || this.s === 0) {
           clearInterval(this.interval)
-          window.location.href = window.location.origin + '/user#/result?sessionId=' + this.sessionId
+          // window.location.href = window.location.origin + '/user#/result?sessionId=' + this.sessionId
+          this.$router.replace({ path: '/test-report', query: { sessionId: this.sessionId } })
         }
       }
     }

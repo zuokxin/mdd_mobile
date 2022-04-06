@@ -173,7 +173,7 @@ export default {
             }
             postTableRes(data).then(resp => {
               if (resp.code === 0) {
-                this.$router.repace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
+                this.$router.replace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
               } else {
                 this.$toast(resp.message)
               }
@@ -189,7 +189,7 @@ export default {
         }
         const res = await postTableRes(data)
         if (res.code === 0) {
-          this.$router.push({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
+          this.$router.replace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
         } else {
           this.$toast(res.message)
         }
@@ -203,9 +203,10 @@ export default {
 @import '../../../assets/style/reset-vant.less';
 .container{
   background-color: #F6F6F6;
-  height: 100vh;
+  max-height: 100vh;
+  min-height: 100vh;
+  padding: 0 .533333rem;
   .test{
-    padding: 0 .533333rem;
     text-align: center;
     .progress{
       color: #000000;
@@ -216,7 +217,9 @@ export default {
     }
     .question-box{
       background-color: #FFFFFF;
-      height: 75vh;
+      max-height: 70vh;
+      min-height: 70vh;
+      overflow: hidden;
       overflow-y: scroll;
       border-radius: .266667rem;
       &::-webkit-scrollbar {
