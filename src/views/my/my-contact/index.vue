@@ -7,21 +7,23 @@
       fixed
     />
   <div class="box">
-    <iframe id="mainIframe" name="mainIframe" width="102%" :src=" `${url}/share/?type=YWJvdXQ=`" frameborder="0" scrolling="auto" ></iframe>
+    <iframe id="mainIframe" name="mainIframe" width="100%" :src=" `${url}/share/?type=YWJvdXQ=`" frameborder="0" scrolling="auto" ></iframe>
   </div>
   </div>
 </template>
 
 <script>
+import browser from '@/utils/browser'
 export default {
   data () {
     return {
-      url: ''
+      url: '',
+      ios: browser().ios
     }
   },
   mounted () {
     const adress = window.location.origin.split('//')[1].split('.')[0]
-    console.log(adress)
+    this.appSource()
     if (adress === '10' || adress.includes('localhost')) {
       this.url = 'https://depression.fubianmed.com'
     } else {
@@ -44,7 +46,16 @@ export default {
     },
     onClickLeft () {
       this.$router.go(-1)
+    },
+    appSource () {
+      const boxWidth = document.querySelector('.box')
+      if (this.ios) {
+        boxWidth.style.width = '100%'
+      } else {
+        boxWidth.style.width = '102%'
+      }
     }
+
   }
 }
 </script>
@@ -53,15 +64,22 @@ export default {
 .main{
   width: 100%;
   height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   position: relative;
+}
+
+.main::-webkit-scrollbar {
+    display: none;
 }
 .box{
   position: absolute;
   left: 0;
   top: 1.226667rem;
-  width: 100%;
+  width: 102%;
+  height: calc(100vh - 1.126667rem);
+  -webkit-overflow-scrolling: touch;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 #mainIframe {
   overflow-x: hidden;

@@ -1,9 +1,5 @@
 <template>
   <div class="main">
-    <van-nav-bar
-      class="header"
-      title="测试"
-      :border="false"/>
     <van-tree-select
       class="tree"
       ref="treeSelect"
@@ -84,6 +80,7 @@ export default {
       const id = this.items[index].activeId
       this.tableSelect = this.tableAll.filter(v => v.selfTableType.id === id)
       const doc = document.querySelectorAll('.van-sidebar-item')
+      console.log(doc[index].clientHeight)
       doc.forEach(v => {
         v.style.borderRadius = 0
       })
@@ -115,8 +112,8 @@ export default {
     overflow: auto;
     .van-tree-select__nav{
       flex:none;
-      width: 1.68rem;
-      white-space: nowrap;
+      width: 1.78rem;
+      // white-space: nowrap;
       .van-sidebar-item{
         background-color: #fff;
         padding: .426667rem .213333rem;
@@ -124,10 +121,10 @@ export default {
         font-size: .32rem;
         color: #999999;
         font-weight: 500;
-        .van-sidebar-item__text{
+      }
+      .van-sidebar-item__text{
           height: .373333rem;
           line-height: .373333rem;
-        }
       }
       .van-sidebar-item--select{
         background-color: #F4F4F4;
