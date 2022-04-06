@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { Dialog } from 'vant'
+import { Dialog, Toast } from 'vant'
 import DetailHeader from './detail-header.vue'
 import DetailBox from './detail-box.vue'
 import PayAction from './pay-action.vue'
@@ -132,7 +132,15 @@ export default {
       const redirect = this.$route.query.redirect
       const orderid = this.$route.query.orderid
       if (redirect === 'h5pay' && orderid) {
-        this.finishPay(orderid)
+        const toast1 = Toast.loading({
+          duration: 0, // 持续展示 toast
+          forbidClick: true,
+          message: '支付处理中'
+        })
+        setTimeout(() => {
+          toast1.clear()
+          this.finishPay(orderid)
+        }, 5000)
       }
     })
   },

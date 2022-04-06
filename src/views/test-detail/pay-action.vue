@@ -9,7 +9,7 @@
         <van-row>
           <van-col class="head-left" span="4">价格</van-col>
           <van-col class="head-right" span="20">
-            <span class="amount-old">￥{{ payInfo.price }}</span>
+            <span class="amount-old" v-show="payInfo.price !== payInfo.discountAmount">￥{{ payInfo.price }}</span>
             <span class="amount-now">￥{{ payInfo.discountAmount }}</span>
           </van-col>
         </van-row>
