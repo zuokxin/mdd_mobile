@@ -1,7 +1,7 @@
 <template>
   <div class="detail-header">
     <p class="title">{{ tableName }}</p>
-    <p><span class="now">￥{{ discountAmountInfo }}</span><span class="normal">￥{{ price }}</span></p>
+    <p><span class="now">￥{{ discountAmountInfo }}</span><span class="normal" v-show="discountAmountInfo !== price">￥{{ price }}</span></p>
   </div>
 </template>
 
