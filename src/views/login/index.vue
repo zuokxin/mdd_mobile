@@ -52,7 +52,7 @@ export default {
   methods: {
     // 检查名字
     checkUsername () {
-      const reg = /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/
+      const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
       if (this.username === '') {
         this.$toast('请输入手机号')
       } else if (!reg.test(this.username)) {

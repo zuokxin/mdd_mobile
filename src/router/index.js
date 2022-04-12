@@ -42,6 +42,7 @@ const routes = [
   {
     path: '/test-report',
     name: '测试-量表报告',
+    meta: { title: '复变云愈测试报告' },
     component: resolve => require(['../views/test-do/test-report/index.vue'], resolve)
   },
   {
