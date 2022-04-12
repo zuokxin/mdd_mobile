@@ -180,6 +180,7 @@ export default {
         } else {
           const path = `${this.$route.path}?tableCode=${this.$route.query.tableCode}`
           this.$router.replace(path)
+          this.showPay = false
         }
       } else {
         // 其他支付，成功后关闭支付弹窗
