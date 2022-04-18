@@ -15,7 +15,7 @@
       <van-cell  is-link title="颜色喜好" :value="form.preferableColor" @click="showColor = true" />
       <van-popup v-model="showBirth" position="bottom">
         <van-datetime-picker
-           type="year-month"
+          type="year-month"
           :min-date="minDate"
           :max-date="maxDate"
           v-model="currentDate"
@@ -40,6 +40,7 @@
 import moment from 'moment'
 import { sexArr, educateArr, marriageArr, tasteArr, colorArr } from './dataSelect'
 import { getUserInfo, updateInfo } from '@/api/modules/user'
+import wxShare from '@/utils/wxShare'
 export default {
   data () {
     return {
@@ -75,6 +76,7 @@ export default {
     this.minDate = new Date(minTime)
     this.maxDate = new Date()
     this.getInfo()
+    wxShare.share(false)
   },
   methods: {
     async getInfo () {
@@ -135,7 +137,7 @@ export default {
     },
     onConfirm (date) {
       this.showBirth = false
-      this.form.birthday = moment(date).format('YYYY-MM-DD')
+      this.form.birthday = moment(date).format('YYYY-MM')
       this.postInfo()
     },
     onClickLeft () {

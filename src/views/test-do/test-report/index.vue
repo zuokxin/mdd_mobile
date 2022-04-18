@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import wxShare from '@/utils/wxShare'
 export default {
   data () {
     return {
@@ -13,6 +14,7 @@ export default {
   },
   mounted () {
     this.src = window.location.origin + '/user#/result?sessionId=' + this.$route.query.sessionId
+    wxShare.hiddenShare()
   }
 }
 </script>

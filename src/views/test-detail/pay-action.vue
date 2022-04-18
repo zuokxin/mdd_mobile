@@ -120,75 +120,111 @@ export default {
       } else if (this.payType === 'h5') {
         this.wxH5pay()
       } else if (this.payType === 'alipay') {
-        this.getParam('alipay').then(
-          res => {
-            console.log(res)
-          }
-        )
+        this.aliPay()
+      }
+    },
+    // 支付宝H5支付
+    async aliPay () {
+      try {
+        const redirect = window.location.origin + window.location.pathname + window.location.hash + '&redirect=alipay&orderid='
+        const paramRes = await this.getParam('alipay', redirect)
+        this.orderId = paramRes.data.orderId
+        if (this.payInfo.discountAmount === '0.00') {
+          this.$emit('finishPay', this.orderId)
+          return
+        }
+        const h5Url = paramRes.data.alipayOrderInfo
+        console.log(h5Url)
+        window.location.href = h5Url
+      } catch (err) {
+        // 错误处理
+        this.$emit('errMessage', err)
       }
     },
     // 微信内支付
     async wxJsapi () {
-      const { data } = await this.getParam('wxpay')
-      const wxPayInfo = data.wxPayInfo
-      this.orderId = data.orderId
-      const param = {
-        appId: wxPayInfo.appid,
-        timeStamp: wxPayInfo.timestamp,
-        nonceStr: wxPayInfo.noncestr,
-        package: wxPayInfo.package,
-        signType: 'RSA',
-        paySign: wxPayInfo.paySign
-      }
-      if (this.payInfo.discountAmount === '0.00') {
-        this.$emit('finishPay', this.orderId)
-        return
-      }
-      const vm = this
-      /* eslint-disable */
-      WeixinJSBridge.invoke('getBrandWCPayRequest', param,
-        function (res) {
-          if (res.err_msg == "get_brand_wcpay_request:ok") {
-            // 使用以上方式判断前端返回,微信团队郑重提示：
-            //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-            vm.payVisible = false
-            vm.$emit('finishPay', vm.orderId)
-          } else {
-            Dialog.alert({
-              message: '支付失败',
-              theme: 'round-button',
-              className: 'detail-dialog',
-              confirmButtonColor: '#34B7B9'
-            })
-          }
+      try {
+        const { data } = await this.getParam('wxpay')
+        const wxPayInfo = data.wxPayInfo
+        this.orderId = data.orderId
+        const param = {
+          appId: wxPayInfo.appid,
+          timeStamp: wxPayInfo.timestamp,
+          nonceStr: wxPayInfo.noncestr,
+          package: wxPayInfo.package,
+          signType: 'RSA',
+          paySign: wxPayInfo.paySign
         }
-      )
-      /* eslint-enable */
+        if (this.payInfo.discountAmount === '0.00') {
+          this.$emit('finishPay', this.orderId)
+          return
+        }
+        const vm = this
+        /* eslint-disable */
+        WeixinJSBridge.invoke('getBrandWCPayRequest', param,
+          function (res) {
+            if (res.err_msg == "get_brand_wcpay_request:ok") {
+              // 使用以上方式判断前端返回,微信团队郑重提示：
+              //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+              vm.payVisible = false
+              vm.$emit('finishPay', vm.orderId)
+            } else {
+              Dialog.alert({
+                message: '支付失败',
+                theme: 'round-button',
+                className: 'detail-dialog',
+                confirmButtonColor: '#34B7B9'
+              })
+            }
+          }
+        )
+        /* eslint-enable */
+      } catch (err) {
+        // 错误处理
+        this.$emit('errMessage', err)
+      }
     },
     // 微信H5支付
     async wxH5pay () {
-      const paramRes = await this.getParam('wxpay')
-      this.orderId = paramRes.data.orderId
-      if (this.payInfo.discountAmount === '0.00') {
-        this.$emit('finishPay', this.orderId)
-        return
+      try {
+        const paramRes = await this.getParam('wxpay')
+        this.orderId = paramRes.data.orderId
+        if (this.payInfo.discountAmount === '0.00') {
+          this.$emit('finishPay', this.orderId)
+          return
+        }
+        const redirect = encodeURIComponent(window.location.origin + window.location.pathname + window.location.hash + '&redirect=h5pay&orderid=' + this.orderId)
+        const h5Url = paramRes.data.wxPayInfo.h5Url
+        window.location.href = h5Url + '&redirect_url=' + redirect
+      } catch (err) {
+        // 错误处理
+        this.$emit('errMessage', err)
       }
-      const redirect = encodeURIComponent(window.location.origin + window.location.pathname + window.location.hash + '&redirect=h5pay&orderid=' + this.orderId)
-      const h5Url = paramRes.data.wxPayInfo.h5Url
-      window.location.href = h5Url + '&redirect_url=' + redirect
     },
     // 提交订单信息
-    getParam (type) {
-      const wxPayType = this.weixin ? 'jsapi' : 'h5'
-      return postTableOrder({
+    getParam (type, url) {
+      const params = {
         tables: this.payInfo.tables,
         aiEvalCamEnabled: false,
         totalAmount: this.payInfo.discountAmount,
+        // totalAmount: '0.99',
         payMethod: type,
         originAmount: this.payInfo.price,
         couponsId: 0,
-        wxPayType: wxPayType
-      })
+        wxPayType: '',
+        alipayType: ''
+      }
+      // 有折扣码的情况下添加折扣码
+      if (this.$route.query.discountCode) {
+        params.discountCode = this.$route.query.discountCode
+      }
+      if (type === 'wxpay') {
+        params.wxPayType = this.weixin ? 'jsapi' : 'h5'
+      } else {
+        params.alipayType = 'h5'
+        params.aliPayH5Url = url
+      }
+      return postTableOrder(params)
     }
   }
 }

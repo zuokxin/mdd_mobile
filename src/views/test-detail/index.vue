@@ -1,28 +1,48 @@
 <template>
   <div class="detail">
     <img class="detail-banner" src="@/assets/img/detail-bannner.png"/>
-    <detail-header :tableName="table.tableName" :discountAmountInfo="discountAmountInfo" :price="String(table.price)"></detail-header>
+    <!-- 头部盒子 -->
+    <detail-header
+      :tableName="table.tableName"
+      :tableCode="tableCode"
+      :discountAmountInfo="discountAmountInfo"
+      :price="String(table.price)"
+      :time="String(time)"
+      :questionNumber="table.questionNumber"
+      :evalRecordCount="table.evalRecordCount"
+      :currentUserIsColl="table.currentUserIsColl"
+      @collect="collectHandle"
+    ></detail-header>
+    <!-- 详情描述 -->
     <div class="detail-wrap">
-      <detail-box title="适用人群">
+      <detail-box v-if="table.introduction" title="测评介绍">
+        <p>{{ table.introduction }}</p>
+      </detail-box>
+      <detail-box v-if="table.applicablePeople" title="适合谁测">
         <p>{{ table.applicablePeople }}</p>
       </detail-box>
-      <detail-box title="评估方向">
+      <detail-box v-if="table.evaluationDirection" title="你将获得">
         <p>{{ table.evaluationDirection }}</p>
       </detail-box>
-      <detail-box title="介绍">
-        <div v-html="table.detail"></div>
+      <detail-box v-if="table.reference" title="参考文献">
+        <p>{{ table.reference }}</p>
       </detail-box>
-      <detail-box title="温馨提示">
+      <detail-box v-if="table.tips && table.tips.length" title="测评须知">
         <p v-for="(tip, index) in table.tips" :key="tip">
           <span v-if="table.tips.length > 1">{{ index+1 }}.</span>
           <span>{{ tip }}</span>
         </p>
       </detail-box>
-      <detail-box title="预估耗时">
-        <p>*本测试预估耗时{{ time }}分钟</p>
-      </detail-box>
+      <likes-action :num="table.kudosNumber" :hasLikes="table.currentUserIsKudos" :tableCode="tableCode"></likes-action>
     </div>
-    <pay-action :payInfo="payInfo" :visible.sync="showPay" @finishPay="finishPay"></pay-action>
+    <!-- 支付弹窗 -->
+    <pay-action
+      :payInfo="payInfo"
+      :visible.sync="showPay"
+      @finishPay="finishPay"
+      @errMessage="errMessage"
+    ></pay-action>
+    <!-- 足部操作区 -->
     <van-goods-action :safe-area-inset-bottom="true">
       <van-goods-action-icon to="/test-more" text="更多测评"/>
       <van-goods-action-button
@@ -42,11 +62,14 @@
 </template>
 
 <script>
-import { Dialog, Toast } from 'vant'
 import DetailHeader from './detail-header.vue'
 import DetailBox from './detail-box.vue'
 import PayAction from './pay-action.vue'
-import { tableInfo, postUserCode, getOrderState } from '@/api/index'
+import LikesAction from './likes-action.vue'
+import { Dialog } from 'vant'
+import { tableInfo, postUserCode, getOrderState, wxSignatures } from '@/api/index'
+import { postTablecoll, getTableDiscount } from '@/api/modules/table'
+import wxShare from '@/utils/wxShare'
 import browser from '@/utils/browser'
 const params = new URLSearchParams(window.location.search)
 export default {
@@ -54,7 +77,8 @@ export default {
   components: {
     DetailHeader,
     DetailBox,
-    PayAction
+    PayAction,
+    LikesAction
   },
   data () {
     return {
@@ -67,11 +91,18 @@ export default {
         maxTimeMinute: 0,
         applicablePeople: '--',
         evaluationDirection: '--',
-        tips: []
+        tips: [],
+        reference: '',
+        questionNumber: 0,
+        evalRecordCount: 0,
+        kudosNumber: 0,
+        currentUserIsKudos: true,
+        currentUserIsColl: false,
+        tableLogo: ''
       },
-      discountAmount: 0,
+      discountAmount: 0, // 折扣价格
       showPay: false, // 付款弹窗
-      code: '',
+      code: '', // 微信code
       go: false, // 是否去测试
       sessionId: '', // 当前测试的sessionid
       continue: false, // 是否为继续测试
@@ -117,7 +148,24 @@ export default {
     this.tableCode = this.$route.query.tableCode
     tableInfo(this.tableCode).then(
       res => {
-        this.table = res.data
+        this.table = Object.assign(this.table, res.data)
+        // 获取优惠码
+        this.discountCode = this.$route.query.discountCode
+        if (this.discountCode) {
+          getTableDiscount(this.tableCode, this.discountCode).then(res => {
+            this.discountAmount = res.data.price
+          }).catch(err => {
+            // 优惠码失效
+            if (err.code === 2102 || err.code === 2103) {
+              this.discountAmount = this.table.price
+              // 更新路由
+              const { discountCode, ...query } = this.$route.query
+              console.log(query)
+              this.$router.replace({ query })
+            }
+          })
+        }
+        this.share()
       }
     )
     this.$nextTick(async () => {
@@ -128,26 +176,27 @@ export default {
           sessionStorage.openid = res.data.openid
         })
       }
-      // h5支付页面回调处理
+      // 支付页面回调
       const redirect = this.$route.query.redirect
       const orderid = this.$route.query.orderid
+      // h5支付
       if (redirect === 'h5pay' && orderid) {
-        const toast1 = Toast.loading({
-          duration: 0, // 持续展示 toast
-          forbidClick: true,
-          message: '支付处理中'
-        })
-        setTimeout(() => {
-          toast1.clear()
+        this.thisDialog('刚才的订单支付了吗？', '已支付', 'confirm').then(() => {
           this.finishPay(orderid)
-        }, 5000)
+        }).catch(() => {
+          this.payReplace()
+        })
+      } else if (redirect === 'alipay' && orderid) { // 支付宝支付
+        if (this.$route.query.type === 'return') {
+          this.finishPay(orderid)
+        } else {
+          // 取消支付的情况直接返回
+          this.$router.go(-1)
+        }
       }
     })
   },
   methods: {
-    consoleReture () {
-      console.log(this.test())
-    },
     onClickButton () {
       // 未登录
       if (!sessionStorage.phone) {
@@ -155,7 +204,7 @@ export default {
           path: '/login',
           query: {
             url: this.$route.path,
-            tableCode: this.$route.query.tableCode
+            ...this.$route.query
           }
         })
         return
@@ -178,10 +227,11 @@ export default {
         if (!state) {
           this.$router.go(-2)
         } else {
-          const path = `${this.$route.path}?tableCode=${this.$route.query.tableCode}`
-          this.$router.replace(path)
-          this.showPay = false
+          this.payReplace()
         }
+      } else if (redirect === 'alipay') {
+        // 支付后去除多余参数
+        this.payReplace()
       } else {
         // 其他支付，成功后关闭支付弹窗
         if (state) {
@@ -190,21 +240,33 @@ export default {
       }
     },
     // 弹窗封装
-    thisDialog (message, btnText = '确定') {
-      return Dialog.alert({
-        message,
-        theme: 'round-button',
-        className: 'detail-dialog',
-        confirmButtonText: btnText,
-        confirmButtonColor: '#34B7B9'
-      })
+    thisDialog (message, btnText = '确定', type = 'alert') {
+      if (type === 'alert') {
+        return Dialog.alert({
+          message,
+          theme: 'round-button',
+          className: 'detail-dialog',
+          confirmButtonText: btnText,
+          confirmButtonColor: '#34B7B9'
+        })
+      } else if (type === 'confirm') {
+        return Dialog.confirm({
+          message,
+          theme: 'round-button',
+          className: 'detail-dialog-confirm',
+          confirmButtonText: btnText,
+          confirmButtonColor: '#fff',
+          cancelButtonText: '未支付',
+          cancelButtonColor: '#34B7B9'
+        })
+      }
     },
     // 完成支付
     finishPay (orderId, num = 0) {
       getOrderState(orderId).then(
         res => {
           if (res.data.orderStatus === 'success') {
-            this.thisDialog('支付成功').then(() => {
+            this.thisDialog('您已完成支付').then(() => {
               this.go = true
               this.sessionId = res.data.sessionId
               this.refresh(1)
@@ -226,10 +288,94 @@ export default {
           }
         }
       )
+    },
+    // 支付回调的刷新
+    payReplace () {
+      const params = {
+        path: this.$route.path,
+        query: {
+          tableCode: this.$route.query.tableCode
+        }
+      }
+      if (this.$route.query.discountCode) params.query.discountCode = this.$route.query.discountCode
+      this.$router.replace(params)
+    },
+    // 下单错误处理
+    errMessage (err) {
+      if (err.code === 1701) { // 通知量表下线
+        this.thisDialog(`${this.table.tableName}被下线了`).then(() => {
+          this.$router.push('/test-more')
+        })
+      } else if (err.code === 2102) { // 通知优惠失效
+        this.thisDialog('优惠失效，请重新核对金额').then(() => {
+          const path = `${this.$route.path}?tableCode=${this.$route.query.tableCode}`
+          this.$router.replace(path)
+          // 处理页面刷新
+          this.$router.go(0)
+        })
+      } else if (err.code === 2104) { // 优惠错误
+        this.thisDialog('优惠信息错误，请刷新重试', '刷新').then(() => {
+          this.$router.go(0)
+        })
+      }
+      console.log(err)
+    },
+    // 收藏该量表
+    collectHandle (data) {
+      postTablecoll(data).then((res) => {
+        if (data.type === '1') {
+          this.$toast('收藏成功')
+        } else {
+          this.$toast('取消收藏')
+        }
+      }).catch(err => {
+        if (err.code === 1701) {
+          const msg = err.message.split(':')[1]
+          this.thisDialog(msg).then(() => {
+            this.$router.replace('/test-more')
+          })
+        }
+      })
+    },
+    // 微信分享详情页
+    share () {
+      const currentUrl = window.location.href
+      const dataForm = {
+        title: this.table.tableName,
+        desc: '我在复变云愈发现一份不错的量表，你也来测测看～',
+        link: currentUrl,
+        imgUrl: this.table.tableLogo
+      }
+      wxSignatures({ url: currentUrl }).then(res => {
+        if (res.code === 0) {
+          wxShare.getJSSDK(res.data, dataForm)
+        }
+      })
     }
   }
 }
 </script>
+<style lang="less">
+.detail-dialog-confirm {
+  .van-dialog__message {
+    font-size: 0.4266667rem;
+    font-weight: 700;
+    color: #000000;
+  }
+  .van-dialog__confirm {
+    color: #34b7b9 !important;
+    border-radius: 999px;
+    border:1px solid #34b7b9 !important;
+  }
+  .van-dialog__cancel {
+    border-radius: 999px;
+    margin-right: 20px;
+  }
+  .van-dialog__footer {
+    padding: 8px 50px 40px;
+  }
+}
+</style>
 <style lang="less" scoped>
 @w: 37.5;
 .detail-banner {

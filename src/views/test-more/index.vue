@@ -35,6 +35,7 @@
 <script>
 import { tableTypeList, getAllTable } from '@/api/modules/user'
 import MainTabbar from '@/components/MainTabbar'
+import wxShare from '@/utils/wxShare'
 export default {
   data () {
     return {
@@ -51,6 +52,7 @@ export default {
   mounted () {
     this.getTypeList()
     this.getAllTable()
+    wxShare.share()
   },
   methods: {
     async getTypeList () {
@@ -80,7 +82,6 @@ export default {
       const id = this.items[index].activeId
       this.tableSelect = this.tableAll.filter(v => v.selfTableType.id === id)
       const doc = document.querySelectorAll('.van-sidebar-item')
-      console.log(doc[index].clientHeight)
       doc.forEach(v => {
         v.style.borderRadius = 0
       })

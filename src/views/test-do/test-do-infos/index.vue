@@ -72,12 +72,12 @@
         <van-button round type="info" @click="sure">确定</van-button>
       </div>
     </div>
-
   </div>
 </template>
 
 <script>
 import { getUserCreate, userCreate } from '@/api/modules/user'
+import wxShare from '@/utils/wxShare'
 export default {
   name: 'my-info',
   data () {
@@ -118,6 +118,7 @@ export default {
     } else {
       this.$router.replace('/login')
     }
+    wxShare.hiddenShare()
   },
   methods: {
     async init () {
