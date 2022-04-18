@@ -23,58 +23,83 @@
         </div>
       </div>
       <div class="ceping">
-        <h3>我的测评</h3>
-        <div class="noLogin" v-if="!isLogin">
-          <img src="@/assets/img/my/login.png" alt="login">
-          <span>登录查看我的测评~</span>
-        </div>
-        <div class="noLogin" v-else-if="isLogin && noData">
-          <img src="@/assets/img/my/nodata.png" alt="login">
-          <span>暂无测评记录~</span>
-        </div>
-        <div class="tableList" ref="tableHeight" v-else-if="isLogin && !noData">
-          <div class="tableCard" v-for="item in tableList" :key="item.index">
-            <img :src="item.evalRecords[0].table.tableLogo" alt="tableLogo">
-            <div class="msg">
-              <div class="name">{{item.evalRecords[0].table.tableName}}</div>
-              <div class="time">
-                <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
-                <span>￥{{item.price}}</span>
+        <van-tabs v-model="active" @click="changeTab">
+          <van-tab title="我的测评">
+            <div class="noLogin" v-if="!isLogin">
+              <img src="@/assets/img/my/login.png" alt="login">
+              <span>登录查看我的测评~</span>
+            </div>
+            <div class="noLogin" v-else-if="isLogin && noData">
+              <img src="@/assets/img/my/nodata.png" alt="login">
+              <span>暂无测评记录~</span>
+            </div>
+            <div class="tableList" ref="tableHeight" v-else-if="isLogin && !noData">
+              <div class="tableCard" v-for="item in tableList" :key="item.index">
+                <img :src="item.evalRecords[0].table.tableLogo" alt="tableLogo">
+                <div class="msg">
+                  <div class="name">{{item.evalRecords[0].table.tableName}}</div>
+                  <div class="time">
+                    <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
+                    <span>￥{{item.price}}</span>
+                  </div>
+                </div>
+                <van-button v-if="item.status === 1" round type="info"
+                  @click="$router.push({ path: '/test-do-infos', query:{ sessionId: item.sessionId, tableCode: item.evalRecords[0].table.tableCode } })"
+                >开始测试</van-button>
+                <van-button v-else-if="item.status === 2" round plain type="info"
+                  @click="$router.push({ path: '/test-do-self', query:{ sessionId: item.sessionId, tableCode: item.evalRecords[0].table.tableCode} })"
+                >继续测试</van-button>
+                <van-button v-else-if="item.status === 9" round plain type="info"
+                @click="readReport(item.sessionId)"
+                >查看报告</van-button>
+              </div>
+              <div class="more" v-for="(item, index) in moreList" :key="item.index">
+                <div class="top">
+                  <span
+                  :style="{'max-height': item.textOpenFlag ? textHeight : ''}"
+                  :class="{hiddenText: item.textOpenFlag}"
+                  class="textMore"
+                  ref="textContainer"
+                  >{{moreListName[index].join('、')}}</span>
+                  <span
+                  v-if="item.textOpenFlag !== null"
+                  @click="item.textOpenFlag = !item.textOpenFlag"
+                  class="btnMore"
+                  >{{item.textOpenFlag ? '【展开】':'【收起】'}}</span>
+                </div>
+                <div class="bottom">
+                  <div class="time">
+                    <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
+                    <span>￥{{item.price}}</span>
+                  </div>
+                  <div class="app">仅支持在APP中测试</div>
+                </div>
               </div>
             </div>
-            <van-button v-if="item.status === 1" round type="info"
-              @click="$router.push({ path: '/test-do-infos', query:{ sessionId: item.sessionId, tableCode: item.evalRecords[0].table.tableCode } })"
-            >开始测试</van-button>
-            <van-button v-else-if="item.status === 2" round plain type="info"
-              @click="$router.push({ path: '/test-do-self', query:{ sessionId: item.sessionId, tableCode: item.evalRecords[0].table.tableCode} })"
-            >继续测试</van-button>
-            <van-button v-else-if="item.status === 9" round plain type="info"
-            @click="readReport(item.sessionId)"
-            >查看报告</van-button>
-          </div>
-          <div class="more" v-for="(item, index) in moreList" :key="item.index">
-            <div class="top">
-              <span
-              :style="{'max-height': item.textOpenFlag ? textHeight : ''}"
-              :class="{hiddenText: item.textOpenFlag}"
-              class="textMore"
-              ref="textContainer"
-              >{{moreListName[index].join('、')}}</span>
-              <span
-              v-if="item.textOpenFlag !== null"
-              @click="item.textOpenFlag = !item.textOpenFlag"
-              class="btnMore"
-              >{{item.textOpenFlag ? '【展开】':'【收起】'}}</span>
+          </van-tab>
+          <van-tab title="收藏">
+            <div class="noLogin" v-if="!isLogin">
+              <img src="@/assets/img/my/login.png" alt="login">
+              <span>登录查看我的收藏~</span>
             </div>
-            <div class="bottom">
-              <div class="time">
-                <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
-                <span>￥{{item.price}}</span>
+            <div class="noLogin" v-else-if="isLogin && noData">
+              <img src="@/assets/img/my/nodata.png" alt="login">
+              <span>暂无收藏~</span>
+            </div>
+            <div class="tableList" ref="tableHeight" v-else-if="isLogin && !noData">
+              <div class="tableCard cllect" v-for="item in collectList" :key="item.index"
+              @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
+                <img :src="item.tableLogo" alt="tableLogo">
+                <div class="msg">
+                  <div class="name">{{item.tableName}}</div>
+                  <div class="time">
+                    <span>￥{{item.price}}</span>
+                  </div>
+                </div>
               </div>
-              <div class="app">仅支持在APP中测试</div>
             </div>
-          </div>
-        </div>
+          </van-tab>
+        </van-tabs>
       </div>
     </div>
     <div style="height:50px"><MainTabbar></MainTabbar></div>
@@ -92,18 +117,21 @@
 </template>
 
 <script>
-import { getIndividual } from '@/api/modules/user'
+import { getIndividual, getCollect } from '@/api/modules/user'
+import wxShare from '@/utils/wxShare'
 import MainTabbar from '@/components/MainTabbar'
 import moment from 'moment'
 export default {
   data () {
     return {
       moment: moment,
+      active: 0,
       isLogin: false,
       noData: true,
       showKefu: false,
       phone: '',
       tableList: [],
+      collectList: [],
       moreList: [],
       moreListName: [],
       textOpenFlag: false, // 展开收起
@@ -120,6 +148,7 @@ export default {
     } else {
       this.isLogin = false
     }
+    wxShare.share()
   },
   methods: {
     async getTableList () {
@@ -165,6 +194,22 @@ export default {
         this.noData = true
       }
     },
+    async getCollection () {
+      const res = await getCollect()
+      const tables = res.data
+      if (tables) {
+        this.noData = false
+        this.collectList = tables
+        this.$nextTick(() => {
+          const contentHeight = document.querySelector('.content').clientHeight
+          const tableHeight = contentHeight - 172
+          const tableDom = this.$refs.tableHeight
+          tableDom.style.height = tableHeight + 'px'
+        })
+      } else {
+        this.noData = true
+      }
+    },
     showTextAll () {
       // 这是默认两行数据的高度，一行的高度可以自定义 可以*3 *4达到三行或者四行显示展示和收起的效果
       const twoHeight = 20 * 2
@@ -185,6 +230,17 @@ export default {
             Object.assign({}, this.moreList[i], { textOpenFlag: null })
           )
         }
+      }
+    },
+    changeTab (e) {
+      if (this.phone) {
+        if (e === 0) {
+          this.getTableList()
+        } else {
+          this.getCollection()
+        }
+      } else {
+        this.isLogin = false
       }
     },
     login () {
@@ -262,18 +318,12 @@ export default {
       }
     }
     .ceping{
-      h3{
-        font-size: .373333rem;
-        font-weight: 600;
-        color: #000000;
-        margin-top: .48rem;
-        margin-bottom: .266667rem;
-      }
       .noLogin{
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        height: 4.266667rem !important;
         img{
           width: 3.733333rem;
           height: 3.733333rem;
@@ -321,6 +371,12 @@ export default {
           padding: 0;
           line-height: .746667rem;
           text-align: center;
+        }
+      }
+      .cllect{
+        justify-content: flex-start;
+        .msg{
+          flex: 1;
         }
       }
     }
@@ -422,4 +478,29 @@ export default {
     }
   }
 }
+</style>
+
+<style lang="less">
+.ceping{
+   .van-tabs--line .van-tabs__wrap{
+      height: .8rem;
+      margin-top: .48rem;
+      margin-bottom: .266667rem;
+      .van-tabs__nav{
+        background: transparent;
+      }
+      .van-tab{
+        font-size: .373333rem;
+        font-weight: 600;
+        color: #000000;
+        margin-right: .8rem;
+        flex: inherit;
+        padding: 0;
+      }
+      .van-tabs__line{
+        background-color:#34B7B9;
+      }
+  }
+}
+
 </style>

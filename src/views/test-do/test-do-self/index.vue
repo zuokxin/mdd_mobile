@@ -32,6 +32,7 @@
 
 <script>
 import { getTableQues, postTableQues, postTableRes } from '@/api/modules/user'
+import wxShare from '@/utils/wxShare'
 export default {
   name: 'do-self',
   data () {
@@ -59,6 +60,7 @@ export default {
     } else {
       this.$router.replace('/login')
     }
+    wxShare.hiddenShare()
   },
   methods: {
     // 获取题目

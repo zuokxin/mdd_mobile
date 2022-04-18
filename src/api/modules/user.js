@@ -133,3 +133,10 @@ export const getIndividual = (params) => fetch({
   method: 'get',
   params
 })
+
+// 获取用户信息
+export const getCollect = (params) => fetch({
+  url: '/api/user/table/collection',
+  method: 'get',
+  params
+})

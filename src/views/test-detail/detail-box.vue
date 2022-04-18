@@ -34,8 +34,10 @@ export default {
     }
   }
   .content {
+    padding-bottom: 12rem / @w;
     font-size: 14rem / @w;
     color: #666666;
+    white-space: pre-wrap;
   }
   /deep/h3 {
     font-size: 14rem / @w;

@@ -10,6 +10,7 @@
 
 <script>
 import { getReportRes } from '@/api/modules/user'
+import wxShare from '@/utils/wxShare'
 export default {
   name: 'test-wait',
   data () {
@@ -29,6 +30,7 @@ export default {
     } else {
       this.$router.replace('/login')
     }
+    wxShare.hiddenShare()
   },
   methods: {
     async init () {

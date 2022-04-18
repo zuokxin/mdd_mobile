@@ -64,3 +64,10 @@ export const getUserAuth = () => fetch({
   url: '/api/user/auth',
   method: 'get'
 }, false)
+
+// 微信分享验签
+export const wxSignatures = params => fetch({
+  url: '/api/user/wx/jsSignature',
+  method: 'get',
+  params
+})
