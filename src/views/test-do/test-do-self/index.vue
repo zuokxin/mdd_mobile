@@ -285,7 +285,7 @@ export default {
     }
   }
   .bnts{
-    width: 100%;
+    width: calc(100% - 1rem);
     position: fixed;
     bottom: .5rem;
     display: flex;
