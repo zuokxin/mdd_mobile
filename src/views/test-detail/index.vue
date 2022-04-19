@@ -157,6 +157,9 @@ export default {
           }).catch(err => {
             // 优惠码失效
             if (err.code === 2102 || err.code === 2103) {
+              if (err.code === 2102) {
+                this.$toast('优惠失效')
+              }
               this.discountAmount = this.table.price
               // 更新路由
               const { discountCode, ...query } = this.$route.query
@@ -385,6 +388,9 @@ export default {
 }
 .detail {
   background: #F6F6F7;
+  .van-goods-action {
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.06);
+  }
   .van-goods-action-icon {
     padding-left: 20rem / @w;
     padding-right: 20rem / @w;
