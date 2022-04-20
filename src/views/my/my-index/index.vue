@@ -82,11 +82,11 @@
               <img src="@/assets/img/my/login.png" alt="login">
               <span>登录查看我的收藏~</span>
             </div>
-            <div class="noLogin" v-else-if="isLogin && noData">
+            <div class="noLogin" v-else-if="isLogin && noCollect">
               <img src="@/assets/img/my/nodata.png" alt="login">
               <span>暂无收藏~</span>
             </div>
-            <div class="tableList" ref="tableHeight" v-else-if="isLogin && !noData">
+            <div class="tableList" ref="tableHeight" v-else-if="isLogin && !noCollect">
               <div class="tableCard cllect" v-for="item in collectList" :key="item.index"
               @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
                 <img :src="item.tableLogo" alt="tableLogo">
@@ -128,6 +128,7 @@ export default {
       active: 0,
       isLogin: false,
       noData: true,
+      noCollect: true,
       showKefu: false,
       phone: '',
       tableList: [],
@@ -197,8 +198,8 @@ export default {
     async getCollection () {
       const res = await getCollect()
       const tables = res.data
-      if (tables) {
-        this.noData = false
+      if (tables && tables.length > 0) {
+        this.noCollect = false
         this.collectList = tables
         this.$nextTick(() => {
           const contentHeight = document.querySelector('.content').clientHeight
@@ -207,7 +208,7 @@ export default {
           tableDom.style.height = tableHeight + 'px'
         })
       } else {
-        this.noData = true
+        this.noCollect = true
       }
     },
     showTextAll () {

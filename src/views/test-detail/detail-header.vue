@@ -18,10 +18,10 @@
         <div class="normal-num">{{ curEvalRecordCount }}</div>
         <div class="normal normal-title">测试人数</div>
       </van-col>
-      <van-col class="content-box-right" :class="{collected: isCollect}" @click="collectHandle">
+      <van-col class="content-box-right" :class="{collected: currentUserIsColl}" @click="collectHandle">
         <!-- 收藏 -->
-        <img :src="isCollect ? collect.icon1 : collect.icon" alt="collect">
-        <div class="name">{{isCollect ? collect.name1 : collect.name}}</div>
+        <img :src="currentUserIsColl ? collect.icon1 : collect.icon" alt="collect">
+        <div class="name">{{currentUserIsColl ? collect.name1 : collect.name}}</div>
       </van-col>
     </van-row>
   </div>
@@ -52,14 +52,14 @@ export default {
       }
     }
   },
-  watch: {
-    currentUserIsColl (val) {
-      this.isCollect = val
-    }
-  },
+  // watch: {
+  //   currentUserIsColl (val) {
+  //     this.isCollect = val
+  //   }
+  // },
   data () {
     return {
-      isCollect: this.currentUserIsColl,
+      // isCollect: this.currentUserIsColl,
       collect: {
         name: '收藏',
         icon: require('@/assets/img/collect.png'),
@@ -70,10 +70,9 @@ export default {
   },
   methods: {
     collectHandle () {
-      this.isCollect = !this.isCollect
       const data = {
         tableCode: this.tableCode,
-        type: this.isCollect ? '1' : '2'
+        type: this.currentUserIsColl ? '2' : '1'
       }
       this.$emit('collect', data)
     }

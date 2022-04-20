@@ -331,6 +331,7 @@ export default {
         } else {
           this.$toast('取消收藏')
         }
+        this.table.currentUserIsColl = !this.table.currentUserIsColl
       }).catch(err => {
         if (err.code === 1701) {
           const msg = err.message.split(':')[1]
