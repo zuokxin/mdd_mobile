@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     msgFlag () {
-      const reg = /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/
+      const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
       if (this.username !== '' && reg.test(this.username)) {
         return false
       } else {
