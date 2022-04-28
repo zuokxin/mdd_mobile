@@ -8,27 +8,12 @@ function getJSSDK (data, dataForm) {
     timestamp: data.timestamp, // 必填，生成签名的时间戳
     nonceStr: data.noncestr, // 必填，生成签名的随机串
     signature: data.sign, // 必填，签名
-    jsApiList: ['onMenuShareAppMessage', 'updateAppMessageShareData'], // 必填，需要使用的JS接口列表
+    jsApiList: ['updateAppMessageShareData'], // 必填，需要使用的JS接口列表
     success: (res) => {
       // alert(res, 'success')
     }
   })
   wx.ready(function () {
-    wx.onMenuShareAppMessage({
-      title: dataForm.title,
-      desc: dataForm.desc,
-      link: dataForm.link,
-      imgUrl: dataForm.imgUrl,
-      success: function success (res) {
-        // alert(res, '成功')
-      },
-      cancel: function cancel (res) {
-        // alert('已取消');
-      },
-      fail: function fail (res) {
-        // alert(res, '失败')
-      }
-    })
     wx.updateAppMessageShareData({
       title: dataForm.title,
       desc: dataForm.desc,
