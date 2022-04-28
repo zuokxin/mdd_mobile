@@ -334,7 +334,7 @@ export default {
         this.table.currentUserIsColl = !this.table.currentUserIsColl
       }).catch(err => {
         if (err.code === 1701) {
-          const msg = err.message.split(':')[1]
+          const msg = err.message
           this.thisDialog(msg).then(() => {
             this.$router.replace('/test-more')
           })
