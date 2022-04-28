@@ -68,6 +68,11 @@ const routes = [
     name: '我的-个人信息',
     meta: { needLogin: true, title: '复变云愈' },
     component: resolve => require(['../views/my/my-infos/index.vue'], resolve)
+  },
+  {
+    path: '/tests',
+    name: '环境检测',
+    component: resolve => require(['../views/tests/index.vue'], resolve)
   }
 ]
 
@@ -77,7 +82,7 @@ const router = new VueRouter({
 
 let init = false
 router.beforeEach(async (to, from, next) => {
-  document.title = to.meta.title
+  document.title = to.meta.title || '复变云愈'
   if (!init) {
     try {
       await store.dispatch('getToken')
