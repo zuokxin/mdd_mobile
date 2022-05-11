@@ -3,7 +3,7 @@
     <div class="img"><img src="@/assets/login.png" alt="yunyu"></div>
     <h5>登录/注册</h5>
     <van-field v-model="username" type="number" placeholder="请输入手机号码（新手机号自动注册）" @blur="checkUsername" />
-    <van-field class="line" v-model="smsCode" type="number"  placeholder="请输入验证码">
+    <van-field class="line" v-model="smsCode" type="number" maxlength="6"  placeholder="请输入验证码">
       <template #button>
         <van-button class="timeBtn" size="small"  @click="getMsgCode" round type="primary" :disabled="msgFlag || timeFlag">{{getmsg}}</van-button>
       </template>
