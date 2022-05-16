@@ -30,3 +30,9 @@ export const login = (data) => fetch({
   method: 'post',
   data
 })
+
+// 新用户奖励
+export const newUserReward = () => fetch({
+  url: '/api/user/newUserReward',
+  method: 'post'
+})
