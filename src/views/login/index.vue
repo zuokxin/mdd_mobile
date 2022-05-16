@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { getCode, postUserLogin } from '@/api/modules/login'
+import { getCode, postUserLogin, newUserReward } from '@/api/modules/login'
 export default {
   name: 'login',
   data () {
@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     msgFlag () {
-      const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
+      const reg = /[0-9]{11}$/
       if (this.username !== '' && reg.test(this.username)) {
         return false
       } else {
@@ -52,7 +52,8 @@ export default {
   methods: {
     // 检查名字
     checkUsername () {
-      const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
+      // const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
+      const reg = /[0-9]{11}$/
       if (this.username === '') {
         this.$toast('请输入手机号')
       } else if (!reg.test(this.username)) {
@@ -86,13 +87,19 @@ export default {
         smsCode: this.smsCode
       }
       postUserLogin(data).then(res => {
-        if (this.$route.query.url) {
-          this.$router.push({ path: this.$route.query.url, query: this.$route.query })
-        } else {
-          this.$router.push({ path: '/test-more' })
+        if (res.code === 0) {
+          if (res.data.isNewUser && !res.data.isRxNUReward) {
+            newUserReward().then(resp => {
+            })
+          }
+          if (this.$route.query.url) {
+            this.$router.push({ path: this.$route.query.url, query: this.$route.query })
+          } else {
+            this.$router.push({ path: '/test-more' })
+          }
+          sessionStorage.phone = res.data.phone
+          res.data.openid && (sessionStorage.openid = res.data.openid) // 微信内授权状态
         }
-        sessionStorage.phone = res.data.phone
-        res.data.openid && (sessionStorage.openid = res.data.openid) // 微信内授权状态
       }).catch(err => {
         this.$toast(err.message)
       })

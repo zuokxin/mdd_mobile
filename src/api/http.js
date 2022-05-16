@@ -46,11 +46,15 @@ http.interceptors.response.use(
   },
   err => {
     console.log('err' + err) // for debug
-    const { status, data } = err.response
-    if (status >= 500) {
+    const { status, data, config } = err.response
+    if (!err.response) { // 无网提示
+      thisMessage('哎哟，网络出小差了~')
+    } else if (status === 400 && config.pushErrMessage) { // 部分400清空下后端返回业务提示
       thisMessage(data.message)
+    } else if (status >= 500 && config.pushErrMessage) { // 500以上提示
+      thisMessage('服务器开小差了，请稍后再试~')
     }
-    return Promise.reject(data)
+    return Promise.reject(err)
   }
 )
 
