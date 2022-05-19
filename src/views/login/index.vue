@@ -65,7 +65,7 @@ export default {
       const { code } = await getCode(this.username)
       if (code === 0) {
         this.timeFlag = true
-        this.countDown(60)
+        this.countDown(5)
       }
     },
     // 计时器
@@ -101,7 +101,8 @@ export default {
           res.data.openid && (sessionStorage.openid = res.data.openid) // 微信内授权状态
         }
       }).catch(err => {
-        this.$toast(err.message)
+        console.log(err)
+        // this.$toast(err.message)
       })
     },
     // 链接
