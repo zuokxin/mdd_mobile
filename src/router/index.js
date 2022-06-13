@@ -40,6 +40,12 @@ const routes = [
     component: resolve => require(['../views/test-do/test-do-self/index.vue'], resolve)
   },
   {
+    path: '/test-do-other',
+    name: '测试-他评量表',
+    meta: { title: '测试' },
+    component: resolve => require(['../views/test-do/test-do-other/index.vue'], resolve)
+  },
+  {
     path: '/test-report',
     name: '测试-量表报告',
     meta: { title: '复变云愈测试报告' },
@@ -69,10 +75,22 @@ const routes = [
     meta: { needLogin: true, title: '复变云愈' },
     component: resolve => require(['../views/my/my-infos/index.vue'], resolve)
   },
+  // {
+  //   path: '/tests',
+  //   name: '环境检测',
+  //   component: resolve => require(['../views/tests/index.vue'], resolve)
+  // },
   {
-    path: '/tests',
-    name: '环境检测',
-    component: resolve => require(['../views/tests/index.vue'], resolve)
+    path: '/testing',
+    name: '授权测试',
+    meta: { title: '授权测试' },
+    component: resolve => require(['../views/testing/index.vue'], resolve)
+  },
+  {
+    path: '/environment',
+    name: '环境测试',
+    meta: { title: '环境测试' },
+    component: resolve => require(['../views/test-environmental/index.vue'], resolve)
   }
 ]
 

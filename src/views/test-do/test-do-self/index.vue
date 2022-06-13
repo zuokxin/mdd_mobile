@@ -175,7 +175,7 @@ export default {
             }
             postTableRes(data).then(resp => {
               if (resp.code === 0) {
-                this.$router.replace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
+                this.$router.replace({ path: '/test-do-wait?s=5', query: { sessionId: this.sessionId } })
               } else {
                 this.$toast(resp.message)
               }
@@ -191,7 +191,7 @@ export default {
         }
         const res = await postTableRes(data)
         if (res.code === 0) {
-          this.$router.replace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
+          this.$router.replace({ path: '/test-do-wait?s=5', query: { sessionId: this.sessionId } })
         } else {
           this.$toast(res.message)
         }

@@ -44,13 +44,13 @@
                   </div>
                 </div>
                 <van-button v-if="item.status === 1" round type="info"
-                  @click="$router.push({ path: '/test-do-infos', query:{ sessionId: item.sessionId, tableCode: item.evalRecords[0].table.tableCode } })"
+                  @click="$router.push({ path: 'test-do-infos', query:{ sessionId: item.sessionId, tableCode: item.evalRecords[0].table.tableCode, tableType: item.evalRecords[0].table.tableType} })"
                 >开始测试</van-button>
                 <van-button v-else-if="item.status === 2" round plain type="info"
-                  @click="$router.push({ path: '/test-do-self', query:{ sessionId: item.sessionId, tableCode: item.evalRecords[0].table.tableCode} })"
+                  @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)"
                 >继续测试</van-button>
                 <van-button v-else-if="item.status === 9" round plain type="info"
-                @click="readReport(item.sessionId)"
+                @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)"
                 >查看报告</van-button>
               </div>
               <div class="more" v-for="(item, index) in moreList" :key="item.index">
@@ -158,11 +158,23 @@ export default {
       const records = res.data.records
       if (records) {
         this.noData = false
-        const oneList = records.filter(v => v.evalRecords.length === 1 && (v.evalRecords[0].tableCode !== 'psqi' && v.evalRecords[0].table.tableType !== 2))
+        const oneList = records.filter(v => v.evalRecords.length === 1 && v.evalRecords[0].tableCode !== 'psqi').filter(v => {
+          if (v.evalRecords[0].table.tableType === 2) {
+            return v.evalRecords[0].tableCode === 'hama' || v.evalRecords[0].tableCode === 'hamd'
+          } else {
+            return v
+          }
+        })
         const status1 = oneList.filter(v => v.status === 1 || v.status === 2)
         const status9 = oneList.filter(v => v.status === 9)
         this.tableList = [...status1, ...status9]
-        this.moreList = records.filter(v => v.evalRecords.length > 1 || v.evalRecords[0].tableCode === 'psqi' || v.evalRecords[0].table.tableType === 2)
+        this.moreList = records.filter(v => v.evalRecords.length > 1 || v.evalRecords[0].tableCode === 'psqi' || v.evalRecords[0].table.tableType === 2).filter(v => {
+          if (v.evalRecords[0].table.tableType === 2) {
+            return v.evalRecords[0].tableCode !== 'hama' && v.evalRecords[0].tableCode !== 'hamd'
+          } else {
+            return v
+          }
+        })
         this.moreList.forEach(v => {
           if (v.evalRecords.length > 1) {
             const arr = []
@@ -257,11 +269,18 @@ export default {
     phoneClick (phoneNum) {
       window.location.href = 'tel:' + phoneNum
     },
+    goOnTable (type, sessionId, tableCode) {
+      if (type === 1) {
+        this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
+      } else {
+        this.$router.push({ path: '/environment', query: { sessionId, tableCode } })
+      }
+    },
     skip () {
       this.$router.push('/my-contact')
     },
-    readReport (sessionId) {
-      window.open(`/user/#/result?sessionId=${sessionId}`)
+    readReport (sessionId, tableType) {
+      this.$router.push({ path: '/test-report', query: { sessionId, tableType } })
     }
   }
 }

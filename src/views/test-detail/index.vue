@@ -11,30 +11,12 @@
       :questionNumber="table.questionNumber"
       :evalRecordCount="table.evalRecordCount"
       :currentUserIsColl="table.currentUserIsColl"
+      :kudosNumber="table.kudosNumber"
+      :currentUserIsKudos="table.currentUserIsKudos"
       @collect="collectHandle"
     ></detail-header>
     <!-- 详情描述 -->
-    <div class="detail-wrap">
-      <detail-box v-if="table.introduction" title="测评介绍">
-        <p>{{ table.introduction }}</p>
-      </detail-box>
-      <detail-box v-if="table.applicablePeople" title="适合谁测">
-        <p>{{ table.applicablePeople }}</p>
-      </detail-box>
-      <detail-box v-if="table.evaluationDirection" title="你将获得">
-        <p>{{ table.evaluationDirection }}</p>
-      </detail-box>
-      <detail-box v-if="table.reference" title="参考文献">
-        <p>{{ table.reference }}</p>
-      </detail-box>
-      <detail-box v-if="table.tips && table.tips.length" title="测评须知">
-        <p v-for="(tip, index) in table.tips" :key="tip">
-          <span v-if="table.tips.length > 1">{{ index+1 }}.</span>
-          <span>{{ tip }}</span>
-        </p>
-      </detail-box>
-      <likes-action :num="table.kudosNumber" :hasLikes="table.currentUserIsKudos" :tableCode="tableCode"></likes-action>
-    </div>
+    <detail-content :table="table"></detail-content>
     <!-- 支付弹窗 -->
     <pay-action
       :payInfo="payInfo"
@@ -55,17 +37,18 @@
         v-else
         type="primary"
         :text="btnGoInfo"
-        @click="$router.push(`/test-do-infos?sessionId=${sessionId}&tableCode=${tableCode}`)"
+        @click="$router.push(`/test-do-infos?sessionId=${sessionId}&tableCode=${tableCode}&tableType=${table.tableType}`)"
       />
     </van-goods-action>
+    <CameraDialog :show.sync="otherTestDialog" @needOpenCamera="needOpenCamera"></CameraDialog>
   </div>
 </template>
 
 <script>
 import DetailHeader from './detail-header.vue'
-import DetailBox from './detail-box.vue'
+import DetailContent from './detail-content.vue'
 import PayAction from './pay-action.vue'
-import LikesAction from './likes-action.vue'
+import CameraDialog from './camera-dialog.vue'
 import { Dialog } from 'vant'
 import { tableInfo, postUserCode, getOrderState, wxSignatures } from '@/api/index'
 import { postTablecoll, getTableDiscount } from '@/api/modules/table'
@@ -76,9 +59,9 @@ export default {
   name: 'test-detail',
   components: {
     DetailHeader,
-    DetailBox,
+    DetailContent,
     PayAction,
-    LikesAction
+    CameraDialog
   },
   data () {
     return {
@@ -98,7 +81,8 @@ export default {
         kudosNumber: 0,
         currentUserIsKudos: true,
         currentUserIsColl: false,
-        tableLogo: ''
+        tableLogo: '',
+        tableType: 1
       },
       discountAmount: 0, // 折扣价格
       showPay: false, // 付款弹窗
@@ -106,7 +90,9 @@ export default {
       go: false, // 是否去测试
       sessionId: '', // 当前测试的sessionid
       continue: false, // 是否为继续测试
-      tableCode: ''
+      tableCode: '',
+      otherTestDialog: false,
+      aiEvalCamEnabled: false
     }
   },
   computed: {
@@ -117,7 +103,8 @@ export default {
         price,
         tableName,
         discountAmount: this.discountAmountInfo,
-        tables: [this.tableCode]
+        tables: [this.tableCode],
+        aiEvalCamEnabled: this.aiEvalCamEnabled
       }
     },
     // 耗时须知文本
@@ -218,8 +205,24 @@ export default {
         const redirect = encodeURIComponent(window.location.href)
         window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`
       } else {
-        this.showPay = true
+        if (this.table.tableType === 1) {
+          this.showPay = true
+        } else {
+          // 他评的情况
+          this.otherTestOpen()
+        }
       }
+    },
+    // 他评窗口
+    otherTestOpen () {
+      this.otherTestDialog = true
+    },
+    // 选择是否开启摄像头后进行购买
+    needOpenCamera (isOpen) {
+      this.aiEvalCamEnabled = isOpen
+      this.otherTestDialog = false
+      this.showPay = true
+      console.log(this.payInfo)
     },
     // 支付回调刷新
     refresh (state = 0) {
@@ -404,12 +407,5 @@ export default {
     font-weight: 700;
     color: #FFFFFF;
   }
-}
-.detail-wrap {
-  padding-top: 25rem / @w;
-  padding-left: 20rem / @w;
-  padding-right: 20rem / @w;
-  padding-bottom: 100rem / @w;
-  background: #fff;
 }
 </style>

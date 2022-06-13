@@ -42,8 +42,8 @@ export default {
       items: [],
       tableAll: [],
       tableSelect: [],
-      beforeHeight: '18px',
-      afterHeight: '18px'
+      beforeHeight: '0.24rem',
+      afterHeight: '0'
     }
   },
   components: {
@@ -58,7 +58,8 @@ export default {
     async getTypeList () {
       const res = await tableTypeList({ page: -1, pageSize: 10 })
       if (res.code === 0) {
-        const typeAll = res.data.tables.filter(v => v.name !== 'AI心理测评')
+        // const typeAll = res.data.tables.filter(v => v.name !== 'AI心理测评')
+        const typeAll = res.data.tables.filter(v => v.count !== 0)
         typeAll.forEach(v => {
           this.items.push(
             {
@@ -72,8 +73,14 @@ export default {
     async getAllTable () {
       const res = await getAllTable()
       if (res.code === 0) {
-        const all = res.data.filter(v => v.tableType !== 2)
-        this.tableAll = all.filter(v => v.tableCode !== 'psqi')
+        this.tableAll = res.data.filter(v => v.tableCode !== 'psqi').filter(v => {
+          if (v.tableType === 2) {
+            return v.tableCode === 'hama' || v.tableCode === 'hamd'
+          } else {
+            return v
+          }
+        })
+
         const id = this.items[0].activeId
         this.tableSelect = this.tableAll.filter(v => v.selfTableType.id === id)
       }
@@ -89,13 +96,13 @@ export default {
         doc[index - 1].style.borderBottomRightRadius = '0.24rem'
         this.beforeHeight = '0'
       } else {
-        this.beforeHeight = '0.426667rem'
+        this.beforeHeight = '0.24rem'
       }
       if (index !== doc.length - 1) {
         doc[index + 1].style.borderTopRightRadius = '0.24rem'
         this.afterHeight = '0'
       } else {
-        this.afterHeight = '0.426667rem'
+        this.afterHeight = '0.24rem'
       }
     }
   }
@@ -114,24 +121,32 @@ export default {
     .van-tree-select__nav{
       flex:none;
       width: 1.78rem;
+      // background: #fff;
       // white-space: nowrap;
       .van-sidebar-item{
         background-color: #fff;
-        padding: .426667rem .213333rem;
+        padding: 0 .213333rem;
         text-align: center;
         font-size: .32rem;
         color: #999999;
         font-weight: 500;
+        height: 40px;
+        justify-content: center;
+        display: flex;
+        align-items: center;
       }
-      .van-sidebar-item__text{
-          height: .373333rem;
-          line-height: .373333rem;
+      // .van-sidebar-item:not(:last-child){
+      //   // margin-bottom: 0.2rem;
+      // }
+      /deep/.van-sidebar-item__text{
+        line-height: initial;
       }
       .van-sidebar-item--select{
         background-color: #F4F4F4;
-        padding: .213333rem;
         color: #34B7B9;
         font-weight: 600;
+        height: 40px;
+        // margin: 5px 0;
       }
       .van-sidebar-item--select::before{
         width: 4px;
@@ -188,20 +203,27 @@ export default {
         }
       }
     }
+    // .van-sidebar-item--select::selection{
+    //   content: '';
+    //   display:inline-block;
+    //   width: 100%;
+    //   height: 0.1rem;
+    //   background-color: #fff;
+    // }
     .van-tree-select__nav::before{
       content: "";
       display:block;
       width: 100%;
-      height: var(--beforeHeight);
-      border-radius: 0 0 .24rem 0;
+      height: 0.426667rem;
+      border-radius: 0 0 var(--beforeHeight) 0;
       background-color: #fff;
     }
     .van-tree-select__nav::after{
       content: "";
       display:block;
       width: 100%;
-      height: var(--afterHeight);
-      border-radius: 0 .24rem 0 0;
+      height: 0.426667rem;
+      border-radius: 0 var(--afterHeight) 0 0;
       background-color: #fff;
     }
   }

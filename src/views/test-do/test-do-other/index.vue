@@ -1,0 +1,678 @@
+<template>
+  <div class="test-do-other">
+    <div class="in-set" v-if="timeOver">
+    <!-- 进度条 -->
+      <div class="progress-bar">
+        <div class="title">测试进度：{{questionData.proDisplay}}</div>
+        <!-- <van-progress :percentage="questionData.progress + 20" stroke-width="5px" color="#34B7B9"  :show-pivot="false" /> -->
+        <van-progress :percentage="toPoint(questionData.proDisplay)" stroke-width="5px" color="#34B7B9"  :show-pivot="false" />
+      </div>
+      <!-- 题目这块 -->
+      <div class="question-box">
+        <div class="question-text">{{questionData.id + 1}}. {{questionData.title}}</div>
+        <!-- 底部提交按钮 -->
+        <div class="under-btn">
+          <div class="line"></div>
+          <div class="answer-title" v-if="!textFlag">请说话，我在听...</div>
+          <div class="answer-title" v-if="textFlag">识别中...</div>
+          <div class="answer-tip" v-if="!waitwait">点击下方 停止回答</div>
+          <div class="answer-tip" v-if="waitwait"> </div>
+          <van-button type="primary" @click="testpost" v-if="false">stop</van-button>
+          <div class="btns">
+            <div class="left same">
+              <span v-for="(it, index) in voice" :key="it" :class="{active: left_Voice[index]}"></span>
+            </div>
+            <div class="center same">
+              <img @click="postAnswer" v-if="!textFlag" src="@/assets/img/stop.png" alt="">
+              <img @click="postAnswer" v-if="textFlag" src="@/assets/img/wait.png" alt="">
+            </div>
+            <div class="right same">
+              <span v-for="(it, index) in voice" :key="it" :class="{active: right_Voice[index]}"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 人脸 -->
+    <div class="face-box" v-show="timeOver && aiEvalCamEnabled && readOver" ref="point" :style="`width:${divWidth}px;height:${divHeight}px;left:${moveLeft}px;top:${moveTop}px;`"
+      @touchstart.prevent="(e)=>{dragStart(e)}" @touchend.prevent="(e)=>{dragEnd(e)}"  @touchmove.prevent="(e) => dragMove(e)">
+      <video ref="videoBox"  @loadedmetadata="start"  src="" style="width: 100%; height:100%; object-fit: cover" muted></video>
+      <!-- <video ref="videoBox"  style="width: 100%; height:100%; object-fit: cover" muted></video> -->
+    </div>
+    <!-- 一开始播报弹窗 -->
+    <popout :countTime="countTime" :popoutShow="popoutShow" @close="close"></popout>
+    <!-- 每一题的语音播报弹窗 -->
+    <voice :voicePopout="voicePopout" @voiceClose="voiceClose" ref="voice">
+    <template slot="text">
+      <div class="text">{{questionData.id + 1}}. {{questionData.title}}</div>
+    </template>
+    </voice>
+    <!-- 错误提示的弹窗 -->
+    <errpopout class="errpopout" :errPopout="errPopout">
+      <template slot="text">
+        <div class="text">无法识别您的回答，请重新作答</div>
+      </template>
+      <template slot="btn">
+        <van-button class="sure-btn" type="primary" @click="sureToAnswer">确定</van-button>
+      </template>
+    </errpopout>
+    <!-- 无人脸 -->
+     <errpopout class="errpopout" :errPopout="noFace">
+      <template slot="text">
+        <div class="text">未识别到全部人脸，请重做本题</div>
+      </template>
+      <template slot="btn">
+        <van-button class="sure-btn" type="primary" @click="getFace">确定</van-button>
+      </template>
+    </errpopout>
+  </div>
+</template>
+
+<script>
+import Recorder from '@/utils/media/recorder'
+import * as faceapi from 'face-api.js'
+// import Recorder from 'js-audio-recorder'
+import { uploader } from '@/utils/uploader'
+import { getTableQues, batchInfo, posTableQues, postTableRes } from '@/api/modules/user'
+import popout from './popout'
+import errpopout from './errpopout'
+import voice from './voice'
+export default {
+  name: 'do-other',
+  components: {
+    popout,
+    errpopout,
+    voice
+  },
+  data () {
+    return {
+      moveLeft: 0, // 左边界&drop
+      moveTop: 0, // 上边界&drop
+      divWidth: 92,
+      divHeight: 92,
+      voice: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // dom元素
+      left_Voice: [],
+      right_Voice: [],
+      sessionId: '', // sessionId
+      tableCode: '', // tableCode
+      timeOver: false,
+      countTime: 3, // 3秒倒计时
+      popoutShow: false,
+      readOver: false,
+      questionData: {}, // 当前题目的信息
+      stream: null, // 流？
+      recorder: null, // 录音&下面2个
+      audioFiles: [],
+      audioFile: null,
+      mediaRecorder: null, // 视频&& 下面5个
+      videoFiles: [],
+      videoFile: null,
+      videoSrc: null,
+      videoChunk: null,
+      canUpload: false,
+      aiEvalCamEnabled: false, // 是否需要开始摄像头的
+      voicePopout: false, // 每个题目播报弹窗
+      errPopout: false, // 回答有问题的弹窗
+      faceFlag: false,
+      noFace: false,
+      stopFlag: true, // next-question
+      error: false, // 设备error
+      waitwait: false,
+      textFlag: false
+    }
+  },
+  mounted () {
+    // 不能同时弹出多个弹出 弹出弹窗都是重新做题 重新记录== 状态恢复== 除了设备上的错误
+    // 弹窗S errPopout noFace（动作waitwait）
+    this.sessionId = this.$route.query.sessionId
+    this.tableCode = this.$route.query.tableCode
+    this.getBatchInfo()
+  },
+  methods: {
+    // 是否需要打开摄像头&&需要做哪些量表的信息
+    async getBatchInfo () {
+      const res = await batchInfo({ sessionId: this.sessionId })
+      // console.log(res)
+      if (res.code === 0) {
+        this.aiEvalCamEnabled = res.data.aiEvalCamEnabled
+        this.initUserMedia()
+      }
+    },
+    // 获取题目
+    async init () {
+      const data = {
+        sessionId: this.sessionId,
+        tableCode: this.tableCode
+      }
+      const res = await getTableQues(data)
+      // console.log(res)
+      if (res.code === 0) {
+        if (res.data.isEnd) {
+          // 获取不到题目了就去等待页
+          postTableRes({
+            sessionId: this.sessionId,
+            tableCode: this.tableCode
+          }).then(res => {
+            if (res.code === 0) {
+              this.$router.replace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
+            }
+          })
+        } else {
+          this.stopFlag = true // 获取过题目可以点按钮
+          this.timeOver = true
+          this.textFlag = false
+          this.canUpload = false
+          this.audioFiles = []
+          this.videoFiles = []
+          this.questionData = res.data
+          this.voicePopout = true
+          this.$refs.voice.playAudio(this.questionData.qAudioUrl)
+        }
+      }
+    },
+    // 初始化设备
+    initDevice (stream) {
+      this.recorder = new Recorder({ stream })
+      // 按钮边上的音量++
+      this.recorder.process.onaudioprocess = (e) => {
+        // console.log(e)
+        const buffer = e.inputBuffer.getChannelData(0)
+        this.recorder.audioBuffers.push(new Float32Array(buffer))
+        let maxVal = 0
+        buffer.forEach(e => {
+          if (maxVal < e) {
+            maxVal = e
+          }
+        })
+        if (this.waitwait) {
+          this.left_Voice = []
+          this.right_Voice = []
+        } else {
+          this.left_Voice = this.voiceLevel(maxVal * 100).reverse()
+          this.right_Voice = this.voiceLevel(maxVal * 100)
+        }
+        // console.log('录音中。。。', buffer)
+      }
+      if (this.aiEvalCamEnabled) {
+        this.mediaRecorder = new MediaRecorder(stream)
+        // this.$refs.videoBox.srcObject = this.stream
+      }
+    },
+    initUserMedia () {
+      const mediaObj = { audio: true }
+      // 录音是必须的 看情况打开摄像头
+      if (this.aiEvalCamEnabled) {
+        mediaObj.video = { facingMode: 'user' }
+      }
+      navigator.mediaDevices.getUserMedia(mediaObj)
+        .then(stream => {
+          window.yunyuStream = stream
+          // 初始化---
+          this.stream = stream
+          this.popoutShow = true
+          this.initDevice(stream)
+          // 没问题就开始播报语音
+          const countTime = setInterval(() => {
+            this.countTime = this.countTime - 1
+            if (this.countTime === 0) {
+              clearInterval(countTime)
+            }
+          }, 1000)
+        })
+        .catch(err => {
+          let errType = '摄像头或麦克风调用错误'
+          switch (err.name) {
+            case 'NotAllowedError':
+            case 'PermissionDeniedError':
+              errType = '用户已禁止网页调用摄像头或麦克风设备'
+              break
+            case 'NotFoundError':
+            case 'DevicesNotFoundError':
+              errType = '摄像头或麦克风设备未找到'
+              break
+            case 'NotSupportedError':
+              errType = '不支持摄像头或麦克风功能'
+              break
+          }
+          this.error = true
+          this.$toast(errType)
+        })
+    },
+    // 倒计时&&固定语音播报结束
+    close () {
+      this.popoutShow = false
+      // 纠结 弹窗之间要不要有间隔时间
+      setTimeout(() => { this.init() }, 300)
+    },
+    // 题目语音播报结束
+    voiceClose () {
+      this.readOver = true
+      this.voicePopout = false
+      this.faceFlag = true
+      this.waitwait = false
+      this.startRecorder()
+    },
+    // 开始记录语音||开启摄像头---------------
+    startRecorder () {
+      // audio
+      this.recorder.start()
+      // video
+      if (this.aiEvalCamEnabled) {
+        this.$refs.videoBox.srcObject = this.stream
+        console.log('录像初始化。。。')
+        this.mediaRecorder.start()
+        this.$refs.videoBox.play()
+        /******************************
+         *          监听录像
+         *****************************/
+        this.mediaRecorder.onstart = e => {
+          console.log(e, '开始录像。。。')
+        }
+        this.mediaRecorder.onstop = e => {
+          console.log(e, '停止录像。。。', this.videoChunk)
+          if (this.canUpload && !this.noFace) {
+            // 视频文件处理
+            this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
+            this.videoFiles.push(this.videoFile)
+            // 音频文件处理
+            this.audioCreate()
+            // 上传文件
+            this.postQuesRes()
+          }
+        }
+        this.mediaRecorder.ondataavailable = e => {
+          console.log('视频生成。。。')
+          this.videoChunk = e.data
+        }
+      }
+    },
+    // 音量等级1-10
+    voiceLevel (n) {
+      // 10 一级
+      const list = [
+        { min: 0, max: 10 }, { min: 10, max: 20 }, { min: 20, max: 30 }, { min: 30, max: 40 }, { min: 40, max: 50 }, { min: 50, max: 60 }, { min: 60, max: 70 }, { min: 70, max: 80 }, { min: 80, max: 90 }, { min: 90, max: 100 }
+      ]
+      const arr = []
+      list.forEach(e => {
+        if (e.min <= Math.round(n)) {
+          arr.push(true)
+        } else {
+          arr.push(false)
+        }
+      })
+      return arr
+    },
+    // 音频/视频先传qiniu云then提交给后端
+    postAnswer () {
+      if (this.error) {
+        this.$toast.fail('请检查设备后再完成题目')
+        return
+      }
+      this.waitwait = true // 提交有个过程
+      this.textFlag = true
+      if (this.stopFlag) {
+        // 这个按钮不能疯狂点击
+        this.stopFlag = false
+        // 看交音频还是交音屏&&视频
+        if (this.aiEvalCamEnabled) {
+          this.$refs.videoBox.pause()
+          this.canUpload = true
+          this.mediaRecorder.stop()
+          console.log('提交audio,video')
+        } else {
+          this.recorder.pause(() => {
+            this.audioCreate()
+            this.postQueResAudio()
+          })
+        }
+      }
+    },
+    // 音频文件处理
+    audioCreate () {
+      // this.audioFile = this.recorder.createFile(`抑郁症辅助诊断_${this.queObj.id}_${this.sessionId}`)
+      this.audioFile = this.recorder.createFile(`${this.tableCode}_${this.questionData.id}_${this.sessionId}`)
+      this.audioFiles.push(this.audioFile)
+    },
+    videoCreate () {
+      this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
+      this.videoFiles.push(this.videoFile)
+    },
+    // 创建文件
+    fileCreate (blobArr, suffix, type) {
+      // const fileName = `抑郁症辅助诊断_${this.queObj.id}_${this.sessionId}`
+      const fileName = `${this.tableCode}_${this.questionData.id}_${this.sessionId}`
+      const dateNow = Date.now()
+      return new File(blobArr, `${fileName}${suffix}`, { type, lastModified: dateNow })
+    },
+    // 提交回答-纯音频
+    async postQueResAudio () {
+      const curData = {
+        token: this.questionData.qiniuToken,
+        customVars: {
+          'x:sessionId': this.sessionId,
+          'x:tableName': this.tableCode,
+          'x:qIndex': this.questionData.id + ''
+        }
+      }
+      try {
+        const audio = await uploader({ file: this.audioFile, ...curData })
+        try {
+          // 提交回答
+          const res = await posTableQues(this.postFormat({ video: '', audio: audio.url }))
+          if (res.code === 0) {
+            this.init()
+          }
+        } catch (err) {
+          console.log(err.response)
+          if (err.response.data.code === 546) {
+            // 没有说话重新回答 弹出错误提示 再点击确定后做题
+            if (!this.noFace) {
+              this.errPopout = true
+            }
+          }
+        }
+      } catch (err) {
+        this.sureToAnswer()
+        this.$toast.fail(`上传失败(${err})`)
+      }
+    },
+    // 提交回答两个
+    async postQuesRes () {
+      const curData = {
+        token: this.questionData.qiniuToken,
+        customVars: {
+          'x:sessionId': this.sessionId,
+          'x:tableName': this.tableCode,
+          'x:qIndex': this.questionData.id + ''
+        }
+      }
+      // 上传音频、视频
+      Promise.all([
+        uploader({ file: this.videoFile, ...curData }),
+        uploader({ file: this.audioFile, ...curData })
+      ]).then(
+        async res => {
+          const [video, audio] = res
+          try {
+            // 提交回答
+            const res = await posTableQues(this.postFormat({ video: video.url, audio: audio.url }))
+            if (res.code === 0) {
+              this.init()
+            }
+          } catch (err) {
+            console.log(err.response)
+            if (err.response.data.code === 546) {
+              // 没有说话重新回答 弹出错误提示 再点击确定后做题
+              if (!this.noFace) {
+                this.errPopout = true
+              }
+            }
+          }
+        }
+      ).catch(
+        err => {
+          console.log(err)
+          this.sureToAnswer()
+          this.$toast.fail(`上传失败(${err})`)
+        }
+      )
+    },
+    // 弹出错误弹窗
+    reAnswer () {
+      this.voicePopout = true
+    },
+    // 重新回答不播放语音
+    sureToAnswer () {
+      // 状态恢复数据清空
+      this.audioFiles = []
+      this.videoFiles = []
+      this.$refs.videoBox.play()
+      this.waitwait = false
+      this.textFlag = false
+      this.stopFlag = true
+      this.errPopout = false
+      this.recorder.audioBuffers = [] // 丢弃录制的音频&&重新开始录制
+      this.recorder.start()
+      if (this.aiEvalCamEnabled) {
+        // 如果开启摄像头 要活动 并且做人脸识别检查
+        this.mediaRecorder.start()
+        setTimeout(() => { this.onPlay() }, 1500)
+      }
+    },
+    postFormat (urls = {}) {
+      const data = {
+        sessionId: this.sessionId,
+        tableCode: this.tableCode,
+        id: this.questionData.id,
+        title: this.questionData.title,
+        topic: this.questionData.topic,
+        ...urls
+      }
+      // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
+      return data
+    },
+    toPoint (str) {
+      const point = str.replace('%', '')
+      return point
+    },
+    // face的功能
+    async start () {
+      await faceapi.nets.tinyFaceDetector.loadFromUri('/models').then(
+        () => {
+          console.log('ready')
+        }
+      )
+      // 加载了立刻查脸太快---查脸都是1.5秒
+      setTimeout(() => { this.onPlay() }, 1500)
+    },
+    // 检查脸
+    onPlay () {
+      const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.6 })
+      const el = this.$refs.videoBox
+      faceapi.detectSingleFace(el, options).then(
+        detection => {
+          console.log(detection)
+          if (detection) {
+            // 有脸-----1.5秒后再来查一边
+            this.noFace = false
+            setTimeout(() => { this.onPlay() }, 1500)
+          } else {
+            // 无脸弹窗  注意其他弹窗
+            if (!this.errPopout && !this.waitwait) {
+              this.noFace = true
+            }
+            // 音频需要丢弃
+            this.$refs.videoBox.pause()
+          }
+        }
+      ).catch(
+        err => {
+          console.log(err, 'err')
+        }
+      )
+    },
+    // 没脸的处理->一些东西重新开始 && 状态恢复
+    getFace () {
+      // 去找人脸重新录制===状态===
+      this.noFace = false
+      this.$refs.videoBox.play()
+      if (this.aiEvalCamEnabled) {
+        this.mediaRecorder.stop()
+        this.recorder.pause()
+      }
+      this.sureToAnswer()
+      setTimeout(() => { this.onPlay() }, 1500)
+    },
+    // face-box关于脱拽
+    dragStart () {
+      this.$refs.point.style.transition = 'none'
+    },
+    dragEnd () {
+      this.$refs.point.style.transition = 'all 0.3s'
+    },
+    dragMove (e) {
+      // 位置移动最小和最大的点
+      if (e.touches.length) {
+        const touch = e.touches[0]
+        this.moveLeft = touch.clientX - this.divWidth + 46
+        const fa = document.getElementsByClassName('test-do-other')[0]
+        if (this.moveLeft <= 0) {
+          this.moveLeft = 0
+        }
+        if (this.moveLeft >= fa.clientWidth - 92) {
+          this.moveLeft = fa.clientWidth - 92
+        }
+        this.moveTop = touch.clientY - this.divHeight + 46
+        if (this.moveTop <= 0) {
+          this.moveTop = 0
+        }
+        if (this.moveTop >= fa.clientHeight - 92) {
+          this.moveTop = fa.clientHeight - 92
+        }
+      }
+    }
+  },
+  beforeDestroy () {
+    this.recorder.close()
+    // this.mediaRecorder = null
+  },
+  beforeRouteLeave (to, from, next) {
+    // 离开后摄像头红点消失
+    if (window.yunyuStream) {
+      const [media01, media02] = window.yunyuStream.getTracks()
+      if (media01) media01.stop()
+      if (media02) media02.stop()
+    }
+    next()
+  }
+}
+</script>
+
+<style lang="less" scoped>
+.test-do-other{
+  width: 100%;
+  z-index: 1;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: #F4F4F4;
+  .in-set{
+    margin: 0 .5405rem;
+    box-sizing: border-box;
+    height: 100%;
+    .progress-bar{
+      height: 1.6757rem;
+      padding: .4324rem .3243rem 0;
+      .title{
+        text-align: center;
+        font-size: 12px;
+        height: 12px;
+        line-height: 12px;
+        margin-bottom: .2703rem;
+      }
+    }
+  }
+  .question-box{
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    border-radius: 10px;
+    background: #FFFFFF;
+    .question-text{
+      font-size: 16px;
+      padding: .4324rem .3243rem;
+      color: 333333;
+      font-weight: 500;
+      line-height: 28px;
+    }
+    .under-btn{
+      background: #FFFFFF;
+      width: calc(100% - 1.07rem);
+      height: 4.9459rem;
+      position: fixed;
+      bottom: 0;
+      .line{
+        margin:  0 .2703rem;
+        height: 2px;
+        background: #D5D5D5;
+      }
+      .answer-title{
+        text-align: center;
+        font-weight: bold;
+        font-size: 14px;
+        color: #000000;
+        margin: .4324rem 0;
+      }
+      .answer-tip{
+        text-align: center;
+        height: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #BBBBBB;
+      }
+      .btns{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap;
+        .same{
+          display: flex;
+          .active{
+            background: #34B7B9;
+          }
+          span{
+            width: .1081rem;
+            height: 24px;
+            background: #EBEBED;
+            border-radius: 2px;
+            margin: 0 2px;
+          }
+        }
+        .center{
+          img{
+            width: 2.1622rem;
+            height: 2.1622rem;
+          }
+        }
+      }
+    }
+  }
+  .face-box{
+    position: absolute;
+    z-index: 10;
+    border-radius: 10px;
+    background-color: rgba(255,255,255,.2);
+    overflow: hidden;
+    filter: blur(2px);
+    box-shadow: 0 0 2px #333;
+    video{
+      mix-blend-mode: screen;
+      border-radius: 10px;
+    }
+  }
+  // lots of errors (popout)
+  .errpopout{
+    /deep/.popout_box{
+      padding: 0 1rem;
+      margin: 0 0.7027rem;
+      text-align: center;
+      .text{
+        color: #000000;
+        margin-top: 1.7027rem;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .sure-btn{
+        background: #34B7B9;
+        width: 2.3243rem;
+        height: 1.0811rem;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 1.0811rem;
+        border-radius: 20px;
+      }
+    }
+  }
+}
+</style>
