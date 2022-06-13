@@ -2,7 +2,7 @@
   <div class="container">
     <div class="img-box">
       <img src="@/assets/trans.png">
-      <div class="text">{{s}} <span>秒</span> </div>
+      <div class="text">{{num}} <span>秒</span> </div>
     </div>
     <p>测试结束，请等待生成结果</p>
   </div>
@@ -15,33 +15,69 @@ export default {
   name: 'test-wait',
   data () {
     return {
-      sessionId: '',
-      s: 5,
-      interval: null
+      num: 60,
+      timer: null
+    }
+  },
+  computed: {
+    sessionId () {
+      return this.$route.query.sessionId
+    },
+    second () {
+      return this.$route.query.s
     }
   },
   mounted () {
-    this.sessionId = this.$route.query.sessionId
+    let getWait = 0
     if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
-      this.interval = setInterval(() => {
-        this.init()
-        this.s -= 1
+      if (this.second) this.num = 5
+      this.timer = setInterval(async () => {
+        if (this.num > 0) {
+          if (!this.second) {
+            if (getWait === 5) {
+              getReportRes({ sessionId: this.sessionId }, false).then(
+                ({ data }) => {
+                  if (data.reportAllCompleted) {
+                    this.finish()
+                  } else {
+                    getWait = 0
+                  }
+                }
+              ).catch(
+                err => {
+                  console.log(err)
+                  getWait = 0
+                }
+              )
+            } else {
+              getWait++
+            }
+          }
+          this.num--
+        } else {
+          this.finish()
+        }
       }, 1000)
     } else {
       this.$router.replace('/login')
     }
     wxShare.hiddenShare()
   },
+  destroyed () {
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
+  },
   methods: {
-    async init () {
-      const res = await getReportRes({ sessionId: this.sessionId })
-      if (res.code === 0) {
-        if (res.data.reportAllCompleted || this.s === 0) {
-          clearInterval(this.interval)
-          // window.location.href = window.location.origin + '/user#/result?sessionId=' + this.sessionId
-          this.$router.replace({ path: '/test-report', query: { sessionId: this.sessionId } })
+    finish () {
+      clearInterval(this.timer)
+      this.$router.replace({
+        path: '/test-report',
+        query: {
+          sessionId: this.sessionId,
+          tableType: this.second || 2
         }
-      }
+      })
     }
   }
 }

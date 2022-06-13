@@ -46,6 +46,13 @@ class Recorder {
     })
   }
 
+  close (cb) {
+    this.audioctx.close().then(() => {
+      const status = true
+      if (cb) cb(status)
+    })
+  }
+
   // 当前只支持wav
   createFile (name = 'download') {
     const resdata = encodeWav(this.sampleRate, this.audioBuffers)

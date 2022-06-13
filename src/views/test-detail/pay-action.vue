@@ -205,7 +205,7 @@ export default {
     getParam (type, url) {
       const params = {
         tables: this.payInfo.tables,
-        aiEvalCamEnabled: false,
+        aiEvalCamEnabled: this.payInfo.aiEvalCamEnabled,
         totalAmount: this.payInfo.discountAmount,
         // totalAmount: '0.99',
         payMethod: type,

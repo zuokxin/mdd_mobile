@@ -32,7 +32,14 @@ export default {
   computed: {
     // 数量
     currNum () {
-      return this.num + this.likeNum
+      const sum = this.num + this.likeNum
+      if (sum < 10000) return sum
+      else {
+        const tenThousand = sum / 10000
+        if (tenThousand >= 10000) return '9999.9w'
+        const curString = tenThousand.toFixed(1)
+        return curString + 'w'
+      }
     },
     // 点赞按钮
     curIcon () {
@@ -62,13 +69,15 @@ export default {
 @w: 37.5;
 .likes-action {
   font-size: 14rem / @w;
-  color: #666666;
+  color: #F5B54C;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   img {
     width: 14rem / @w;
   }
   span {
-    margin-left: 4rem / @w;
-    vertical-align: top;
+    margin-top: 5rem / @w;
   }
 }
 </style>

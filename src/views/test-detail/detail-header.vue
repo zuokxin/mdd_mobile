@@ -18,16 +18,20 @@
         <div class="normal-num">{{ curEvalRecordCount }}</div>
         <div class="normal normal-title">测试人数</div>
       </van-col>
-      <van-col class="content-box-right" :class="{collected: currentUserIsColl}" @click="collectHandle">
+      <van-col class="content-box-right">
+        <likes-action :num="kudosNumber" :hasLikes="currentUserIsKudos" :tableCode="tableCode"></likes-action>
         <!-- 收藏 -->
-        <img :src="currentUserIsColl ? collect.icon1 : collect.icon" alt="collect">
-        <div class="name">{{currentUserIsColl ? collect.name1 : collect.name}}</div>
+        <div class="right_box">
+          <img :src="currentUserIsColl ? collect.icon1 : collect.icon" alt="collect" @click="collectHandle">
+          <div class="name">{{currentUserIsColl ? collect.name1 : collect.name}}</div>
+        </div>
       </van-col>
     </van-row>
   </div>
 </template>
 
 <script>
+import LikesAction from './likes-action.vue'
 export default {
   name: 'detail-header',
   props: {
@@ -38,7 +42,12 @@ export default {
     evalRecordCount: Number, // 测试人数
     time: String, // 时间范围
     questionNumber: Number, // 题目数量
-    currentUserIsColl: Boolean // 当前用户是否收藏
+    currentUserIsColl: Boolean, // 当前用户是否收藏
+    currentUserIsKudos: Boolean, // 当前用户是否点赞
+    kudosNumber: Number // 点赞数量
+  },
+  components: {
+    LikesAction
   },
   computed: {
     // 测试人数格式化
@@ -130,14 +139,18 @@ export default {
   }
   .content-box-right {
     float: right;
-    width: 70rem / @w;
     height: 28rem / @w;
-    border: 1px solid #F5B54C;
-    border-radius: 15rem / @w;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     margin-top: 5px;
+    .right_box{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-left: 20rem / @w;
+      width: 40rem / @w;
+    }
     img{
       width: 14rem / @w;
       height: 14rem / @w;
@@ -146,12 +159,8 @@ export default {
       font-size: 12rem / @w;
       font-weight: 400;
       color: #F5B54C;
-      margin-left: 2rem / @w;
+      margin-top: 5rem / @w;
     }
-  }
-  .collected{
-    border: 0;
-    background: #F6F6F7;
   }
 }
 </style>

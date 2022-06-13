@@ -71,3 +71,10 @@ export const wxSignatures = params => fetch({
   method: 'get',
   params
 })
+
+// 提交指定量表信息
+export const postTableRes = data => fetch({
+  url: '/api/user/table/finish',
+  method: 'post',
+  data
+})

@@ -140,3 +140,10 @@ export const getCollect = (params) => fetch({
   method: 'get',
   params
 })
+
+// 获取测试需要完成的量表信息
+export const batchInfo = (params) => fetch({
+  url: '/api/user/batch/info',
+  method: 'get',
+  params
+})
