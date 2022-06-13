@@ -75,11 +75,11 @@ const routes = [
     meta: { needLogin: true, title: '复变云愈' },
     component: resolve => require(['../views/my/my-infos/index.vue'], resolve)
   },
-  // {
-  //   path: '/tests',
-  //   name: '环境检测',
-  //   component: resolve => require(['../views/tests/index.vue'], resolve)
-  // },
+  {
+    path: '/tests',
+    name: '环境检测',
+    component: resolve => require(['../views/tests/index.vue'], resolve)
+  },
   {
     path: '/testing',
     name: '授权测试',
