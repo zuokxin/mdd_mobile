@@ -51,39 +51,48 @@ export default {
   },
   mounted () {
     this.getTypeList()
-    this.getAllTable()
     wxShare.share()
   },
   methods: {
     async getTypeList () {
       const res = await tableTypeList({ page: -1, pageSize: 10 })
-      if (res.code === 0) {
+      getAllTable().then(table => {
         // const typeAll = res.data.tables.filter(v => v.name !== 'AI心理测评')
         const typeAll = res.data.tables.filter(v => v.count !== 0)
-        typeAll.forEach(v => {
-          this.items.push(
-            {
-              text: v.name,
-              activeId: v.id
-            }
-          )
-        })
-      }
-    },
-    async getAllTable () {
-      const res = await getAllTable()
-      if (res.code === 0) {
-        this.tableAll = res.data.filter(v => v.tableCode !== 'psqi').filter(v => {
-          if (v.tableType === 2) {
-            return v.tableCode === 'hama' || v.tableCode === 'hamd'
-          } else {
-            return v
+        typeAll.forEach((v, i) => {
+          const flag = table.data.some(item => {
+            return v.id === item.selfTableType.id
+          })
+          // console.log(flag, i, v.name)
+          if (!flag) {
+            typeAll.splice(i, 1)
           }
         })
+        // console.log(typeAll)
+        this.items = typeAll.map(v => {
+          return {
+            text: v.name,
+            activeId: v.id
+          }
+        })
+        this.getTableList()
+      })
+    },
+    getTableList () {
+      getAllTable().then(res => {
+        if (res.code === 0) {
+          this.tableAll = res.data.filter(v => v.tableCode !== 'psqi').filter(v => {
+            if (v.tableType === 2) {
+              return v.tableCode === 'hama' || v.tableCode === 'hamd'
+            } else {
+              return v
+            }
+          })
 
-        const id = this.items[0].activeId
-        this.tableSelect = this.tableAll.filter(v => v.selfTableType.id === id)
-      }
+          const id = this.items[0].activeId
+          this.tableSelect = this.tableAll.filter(v => v.selfTableType.id === id)
+        }
+      })
     },
     onNavClick (index) {
       const id = this.items[index].activeId
