@@ -169,7 +169,7 @@ export default {
         const status9 = oneList.filter(v => v.status === 9)
         this.tableList = [...status1, ...status9]
         this.moreList = records.filter(v => v.evalRecords.length > 1 || v.evalRecords[0].tableCode === 'psqi' || v.evalRecords[0].table.tableType === 2).filter(v => {
-          if (v.evalRecords[0].table.tableType === 2) {
+          if (v.evalRecords.length === 1 && v.evalRecords[0].table.tableType === 2) {
             return v.evalRecords[0].tableCode !== 'hama' && v.evalRecords[0].tableCode !== 'hamd'
           } else {
             return v
