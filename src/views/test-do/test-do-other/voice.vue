@@ -77,6 +77,11 @@ export default {
       }
       this.$emit('voiceClose')
     }
+  },
+  beforeDestroy () {
+    if (this.player?.source.playStatus === 2) {
+      this.player.source.stop()
+    }
   }
 }
 </script>
