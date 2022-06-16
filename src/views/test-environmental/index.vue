@@ -302,30 +302,30 @@ export default {
 </script>
 
 <style lang="less">
-// .dialog-confirm {
-//   .van-dialog__message {
-//     font-size: 0.4266667rem;
-//     font-weight: 700;
-//     color: #000000;
-//   }
-//   .van-dialog__confirm {
-//     color: #34b7b9 !important;
-//     border-radius: 999px;
-//     border:1px solid #34b7b9 !important;
-//   }
-//   .van-dialog__cancel {
-//     border-radius: 999px;
-//     margin-left: 20px;
-//   }
-//   // .van-dialog__confirm {
-//   //   border-radius: 999px;
-//   //   margin-right: 20px;
-//   // }
-//   .van-dialog__footer {
-//     padding: 8px 50px 40px;
-//     flex-direction: row-reverse;
-//   }
-// }
+.dialog-confirm {
+  .van-dialog__message {
+    font-size: 0.4266667rem;
+    font-weight: 700;
+    color: #000000;
+  }
+  .van-dialog__confirm {
+    color: #34b7b9 !important;
+    border-radius: 999px;
+    border:1px solid #34b7b9 !important;
+  }
+  .van-dialog__cancel {
+    border-radius: 999px;
+    margin-left: 20px;
+  }
+  // .van-dialog__confirm {
+  //   border-radius: 999px;
+  //   margin-right: 20px;
+  // }
+  .van-dialog__footer {
+    padding: 8px 50px 40px;
+    flex-direction: row-reverse;
+  }
+}
 </style>
 <style lang="less" scoped>
 @w: 37.5;
