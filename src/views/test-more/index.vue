@@ -1,5 +1,6 @@
 <template>
   <div class="main">
+    <van-loading color="#1989fa" v-if="loading"/>
     <van-tree-select
       class="tree"
       ref="treeSelect"
@@ -8,7 +9,8 @@
       :items="items"
       :active-id.sync="items.activeId"
       :main-active-index.sync="items.activeId"
-      @click-nav="onNavClick">
+      @click-nav="onNavClick"
+      v-else>
       <template slot="content">
         <div v-if="tableSelect.length > 0">
           <div class="m_box"
@@ -43,7 +45,8 @@ export default {
       tableAll: [],
       tableSelect: [],
       beforeHeight: '0.24rem',
-      afterHeight: '0'
+      afterHeight: '0',
+      loading: false
     }
   },
   components: {
@@ -55,6 +58,7 @@ export default {
   },
   methods: {
     async getTypeList () {
+      this.loading = true
       const res = await tableTypeList({ page: -1, pageSize: 10 })
       getAllTable().then(table => {
         // const typeAll = res.data.tables.filter(v => v.name !== 'AI心理测评')
@@ -91,6 +95,7 @@ export default {
 
           const id = this.items[0].activeId
           this.tableSelect = this.tableAll.filter(v => v.selfTableType.id === id)
+          this.loading = false
         }
       })
     },
@@ -239,6 +244,18 @@ export default {
   .footer{
     height: 1.226667rem;
   }
+  .van-loading {
+    position: relative;
+    color: #D5D5D5;
+    font-size: 0;
+    vertical-align: middle;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0);
+}
 }
 
 </style>
