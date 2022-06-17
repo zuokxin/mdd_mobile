@@ -260,7 +260,9 @@ export default {
       if (this.aiEvalCamEnabled) {
         this.$refs.videoBox.srcObject = this.stream
         console.log('录像初始化。。。')
-        this.mediaRecorder.start()
+        if (this.mediaRecorder.state !== 'recording') {
+          this.mediaRecorder.start()
+        }
         this.$refs.videoBox.play()
         /******************************
          *          监听录像
