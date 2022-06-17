@@ -473,15 +473,12 @@ export default {
         detection => {
           console.log(detection)
           if (detection) {
-            // 有脸-----1.5秒后再来查一边
-            this.noFace = false
             setTimeout(() => { this.onPlay() }, 1500)
           } else {
             // 无脸弹窗  注意其他弹窗
             if (!this.errPopout && !this.waitwait) {
               this.noFace = true
             }
-            // 音频需要丢弃
             this.$refs.videoBox.pause()
           }
         }
@@ -501,7 +498,7 @@ export default {
         this.recorder.pause()
       }
       this.sureToAnswer()
-      setTimeout(() => { this.onPlay() }, 1500)
+      // setTimeout(() => { this.onPlay() }, 1500)
     },
     // face-box关于脱拽
     dragStart () {
