@@ -23,17 +23,29 @@ export default {
     sessionId () {
       return this.$route.query.sessionId
     },
+    configTables () {
+      return sessionStorage.tables ? JSON.parse(sessionStorage.tables) : []
+    },
     second () {
-      return this.$route.query.s
+      if (this.configTables.length !== 0) {
+        const flag = this.configTables.some(v => {
+          return v.table.tableType === 2
+        })
+        // console.log('flag:' + flag)
+        return flag
+      } else {
+        return !(this.$route.query.s === '5')
+      }
     }
   },
   mounted () {
     let getWait = 0
+    // console.log(this.second, this.configTables)
     if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
-      if (this.second) this.num = 5
+      if (!this.second) this.num = 5
       this.timer = setInterval(async () => {
         if (this.num > 0) {
-          if (!this.second) {
+          if (this.second) {
             if (getWait === 5) {
               getReportRes({ sessionId: this.sessionId }, false).then(
                 ({ data }) => {
@@ -67,6 +79,9 @@ export default {
     if (this.timer) {
       clearInterval(this.timer)
     }
+    if (sessionStorage.tables) {
+      sessionStorage.removeItem('tables')
+    }
   },
   methods: {
     finish () {
@@ -75,7 +90,7 @@ export default {
         path: '/test-report',
         query: {
           sessionId: this.sessionId,
-          tableType: this.second || 2
+          tableType: this.second ? 2 : 1
         }
       })
     }

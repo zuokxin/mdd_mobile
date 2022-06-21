@@ -127,14 +127,14 @@ export const tableTypeList = (params) => fetch({
   params
 })
 
-// 获取用户信息
+// 获取用户测试记录
 export const getIndividual = (params) => fetch({
   url: '/api/user/history/individual',
   method: 'get',
   params
 })
 
-// 获取用户信息
+// 获取用户收藏
 export const getCollect = (params) => fetch({
   url: '/api/user/table/collection',
   method: 'get',
@@ -144,6 +144,27 @@ export const getCollect = (params) => fetch({
 // 获取测试需要完成的量表信息
 export const batchInfo = (params) => fetch({
   url: '/api/user/batch/info',
+  method: 'get',
+  params
+})
+
+// 获取测试需要完成的量表信息
+export const orgBind = (params) => fetch({
+  url: '/api/user/orgBind/check',
+  method: 'get',
+  params
+}, false)
+
+// 机构绑定新增
+export const orgBindAdd = data => fetch({
+  url: '/api/user/orgBind/create',
+  method: 'post',
+  data
+}, false)
+
+// 查看机构测试记录
+export const organization = (params) => fetch({
+  url: '/api/user/history/organization',
   method: 'get',
   params
 })

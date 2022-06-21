@@ -55,8 +55,8 @@ const share = (isMain = true) => {
   const currentUrl = window.location.href
   const url = currentUrl.split('#')[0]
   const dataForm = {
-    title: '复变云愈，专业高效的AI心理测评',
-    desc: '复变云愈提供专业高效的心理测评，让你更懂得自己',
+    title: '云愈心理，专业高效的AI心理测评',
+    desc: '云愈心理提供专业高效的心理测评，让你更懂得自己',
     link: isMain ? currentUrl : url + '#/my-index',
     imgUrl: 'https://s1.ax1x.com/2022/04/11/LVs3i6.png'
   }
