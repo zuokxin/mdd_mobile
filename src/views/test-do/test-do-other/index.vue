@@ -77,6 +77,8 @@ import { getTableQues, batchInfo, posTableQues, postTableRes } from '@/api/modul
 import popout from './popout'
 import errpopout from './errpopout'
 import voice from './voice'
+import { mapGetters } from 'vuex'
+import { Dialog } from 'vant'
 export default {
   name: 'do-other',
   components: {
@@ -121,6 +123,34 @@ export default {
       textFlag: false
     }
   },
+  computed: {
+    // 当前表名
+    thisTable () {
+      return this.$route.query.tableCode
+    },
+    ...mapGetters([
+      'nextTable'
+    ]),
+    routerPath () {
+      // 测试表未完成
+      const next = this.nextTable(this.thisTable)
+      // console.log(next, '他评')
+      if (next) {
+        if (next.table.tableType === 1) {
+          return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+        } else {
+          return `/test-do-other?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+        }
+      } else {
+        return `/test-do-wait?sessionId=${this.sessionId}`
+      }
+    }
+  },
+  watch: {
+    '$route' (to, from) {
+      this.$router.go(0)
+    }
+  },
   mounted () {
     // 不能同时弹出多个弹出 弹出弹窗都是重新做题 重新记录== 状态恢复== 除了设备上的错误
     // 弹窗S errPopout noFace（动作waitwait）
@@ -145,6 +175,7 @@ export default {
         tableCode: this.tableCode
       }
       const res = await getTableQues(data)
+      const next = this.nextTable(this.thisTable)
       // console.log(res)
       if (res.code === 0) {
         if (res.data.isEnd) {
@@ -154,7 +185,14 @@ export default {
             tableCode: this.tableCode
           }).then(res => {
             if (res.code === 0) {
-              this.$router.replace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
+              if (next) {
+                this.thisDialog('您将进入下一个量表进行测试').then(() => {
+                  this.$router.replace(this.routerPath)
+                })
+              } else {
+                this.$router.replace(this.routerPath)
+              }
+              // this.$router.replace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
             }
           })
         } else {
@@ -530,6 +568,16 @@ export default {
           this.moveTop = fa.clientHeight - 92
         }
       }
+    },
+    // 弹窗封装
+    thisDialog (message) {
+      return Dialog.alert({
+        message,
+        theme: 'round-button',
+        className: 'detail-dialog',
+        confirmButtonText: '确定',
+        confirmButtonColor: '#34B7B9'
+      })
     }
   },
   beforeDestroy () {

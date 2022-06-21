@@ -37,7 +37,7 @@
         v-else
         type="primary"
         :text="btnGoInfo"
-        @click="$router.push(`/test-do-infos?sessionId=${sessionId}&tableCode=${tableCode}&tableType=${table.tableType}`)"
+        @click="goTest"
       />
     </van-goods-action>
     <CameraDialog :show.sync="otherTestDialog" @needOpenCamera="needOpenCamera"></CameraDialog>
@@ -213,6 +213,13 @@ export default {
         }
       }
     },
+    // 开始测试
+    goTest () {
+      if (sessionStorage.tables) {
+        sessionStorage.removeItem('tables')
+      }
+      this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.tableCode}&tableType=${this.table.tableType}`)
+    },
     // 他评窗口
     otherTestOpen () {
       this.otherTestDialog = true
@@ -349,7 +356,7 @@ export default {
       const currentUrl = window.location.href
       const dataForm = {
         title: this.table.tableName,
-        desc: '我在复变云愈发现一份不错的量表，你也来测测看～',
+        desc: '我在云愈心理发现一份不错的量表，你也来测测看～',
         link: currentUrl,
         imgUrl: this.table.tableLogo
       }

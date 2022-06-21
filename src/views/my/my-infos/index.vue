@@ -42,6 +42,20 @@ import { sexArr, educateArr, marriageArr, tasteArr, colorArr } from './dataSelec
 import { getUserInfo, updateInfo } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
 export default {
+  beforeRouteEnter (to, from, next) {
+    if (sessionStorage.getItem('phone')) {
+      next()
+    } else {
+      next(vm => {
+        vm.$router.push({
+          path: '/login',
+          query: {
+            url: '/my-infos'
+          }
+        })
+      })
+    }
+  },
   data () {
     return {
       form: {
@@ -141,7 +155,7 @@ export default {
       this.postInfo()
     },
     onClickLeft () {
-      this.$router.go(-1)
+      this.$router.push('/my-index')
     }
   }
 }
