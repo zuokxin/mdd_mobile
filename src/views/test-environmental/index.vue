@@ -3,11 +3,11 @@
     <div class="test-wrap">
       <div v-if="aiEvalCamEnabled">
         <p class="title">
-          <span>摄像头测试</span>
+          <span>摄像头检测</span>
           <img width="28" :src="curImg(faceSuccess)" alt="check-icon">
         </p>
-        <p>请打开摄像头，将人脸对准图像框内3S</p>
-        <p class="subtitle test-error" :class="{ 'hidden': faceSuccess || face }">未识别到人脸，可能是光线较暗或人脸不在图像框内</p>
+        <p>请打开摄像头，将人脸对准图像框内3秒</p>
+        <p class="subtitle test-error" :class="{ 'hidden': faceSuccess || face }">未识别到人脸，请保持人脸在相框内</p>
         <video-box
           ref="thisVideo"
           :faceDetection="true"
@@ -27,13 +27,13 @@
         <img width="28" :src="curImg(!volumeWarn)" alt="check-icon">
       </p>
       <p>进行环境语音检测</p>
-      <p class="subtitle test-error" :class="{ 'hidden': volumeTips }">当前噪音过大！</p>
+      <p class="subtitle test-error" :class="{ 'hidden': volumeTips }">当前噪音过大</p>
       <p class="tips">
         <b :style="{ color: volumeColor }">{{ db }}</b>
         <span>分贝</span>
       </p>
     </div>
-    <van-button round type="primary" :disabled="!(!volumeWarn && faceSuccess)" @click="start" style="display: block; width: 80%; margin: 20px auto 0;">开始测试</van-button>
+    <van-button round type="primary" :disabled="!(!volumeWarn && faceSuccess)" @click="start" style="display: block; width: 80%; margin: 20px auto 0;">开始答题</van-button>
   </div>
 </template>
 
