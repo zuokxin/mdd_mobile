@@ -73,6 +73,8 @@ export default {
       orgBindAdd(form).then(res => {
         this.thisDialog('您已成功绑定机构，可以开始做题啦~').then(() => {
           this.$emit('bindSuccess')
+          this.batchId = ''
+          this.userNumber = ''
         })
       }).catch(err => {
         if (err.response.data.code === 2302) {

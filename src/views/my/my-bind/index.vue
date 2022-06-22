@@ -8,7 +8,8 @@
     <BindBatch :id="batchId" :number="userNumber" @bindSuccess="bindSuccess"></BindBatch>
     <div class="myBind">
       <h3>我的绑定</h3>
-      <div class="bindist">
+      <van-loading color="#1989fa" v-if="loading"/>
+      <div class="bindist" v-else>
         <div class="noLogin" v-if="bindList.length === 0">
           <img src="@/assets/img/my/nodata.png" alt="login">
           <span>暂无绑定</span>
@@ -92,7 +93,8 @@ export default {
       batchId: '',
       userNumber: '',
       bindList: [],
-      flagT: false
+      flagT: false,
+      loading: true
     }
   },
   components: {
@@ -144,11 +146,10 @@ export default {
     async organization () {
       const { data } = await organization({ page: -1, pageSize: -1 })
       this.bindList = data.records || []
+      this.loading = false
     },
     // 绑定机构成功
     bindSuccess () {
-      this.batchId = ''
-      this.userNumber = ''
       this.organization()
     },
     // 单个量表开始测试 & 多个量表开始和继续测试
@@ -283,4 +284,14 @@ export default {
     font-size: .32rem;
   }
 }
+  .van-loading {
+    position: relative;
+    color: #D5D5D5;
+    width: 100%;
+    height: 200rem/@w;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0);
+  }
 </style>
