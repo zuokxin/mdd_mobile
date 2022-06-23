@@ -7,7 +7,7 @@
           <img width="28" :src="curImg(faceSuccess)" alt="check-icon">
         </p>
         <p>请打开摄像头，将人脸对准图像框内3秒</p>
-        <p class="subtitle test-error" :class="{ 'hidden': faceSuccess || face }">未识别到人脸，请保持人脸在相框内</p>
+        <p class="subtitle test-error" :class="{ 'hidden': faceSuccess || face }">未识别到人脸，请保持人脸在图像框内。</p>
         <video-box
           ref="thisVideo"
           :faceDetection="true"
@@ -19,7 +19,7 @@
         </video-box>
         <p class="tips" style="margin-top: 0.27rem;">
           <span v-if="!faceSuccess"><span class="test-success" style="font-size:0.8rem">{{ faceIndex }}</span>s</span>
-          <span v-if="faceSuccess" class="test-success">请在接下来的答题过程中也保持人脸在图像框内，否则需要重新答题</span>
+          <span v-if="faceSuccess" class="test-success">请在接下来的答题过程中也保持人脸在图像框内<br/>否则需要重新答题</span>
         </p>
       </div>
       <p class="title">
