@@ -171,13 +171,13 @@ export default {
           .catch(err => {
             console.log(`错误:${err}`)
             if (mediaErrorTypes(err.name) === '用户已禁止网页调用摄像头或麦克风设备') {
-              this.thisDialog('您已禁止调用摄像头或麦克风设备，当前网页无法满足此量表测试。建议您在设置中打开应用权限并退出重新进入网页，也可以下载复变云愈App进行测试～')
+              this.thisDialog('您已禁止调用摄像头或麦克风设备，当前网页无法满足此量表测试。建议您在设置中打开应用权限并退出重新进入网页，也可以下载云愈心理App进行测试～')
             } else {
-              this.thisDialog('打开摄像头失败，您无法在当前网页测试此量表，您可以下载复变云愈App进行测试～')
+              this.thisDialog('打开摄像头失败，您无法在当前网页测试此量表，您可以下载云愈心理App进行测试～')
             }
           })
       } catch (err) {
-        this.thisDialog('打开摄像头失败，您无法在当前网页测试此量表，您可以下载复变云愈App进行测试～')
+        this.thisDialog('打开摄像头失败，您无法在当前网页测试此量表，您可以下载云愈心理App进行测试～')
         console.log(err)
       }
     },

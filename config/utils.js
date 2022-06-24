@@ -1,5 +1,5 @@
 const pages = {
-  title: '复变云愈',
+  title: '云愈心理',
   cdn: {},
   externals: {}
 }

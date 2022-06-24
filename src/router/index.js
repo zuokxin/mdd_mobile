@@ -12,7 +12,7 @@ const routes = [
   {
     path: '/login',
     name: '登录',
-    meta: { title: '复变云愈' },
+    meta: { title: '云愈心理' },
     component: resolve => require(['../views/login/index.vue'], resolve)
   },
   {
@@ -48,7 +48,7 @@ const routes = [
   {
     path: '/test-report',
     name: '测试-量表报告',
-    meta: { title: '复变云愈测试报告' },
+    meta: { title: '云愈心理测试报告' },
     component: resolve => require(['../views/test-do/test-report/index.vue'], resolve)
   },
   {
@@ -60,21 +60,32 @@ const routes = [
   {
     path: '/my-contact',
     name: '我的-联系客服',
-    meta: { title: '复变云愈' },
+    meta: { title: '云愈心理' },
     component: resolve => require(['../views/my/my-contact/index.vue'], resolve)
   },
   {
     path: '/my-index',
     name: '我的',
-    meta: { title: '复变云愈' },
+    meta: { title: '云愈心理' },
     component: resolve => require(['../views/my/my-index/index.vue'], resolve)
   },
   {
     path: '/my-infos',
     name: '我的-个人信息',
-    meta: { needLogin: true, title: '复变云愈' },
+    meta: { needLogin: true, title: '云愈心理' },
     component: resolve => require(['../views/my/my-infos/index.vue'], resolve)
   },
+  {
+    path: '/my-bind',
+    name: '我的-机构绑定',
+    meta: { needLogin: true, title: '云愈心理' },
+    component: resolve => require(['../views/my/my-bind/index.vue'], resolve)
+  },
+  // {
+  //   path: '/tests',
+  //   name: '环境检测',
+  //   component: resolve => require(['../views/tests/index.vue'], resolve)
+  // },
   {
     path: '/tests',
     name: '环境检测',
@@ -100,7 +111,7 @@ const router = new VueRouter({
 
 let init = false
 router.beforeEach(async (to, from, next) => {
-  document.title = to.meta.title || '复变云愈'
+  document.title = to.meta.title || '云愈心理'
   if (!init) {
     try {
       await store.dispatch('getToken')
@@ -116,18 +127,7 @@ router.beforeEach(async (to, from, next) => {
       }
     }
   } else {
-    const phone = sessionStorage.getItem('phone')
-    if (to.meta.needLogin) {
-      if (!phone) {
-        next({
-          path: '/login'
-        })
-      } else {
-        return next()
-      }
-    } else {
-      return next()
-    }
+    next()
   }
 })
 

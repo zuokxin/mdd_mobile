@@ -13,6 +13,10 @@
           <img src="@/assets/img/my/info.png" alt="info">
           <div class="tip">个人信息</div>
         </div>
+        <div class="card" @click="$router.push('/my-bind').catch(() => {})">
+          <img src="@/assets/img/my/bind.png" alt="bind">
+          <div class="tip">机构绑定</div>
+        </div>
         <div class="card" @click="showKefu = true">
           <img src="@/assets/img/my/kefu.png" alt="kefu">
           <div class="tip">联系客服</div>
@@ -34,45 +38,58 @@
               <span>暂无测评记录~</span>
             </div>
             <div class="tableList" ref="tableHeight" v-else-if="isLogin && !noData">
-              <div class="tableCard" v-for="item in tableList" :key="item.index">
-                <img :src="item.evalRecords[0].table.tableLogo" alt="tableLogo">
-                <div class="msg">
-                  <div class="name">{{item.evalRecords[0].table.tableName}}</div>
-                  <div class="time">
-                    <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
-                    <span>￥{{item.price}}</span>
+              <div v-for="(item, index) in tableList" :key="item.index" :class="{'tableCard': showStyle(item.evalRecords), 'more': !showStyle(item.evalRecords) }">
+                <div class="cardBox" v-if="showStyle(item.evalRecords)" ref="textContainer">
+                  <img :src="item.evalRecords[0].table.tableLogo" alt="tableLogo">
+                  <div class="msg">
+                    <div class="name">{{item.evalRecords[0].table.tableName}}</div>
+                    <div class="time">
+                      <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
+                      <span>￥{{item.price}}</span>
+                    </div>
                   </div>
+                  <van-button v-if="item.status === 1" round type="info"
+                    @click="startTest(item.sessionId, item.evalRecords, item.status)"
+                  >开始测试</van-button>
+                  <van-button v-else-if="item.status === 2" round plain type="info"
+                    @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)"
+                  >继续测试</van-button>
+                  <van-button v-else-if="item.status === 9" round plain type="info"
+                  @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)"
+                  >查看报告</van-button>
                 </div>
-                <van-button v-if="item.status === 1" round type="info"
-                  @click="$router.push({ path: 'test-do-infos', query:{ sessionId: item.sessionId, tableCode: item.evalRecords[0].table.tableCode, tableType: item.evalRecords[0].table.tableType} })"
-                >开始测试</van-button>
-                <van-button v-else-if="item.status === 2" round plain type="info"
-                  @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)"
-                >继续测试</van-button>
-                <van-button v-else-if="item.status === 9" round plain type="info"
-                @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)"
-                >查看报告</van-button>
-              </div>
-              <div class="more" v-for="(item, index) in moreList" :key="item.index">
-                <div class="top">
-                  <span
-                  :style="{'max-height': item.textOpenFlag ? textHeight : ''}"
-                  :class="{hiddenText: item.textOpenFlag}"
-                  class="textMore"
-                  ref="textContainer"
-                  >{{moreListName[index].join('、')}}</span>
-                  <span
-                  v-if="item.textOpenFlag !== null"
-                  @click="item.textOpenFlag = !item.textOpenFlag"
-                  class="btnMore"
-                  >{{item.textOpenFlag ? '【展开】':'【收起】'}}</span>
-                </div>
-                <div class="bottom">
-                  <div class="time">
-                    <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
-                    <span>￥{{item.price}}</span>
+                <div class="moreBox" v-else>
+                  <div class="top">
+                    <span
+                    :style="{'max-height': item.textOpenFlag ? textHeight : ''}"
+                    :class="{hiddenText: item.textOpenFlag}"
+                    class="textMore"
+                    ref="textContainer"
+                    >{{moreListName[index].join('、')}}</span>
+                    <span
+                    v-if="item.textOpenFlag !== null"
+                    @click="item.textOpenFlag = !item.textOpenFlag"
+                    class="btnMore"
+                    >{{item.textOpenFlag ? '【展开】':'【收起】'}}</span>
                   </div>
-                  <div class="app">仅支持在APP中测试</div>
+                  <div class="bottom">
+                    <div class="time moreTime">
+                      <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
+                      <span>￥{{item.price}}</span>
+                    </div>
+                    <div v-if="!isCanDo(item.evalRecords)" class="btnBox">
+                      <van-button v-if="item.status === 1" round type="info"
+                        @click="startTest(item.sessionId, item.evalRecords, item.status)"
+                      >开始测试</van-button>
+                      <van-button v-if="item.status === 2" round  type="info"
+                        @click="startTest(item.sessionId, item.evalRecords, item.status)"
+                      >继续测试</van-button>
+                      <van-button v-if="item.status === 9 || hasFinish(item.evalRecords)" round plain type="info"
+                      @click="readReport(item.sessionId, second(item.evalRecords) ? 2 : 1)"
+                      style="margin-left: 10px">查看报告</van-button>
+                    </div>
+                    <div v-if="isCanDo(item.evalRecords)" class="app">仅支持在APP中测试</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -89,11 +106,13 @@
             <div class="tableList" ref="tableHeight" v-else-if="isLogin && !noCollect">
               <div class="tableCard cllect" v-for="item in collectList" :key="item.index"
               @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
-                <img :src="item.tableLogo" alt="tableLogo">
-                <div class="msg">
-                  <div class="name">{{item.tableName}}</div>
-                  <div class="time">
-                    <span>￥{{item.price}}</span>
+                <div class="cardBox">
+                  <img :src="item.tableLogo" alt="tableLogo">
+                  <div class="msg">
+                    <div class="name">{{item.tableName}}</div>
+                    <div class="time">
+                      <span>￥{{item.price}}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -121,6 +140,7 @@ import { getIndividual, getCollect } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
 import MainTabbar from '@/components/MainTabbar'
 import moment from 'moment'
+import { findIndexByKeyValue } from '@/utils/checkFinish'
 export default {
   data () {
     return {
@@ -142,6 +162,50 @@ export default {
   components: {
     MainTabbar
   },
+  computed: {
+    // 判断能否在H5做量表
+    isCanDo () {
+      return (arr) => {
+        const flag = arr.some(v => {
+          if (v.table.tableType === 2) {
+            return v.tableCode !== 'hamd' && v.tableCode !== 'hama'
+          } else {
+            return v.tableCode === 'psqi'
+          }
+        })
+        return flag
+      }
+    },
+    // 判断多个量表中是否有已经完成的量表
+    hasFinish () {
+      return (arr) => {
+        const flag = arr.some(v => {
+          return v.finishedAt !== 0
+        })
+        return flag
+      }
+    },
+    // 判断多个量表中是否有他评量表
+    second () {
+      return (arr) => {
+        const flag = arr.some(v => {
+          return v.table.tableType === 2
+        })
+        // console.log(flag, this.configTables)
+        return flag
+      }
+    },
+    // 判断显示样式
+    showStyle () {
+      return (arr) => {
+        if (arr.length === 1 && arr[0].tableCode !== 'psqi') {
+          return true
+        } else {
+          return false
+        }
+      }
+    }
+  },
   mounted () {
     this.phone = sessionStorage.getItem('phone')
     if (this.phone) {
@@ -158,44 +222,25 @@ export default {
       const records = res.data.records
       if (records) {
         this.noData = false
-        const oneList = records.filter(v => v.evalRecords.length === 1 && v.evalRecords[0].tableCode !== 'psqi').filter(v => {
-          if (v.evalRecords[0].table.tableType === 2) {
-            return v.evalRecords[0].tableCode === 'hama' || v.evalRecords[0].tableCode === 'hamd'
-          } else {
-            return v
-          }
+        this.tableList = records
+        this.tableList.forEach(v => {
+          const arr = []
+          v.evalRecords.forEach(el => {
+            arr.push(el.table.tableName)
+          })
+          this.moreListName.push(arr)
         })
-        const status1 = oneList.filter(v => v.status === 1 || v.status === 2)
-        const status9 = oneList.filter(v => v.status === 9)
-        this.tableList = [...status1, ...status9]
-        this.moreList = records.filter(v => v.evalRecords.length > 1 || v.evalRecords[0].tableCode === 'psqi' || v.evalRecords[0].table.tableType === 2).filter(v => {
-          if (v.evalRecords.length === 1 && v.evalRecords[0].table.tableType === 2) {
-            return v.evalRecords[0].tableCode !== 'hama' && v.evalRecords[0].tableCode !== 'hamd'
-          } else {
-            return v
+        this.tableList.forEach((ele, index) => {
+          if (ele.evalRecords.length > 1) {
+            this.$set(
+              this.tableList,
+              index,
+              Object.assign({}, ele, { textOpenFlag: null })
+            )
           }
-        })
-        this.moreList.forEach(v => {
-          if (v.evalRecords.length > 1) {
-            const arr = []
-            v.evalRecords.forEach(el => {
-              arr.push(el.table.tableName)
-            })
-            this.moreListName.push(arr)
-          } else {
-            this.moreListName.push([v.evalRecords[0].table.tableName])
-          }
-        })
-        // console.log(this.tableList, this.moreList, this.moreListName)
-        this.moreList.forEach((ele, index) => {
-          this.$set(
-            this.moreList,
-            index,
-            Object.assign({}, ele, { textOpenFlag: null })
-          )
         })
         this.$nextTick(() => {
-          if (this.moreList.length > 0) {
+          if (this.tableList.length > 0) {
             this.showTextAll()
           }
           const contentHeight = document.querySelector('.content').clientHeight
@@ -203,6 +248,7 @@ export default {
           const tableDom = this.$refs.tableHeight
           tableDom.style.height = tableHeight + 'px'
         })
+        // console.log(this.tableList, this.moreListName)
       } else {
         this.noData = true
       }
@@ -232,15 +278,15 @@ export default {
         const curHeight = txtDom[i].offsetHeight
         if (curHeight > twoHeight) {
           this.$set(
-            this.moreList,
+            this.tableList,
             i,
-            Object.assign({}, this.moreList[i], { textOpenFlag: true })
+            Object.assign({}, this.tableList[i], { textOpenFlag: true })
           )
         } else {
           this.$set(
-            this.moreList,
+            this.tableList,
             i,
-            Object.assign({}, this.moreList[i], { textOpenFlag: null })
+            Object.assign({}, this.tableList[i], { textOpenFlag: null })
           )
         }
       }
@@ -266,27 +312,53 @@ export default {
         })
       }
     },
+    // 拨打手机号
     phoneClick (phoneNum) {
       window.location.href = 'tel:' + phoneNum
     },
+    // 单个量表开始测试 & 多个量表开始和继续测试
+    startTest (sessionId, tables, status) {
+      if (sessionStorage.tables) {
+        sessionStorage.removeItem('tables')
+      }
+      sessionStorage.setItem('tables', JSON.stringify(tables))
+      const tablesList = JSON.parse(sessionStorage.tables) || []
+      const currentIndex = findIndexByKeyValue(tablesList, 'finishedAt', 0)
+      if (status === 1) {
+        this.$router.push({ path: '/test-do-infos', query: { sessionId, tableCode: tablesList[0].tableCode, tableType: tablesList[0].table.tableType } })
+      } else {
+        if (tablesList[currentIndex].table.tableType === 1) {
+          this.$router.replace({ path: '/test-do-self', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
+        } else {
+          this.$router.replace({ path: '/environment', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
+        }
+      }
+    },
+    // 单个量表继续测试
     goOnTable (type, sessionId, tableCode) {
+      if (sessionStorage.tables) {
+        sessionStorage.removeItem('tables')
+      }
       if (type === 1) {
         this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
       } else {
         this.$router.push({ path: '/environment', query: { sessionId, tableCode } })
       }
     },
-    skip () {
-      this.$router.push('/my-contact')
-    },
+    // 查看报告
     readReport (sessionId, tableType) {
       this.$router.push({ path: '/test-report', query: { sessionId, tableType } })
+    },
+    // 联系客服
+    skip () {
+      this.$router.push('/my-contact')
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+@w: 37.5;
 .main{
   display: flex;
   flex-direction: column;
@@ -359,38 +431,40 @@ export default {
         // height: 500px;
       }
       .tableCard{
-        width: 8.4rem;
-        height: 1.813333rem;
-        padding: .266667rem;
-        background: #FFFFFF;
-        border-radius: .266667rem;
-        display: flex;
-        align-items: center;
-        margin-bottom: .266667rem;
-        justify-content: space-between;
-        img{
-          width: 1.813333rem;
+        .cardBox{
+          width: 8.4rem;
           height: 1.813333rem;
-        }
-        .msg{
-          width: 4.4rem;
+          padding: .266667rem;
+          background: #FFFFFF;
+          border-radius: .266667rem;
           display: flex;
-          flex-direction: column;
-          justify-content: space-around;
-          margin-left: .266667rem;
-          height: 100%;
-          .name{
-            font-size: .373333rem;;
-            color: #333333;
+          align-items: center;
+          margin-bottom: .266667rem;
+          justify-content: space-between;
+          img{
+            width: 1.813333rem;
+            height: 1.813333rem;
           }
-        }
-        .van-button{
-          width: 1.866667rem;
-          height: .746667rem;
-          font-size: .32rem;
-          padding: 0;
-          line-height: .746667rem;
-          text-align: center;
+          .msg{
+            width: 4.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            margin-left: .266667rem;
+            height: 100%;
+            .name{
+              font-size: .373333rem;;
+              color: #333333;
+            }
+          }
+          .van-button{
+            width: 1.866667rem;
+            height: .746667rem;
+            font-size: .32rem;
+            padding: 0;
+            line-height: .746667rem;
+            text-align: center;
+          }
         }
       }
       .cllect{
@@ -409,45 +483,66 @@ export default {
     }
   }
   .more{
-    width: 8.4rem;
-    background: #FFFFFF;
-    border-radius: .266667rem;
-    padding: .4rem .266667rem;
-    margin-bottom: .266667rem;
-    .top{
-      font-size: .373333rem;
-      color: #333333;
-      position: relative;
-      .hiddenText {
-        overflow: hidden;
-        display: block;
+    .moreBox{
+      width: 8.4rem;
+      background: #FFFFFF;
+      border-radius: .266667rem;
+      padding: .4rem .266667rem;
+      margin-bottom: .266667rem;
+      .top{
+        font-size: .373333rem;
+        color: #333333;
+        position: relative;
+        .hiddenText {
+          overflow: hidden;
+          display: block;
+        }
+        .hiddenText:after {
+          z-index: 3;
+          content: "...";
+          position: absolute;
+          bottom: 2px;
+          right: 1.28rem;
+          width: .533333rem;
+          padding-left: .48rem;
+          background: linear-gradient(to right, rgba(255, 255, 255, 0.1), #fff 45%);
+        }
+        .btnMore{
+          color: #34B7B9;
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          background-color: #fff;
+        }
       }
-      .hiddenText:after {
-        z-index: 3;
-        content: "...";
-        position: absolute;
-        bottom: 2px;
-        right: 1.28rem;
-        width: .533333rem;
-        padding-left: .48rem;
-        background: linear-gradient(to right, rgba(255, 255, 255, 0.1), #fff 45%);
-      }
-      .btnMore{
-        color: #34B7B9;
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        background-color: #fff;
-      }
-    }
-    .bottom{
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-      .app{
-        color: #34B7B9;
-        font-size: .32rem;
+      .bottom{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        .moreTime{
+          display: flex;
+          flex-direction: column;
+          span:nth-child(2){
+            margin-left:0;
+          }
+        }
+        .app{
+          color: #34B7B9;
+          font-size: .32rem;
+        }
+        .btnBox{
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          .van-button--info{
+            width: 72rem/@w;
+            height: 28rem/@w;
+            border-radius: 15rem/@w;
+            font-size: 12rem/@w;
+            padding: 0;
+          }
+        }
       }
     }
   }

@@ -33,6 +33,9 @@
 <script>
 import { getTableQues, postTableQues, postTableRes } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
+// import { findIndexByKeyValue } from '@/utils/checkFinish'
+import { mapGetters } from 'vuex'
+import { Dialog } from 'vant'
 export default {
   name: 'do-self',
   data () {
@@ -50,6 +53,32 @@ export default {
       const num = (this.allData.id + 1) / this.allData.questionTotal
       const percentNum = (num * 100).toFixed(0)
       return percentNum
+    },
+    // 当前表名
+    thisTable () {
+      return this.$route.query.tableCode
+    },
+    ...mapGetters([
+      'nextTable'
+    ]),
+    routerPath () {
+      // 测试表未完成
+      const next = this.nextTable(this.thisTable)
+      console.log(next, '自评')
+      if (next) {
+        if (next.table.tableType === 1) {
+          return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+        } else {
+          return `/environment?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+        }
+      } else {
+        return `/test-do-wait?sessionId=${this.sessionId}&s=5`
+      }
+    }
+  },
+  watch: {
+    '$route' (to, from) {
+      this.$router.go(0)
     }
   },
   mounted () {
@@ -159,6 +188,7 @@ export default {
     },
     // 完成
     async finished () {
+      const next = this.nextTable(this.thisTable)
       if (this.needSend) {
         this.allData.form.formItems[0].options = this.options
         const data = {
@@ -175,7 +205,14 @@ export default {
             }
             postTableRes(data).then(resp => {
               if (resp.code === 0) {
-                this.$router.replace({ path: '/test-do-wait?s=5', query: { sessionId: this.sessionId } })
+                if (next) {
+                  this.thisDialog('您将进入下一个量表进行测试').then(() => {
+                    this.$router.replace(this.routerPath)
+                  })
+                } else {
+                  this.$router.replace(this.routerPath)
+                }
+                // this.$router.replace({ path: '/test-do-wait?s=5', query: { sessionId: this.sessionId } })
               } else {
                 this.$toast(resp.message)
               }
@@ -191,11 +228,28 @@ export default {
         }
         const res = await postTableRes(data)
         if (res.code === 0) {
-          this.$router.replace({ path: '/test-do-wait?s=5', query: { sessionId: this.sessionId } })
+          // this.$router.replace({ path: '/test-do-wait?s=5', query: { sessionId: this.sessionId } })
+          if (next) {
+            this.thisDialog('您将进入下一个量表进行测试').then(() => {
+              this.$router.replace(this.routerPath)
+            })
+          } else {
+            this.$router.replace(this.routerPath)
+          }
         } else {
           this.$toast(res.message)
         }
       }
+    },
+    // 弹窗封装
+    thisDialog (message) {
+      return Dialog.alert({
+        message,
+        theme: 'round-button',
+        className: 'detail-dialog',
+        confirmButtonText: '确定',
+        confirmButtonColor: '#34B7B9'
+      })
     }
   }
 }
