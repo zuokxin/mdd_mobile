@@ -108,6 +108,9 @@ export default {
       const d = date.getFullYear() - 100
       const m = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1)
       return new Date(d, m, 1)
+    },
+    configTables () {
+      return sessionStorage.tables ? JSON.parse(sessionStorage.tables) : []
     }
   },
   mounted () {
@@ -186,12 +189,20 @@ export default {
           if (res.code === 0) {
             // this.$router.replace({ path: `/test-do-${this.$route.query.type}`, query: { sessionId: this.sessionId, tableCode: this.tableCode } })
             // 1 自评
-            if (this.$route.query.tableType === '1') {
-              this.$router.replace({ path: '/test-do-self', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
-            }
-            // 2 他评
-            if (this.$route.query.tableType === '2') {
-              this.$router.replace({ path: '/environment', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
+            if (this.configTables.length) {
+              if (this.configTables[0].table.tableType === 1) {
+                this.$router.replace({ path: '/test-do-self', query: { sessionId: this.sessionId, tableCode: this.configTables[0].tableCode } })
+              } else {
+                this.$router.replace({ path: '/environment', query: { sessionId: this.sessionId, tableCode: this.configTables[0].tableCode } })
+              }
+            } else {
+              if (this.$route.query.tableType === '1') {
+                this.$router.replace({ path: '/test-do-self', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
+              }
+              // 2 他评
+              if (this.$route.query.tableType === '2') {
+                this.$router.replace({ path: '/environment', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
+              }
             }
           } else {
             this.$toast(res.message)

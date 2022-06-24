@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import test from './modules/test'
 import { getUserAuth } from '@/api/index'
 
 Vue.use(Vuex)
@@ -14,6 +15,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    INIT () {
+      if (sessionStorage.tables) sessionStorage.removeItem('tables')
+    }
   },
   actions: {
     // 获得token
@@ -43,5 +47,6 @@ export default new Vuex.Store({
     }
   },
   modules: {
+    test
   }
 })
