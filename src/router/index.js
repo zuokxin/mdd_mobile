@@ -87,6 +87,11 @@ const routes = [
   //   component: resolve => require(['../views/tests/index.vue'], resolve)
   // },
   {
+    path: '/tests',
+    name: '环境检测',
+    component: resolve => require(['../views/tests/index.vue'], resolve)
+  },
+  {
     path: '/testing',
     name: '授权测试',
     meta: { title: '授权测试' },

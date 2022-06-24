@@ -9,7 +9,7 @@
       </div>
       <!-- 题目这块 -->
       <div class="question-box">
-        <div class="question-text">{{questionData.id + 1}}. {{questionData.title}}</div>
+        <div class="question-text">{{questionData.title}}</div>
         <!-- 底部提交按钮 -->
         <div class="under-btn">
           <div class="line"></div>
@@ -36,7 +36,7 @@
     <!-- 人脸 -->
     <div class="face-box" v-show="timeOver && aiEvalCamEnabled && readOver" ref="point" :style="`width:${divWidth}px;height:${divHeight}px;left:${moveLeft}px;top:${moveTop}px;`"
       @touchstart.prevent="(e)=>{dragStart(e)}" @touchend.prevent="(e)=>{dragEnd(e)}"  @touchmove.prevent="(e) => dragMove(e)">
-      <video ref="videoBox"  @loadedmetadata="start"  src="" style="width: 100%; height:100%; object-fit: cover" muted></video>
+      <video ref="videoBox" webkit-playsinline="true" playsinline="true"  @loadedmetadata="start"  src="" style="width: 100%; height:100%; object-fit: cover" muted></video>
       <!-- <video ref="videoBox"  style="width: 100%; height:100%; object-fit: cover" muted></video> -->
     </div>
     <!-- 一开始播报弹窗 -->
@@ -44,13 +44,13 @@
     <!-- 每一题的语音播报弹窗 -->
     <voice :voicePopout="voicePopout" @voiceClose="voiceClose" ref="voice">
     <template slot="text">
-      <div class="text">{{questionData.id + 1}}. {{questionData.title}}</div>
+      <div class="text">{{questionData.title}}</div>
     </template>
     </voice>
     <!-- 错误提示的弹窗 -->
     <errpopout class="errpopout" :errPopout="errPopout">
       <template slot="text">
-        <div class="text">无法识别您的回答，请重新作答</div>
+        <div class="text">未听到您的回答，请重新回答题目</div>
       </template>
       <template slot="btn">
         <van-button class="sure-btn" type="primary" @click="sureToAnswer">确定</van-button>
@@ -298,7 +298,9 @@ export default {
       if (this.aiEvalCamEnabled) {
         this.$refs.videoBox.srcObject = this.stream
         console.log('录像初始化。。。')
-        this.mediaRecorder.start()
+        if (this.mediaRecorder.state !== 'recording') {
+          this.mediaRecorder.start()
+        }
         this.$refs.videoBox.play()
         /******************************
          *          监听录像
@@ -401,7 +403,6 @@ export default {
             this.init()
           }
         } catch (err) {
-          console.log(err.response)
           if (err.response.data.code === 546) {
             // 没有说话重新回答 弹出错误提示 再点击确定后做题
             if (!this.noFace) {
@@ -438,7 +439,6 @@ export default {
               this.init()
             }
           } catch (err) {
-            console.log(err.response)
             if (err.response.data.code === 546) {
               // 没有说话重新回答 弹出错误提示 再点击确定后做题
               if (!this.noFace) {
@@ -511,15 +511,12 @@ export default {
         detection => {
           console.log(detection)
           if (detection) {
-            // 有脸-----1.5秒后再来查一边
-            this.noFace = false
             setTimeout(() => { this.onPlay() }, 1500)
           } else {
             // 无脸弹窗  注意其他弹窗
             if (!this.errPopout && !this.waitwait) {
               this.noFace = true
             }
-            // 音频需要丢弃
             this.$refs.videoBox.pause()
           }
         }
@@ -539,7 +536,7 @@ export default {
         this.recorder.pause()
       }
       this.sureToAnswer()
-      setTimeout(() => { this.onPlay() }, 1500)
+      // setTimeout(() => { this.onPlay() }, 1500)
     },
     // face-box关于脱拽
     dragStart () {
@@ -580,12 +577,9 @@ export default {
       })
     }
   },
-  beforeDestroy () {
-    this.recorder.close()
-    // this.mediaRecorder = null
-  },
   beforeRouteLeave (to, from, next) {
     // 离开后摄像头红点消失
+    this.recorder.close()
     if (window.yunyuStream) {
       const [media01, media02] = window.yunyuStream.getTracks()
       if (media01) media01.stop()

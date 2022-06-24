@@ -94,6 +94,11 @@ export default {
       }
       this.$emit('close')
     }
+  },
+  beforeDestroy () {
+    if (this.player?.source.playStatus === 2) {
+      this.player.source.stop()
+    }
   }
 }
 </script>

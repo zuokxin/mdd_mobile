@@ -3,7 +3,7 @@
     <div class="test-wrap">
       <div>
         <p class="title">
-          摄像头测试
+          摄像头检测
         </p>
         <p>请将人脸放置在图像框内</p>
         <video-box
@@ -18,11 +18,13 @@
         语音测试
       </p>
       <p>进行环境语音检测</p>
-      <p class="tips text-center">
+      <p class="tips">
         <b :style="{ color: '#0CB000' }">{{ db > 0 ? db : 0 }}</b>
         <span style="margin-left: 10px">分贝</span>
       </p>
+      <p class="test-success message">{{ curMessage }}</p>
     </div>
+    <van-button round type="primary" @click="go" style="display: block; width: 80%; margin: 20px auto 0;">确定</van-button>
   </div>
 </template>
 
@@ -51,17 +53,14 @@ export default {
     return {
       stream: null,
       init: false,
-      status: 1,
       recorder: null,
       mediaRecorder: null,
       db: 0,
       // dbArray: [],
       volumeWarn: true,
       timer: null,
-      face: false,
-      faceSuccess: false,
-      faceTimer: null,
-      faceIndex: 0
+      curMessage: '',
+      hasPermission: true
     }
   },
   computed: {
@@ -99,13 +98,14 @@ export default {
           .catch(err => {
             console.log(`错误:${err}`)
             if (mediaErrorTypes(err.name) === '用户已禁止网页调用摄像头或麦克风设备') {
-              this.thisDialog('您已禁止调用摄像头或麦克风设备，当前网页无法满足此量表测试。建议您在设置中打开应用权限并退出重新进入网页，也可以购买后下载云愈心理App测试～')
+              this.curMessage = '您已禁止调用摄像头或麦克风设备，当前网页无法满足此量表测试。建议您在设置中打开应用权限并退出重新进入网页，也可以购买后下载复变云愈App测试～'
+              this.hasPermission = false
             } else {
-              this.thisDialog('打开摄像头失败，您无法在当前网页测试此量表，您可以购买后在云愈心理App内进行测试，是否继续购买？')
+              this.curMessage = '打开摄像头失败，您无法在当前网页测试此量表，您可以购买后在复变云愈App内进行测试，是否继续购买？'
             }
           })
       } catch (err) {
-        this.thisDialog('打开摄像头失败，您无法在当前网页测试此量表，您可以购买后在云愈心理App内进行测试，是否继续购买？')
+        this.curMessage = '打开摄像头失败，您无法在当前网页测试此量表，您可以购买后在复变云愈App内进行测试，是否继续购买？'
         console.log(err)
       }
     },
@@ -114,7 +114,7 @@ export default {
     },
     initFirst (stream) {
       window.yunyuStream = stream
-      this.thisDialog('您当前的设备支持测试此量表，继续购买吧～')
+      this.curMessage = '您当前的设备支持测试此量表，继续购买吧～'
       /******************************
        *      音视频控件初始化
        *****************************/
@@ -171,9 +171,9 @@ export default {
       for (let i = 0; i < inputData.length; i++) {
         size += inputData[i].length
       }
-      var data = new Float32Array(size)
-      var offset = 0
-      for (var i = 0; i < inputData.length; i++) {
+      const data = new Float32Array(size)
+      let offset = 0
+      for (let i = 0; i < inputData.length; i++) {
         data.set(inputData[i], offset)
         offset += inputData[i].length
       }
@@ -202,6 +202,13 @@ export default {
       const db = 20 * Math.log10(avgEnergy)
       return parseInt(db)
     },
+    go () {
+      if (this.hasPermission) {
+        this.$router.go(-1)
+      } else {
+        this.$router.replace('/test-more')
+      }
+    },
     thisDialog (message) {
       Dialog.alert({
         message,
@@ -224,7 +231,7 @@ export default {
   padding: 16px 20px;
   .test-wrap {
     background-color: #fff;
-    min-height: 90vh;
+    min-height: 80vh;
     border-radius: 10px;
     padding: 16px 12px;
   }
@@ -238,6 +245,9 @@ export default {
     margin: 0;
   }
   .tips {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
     color: #BBB;
     text-align: center;
     b {
@@ -250,8 +260,15 @@ export default {
       border-radius: 50%;
     }
   }
+  .message {
+    text-align: center;
+    padding: 0 2em;
+  }
 }
 .hidden {
   visibility: hidden;
+}
+.test-success {
+  color:#34B7B9;
 }
 </style>

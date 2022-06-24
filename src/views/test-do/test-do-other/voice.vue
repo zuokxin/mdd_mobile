@@ -25,6 +25,7 @@ export default {
     return {
       player: null,
       interval: null,
+      closeShow: false,
       timeNow: 0, // 音频播放时间
       timeAll: 0 // 音频时长
     }
@@ -43,9 +44,11 @@ export default {
     playAudio (url) {
       const vm = this
       // console.log(url)
+      this.closeShow = false
       this.player = new Music(url)
       this.player.addEventListener('load', function () {
         this.play()
+        this.closeShow = true
         vm.timeAll = this.audioBuffer.duration
         // 计时器
         vm.interval = setInterval(() => {
@@ -72,10 +75,17 @@ export default {
     voiceClose () {
       // this.timeNow = 0
       // this.timeAll = 0
+      console.log(this.player?.source.playStatus)
       if (this.player?.source.playStatus === 2) {
         this.player.source.stop()
       }
+      // this.player.source.stop()
       this.$emit('voiceClose')
+    }
+  },
+  beforeDestroy () {
+    if (this.player?.source.playStatus === 2) {
+      this.player.source.stop()
     }
   }
 }

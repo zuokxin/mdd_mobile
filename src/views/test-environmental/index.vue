@@ -3,11 +3,11 @@
     <div class="test-wrap">
       <div v-if="aiEvalCamEnabled">
         <p class="title">
-          <span>摄像头测试</span>
+          <span>摄像头检测</span>
           <img width="28" :src="curImg(faceSuccess)" alt="check-icon">
         </p>
-        <p>请打开摄像头，将人脸对准图像框内3S</p>
-        <p class="subtitle test-error" :class="{ 'hidden': faceSuccess || face }">未识别到人脸，可能是光线较暗或人脸不在图像框内</p>
+        <p>请打开摄像头，将人脸对准图像框内3秒</p>
+        <p class="subtitle test-error" :class="{ 'hidden': faceSuccess || face }">未识别到人脸，请保持人脸在图像框内。</p>
         <video-box
           ref="thisVideo"
           :faceDetection="true"
@@ -19,7 +19,7 @@
         </video-box>
         <p class="tips" style="margin-top: 0.27rem;">
           <span v-if="!faceSuccess"><span class="test-success" style="font-size:0.8rem">{{ faceIndex }}</span>s</span>
-          <span v-if="faceSuccess" class="test-success">请在接下来的答题过程中也保持人脸在图像框内，否则需要重新答题</span>
+          <span v-if="faceSuccess" class="test-success">请在接下来的答题过程中也保持人脸在图像框内<br/>否则需要重新答题</span>
         </p>
       </div>
       <p class="title">
@@ -27,13 +27,13 @@
         <img width="28" :src="curImg(!volumeWarn)" alt="check-icon">
       </p>
       <p>进行环境语音检测</p>
-      <p class="subtitle test-error" :class="{ 'hidden': volumeTips }">当前噪音过大！</p>
+      <p class="subtitle test-error" :class="{ 'hidden': volumeTips }">当前噪音过大</p>
       <p class="tips">
         <b :style="{ color: volumeColor }">{{ db }}</b>
         <span>分贝</span>
       </p>
     </div>
-    <van-button round type="primary" :disabled="!(!volumeWarn && faceSuccess)" @click="start" style="display: block; width: 80%; margin: 20px auto 0;">开始测试</van-button>
+    <van-button round type="primary" :disabled="!(!volumeWarn && faceSuccess)" @click="start" style="display: block; width: 80%; margin: 20px auto 0;">开始答题</van-button>
   </div>
 </template>
 
@@ -227,11 +227,12 @@ export default {
       this.timer = setInterval(() => {
         if (this.db > 40) {
           index = 0
+          this.volumeWarn = true
         } else {
           index++
           if (index > 30) {
             this.volumeWarn = false
-            clearInterval(this.timer)
+            // clearInterval(this.timer)
           }
         }
       }, 100)
