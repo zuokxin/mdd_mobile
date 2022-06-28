@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <van-nav-bar
-      title="机构绑定"
+      title="我的机构"
       left-arrow
       @click-left="onClickLeft"
     />
