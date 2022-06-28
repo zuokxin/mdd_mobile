@@ -93,7 +93,7 @@ export default {
       maxDate: new Date(),
       minDate1: new Date(),
       eduShow: false,
-      eduList: [{ name: '文盲' }, { name: '小学' }, { name: '初中' }, { name: '高中' }, { name: '大专' }, { name: '本科' }, { name: '研究生' }],
+      eduList: [{ name: '文盲' }, { name: '小学' }, { name: '初中' }, { name: '高中' }, { name: '中专' }, { name: '大专' }, { name: '本科' }, { name: '研究生' }],
       marShow: false,
       marList: [{ name: '未婚' }, { name: '已婚' }, { name: '离异' }, { name: '丧偶' }, { name: '分居' }],
       tasteShow: false,
