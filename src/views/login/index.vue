@@ -108,9 +108,10 @@ export default {
     // 链接
     skip (type) {
       if (type === 'policy') {
-        window.location.href = 'https://depression.fubianmed.com/agreements/#/privacy'
+        window.location.href = window.location.origin + '/agreements/#/privacy'
       } else {
-        window.location.href = 'https://depression.fubianmed.com/agreements/#/user'
+        window.location.href = window.location.origin + '/agreements/#/user'
+        // window.location.href = 'https://depression.fubianmed.com/agreements/#/user'
       }
     }
   }
