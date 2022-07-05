@@ -265,6 +265,10 @@ export default {
     span:first-child{
       white-space: nowrap;
     }
+    span:last-child{
+      text-align: right;
+      word-break: break-all;
+    }
   }
   .btnBox{
     display: flex;
