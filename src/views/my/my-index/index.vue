@@ -198,8 +198,15 @@ export default {
     // 判断显示样式
     showStyle () {
       return (arr) => {
-        if (arr.length === 1 && arr[0].tableCode !== 'psqi') {
-          return true
+        const obj = arr[0]
+        if (arr.length === 1) {
+          if (obj.table.tableType === 2 && obj.tableCode !== 'hamd' && obj.tableCode !== 'hama') {
+            return false
+          } else if (obj.table.tableType === 1 && obj.tableCode === 'psqi') {
+            return false
+          } else {
+            return true
+          }
         } else {
           return false
         }
