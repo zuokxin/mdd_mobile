@@ -10,7 +10,7 @@
         <!-- {{end}}{{allData.id}} -->
         <div class="question">{{allData.id + 1}}.{{allData.title}}</div>
         <div  v-for="(it,index) in options" :key="index">
-          <div class="each-choice" @click="dispose(index)">
+          <div class="each-choice">
             <span class="left-title">{{it.name}}</span>
             <span class="right-choice">
               <img class="uncheck" v-if="!it.checked" @click="dispose(index)" src="@/assets/uncheck.png">
@@ -77,8 +77,8 @@ export default {
     }
   },
   watch: {
-    '$route' (to, from) {
-      this.$router.go(0)
+    '$route' () {
+      window.location.reload()
     }
   },
   mounted () {
