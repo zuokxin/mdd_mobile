@@ -65,7 +65,7 @@ export default {
       const { code } = await getCode(this.username)
       if (code === 0) {
         this.timeFlag = true
-        this.countDown(5)
+        this.countDown(60)
       }
     },
     // 计时器
