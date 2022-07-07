@@ -168,3 +168,10 @@ export const organization = (params) => fetch({
   method: 'get',
   params
 })
+
+// 查看CBT测试记录
+export const cbtCourse = (params) => fetch({
+  url: '/api/cbtCourse/batch/bindList',
+  method: 'get',
+  params
+})
