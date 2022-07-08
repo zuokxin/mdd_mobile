@@ -190,9 +190,14 @@ export default {
       this.loading = false
     },
     // 绑定机构成功
-    bindSuccess () {
-      this.organization()
-      this.cbtCourse()
+    bindSuccess (type) {
+      if (type === 'table') {
+        this.active = 0
+        this.organization()
+      } else {
+        this.active = 1
+        this.cbtCourse()
+      }
     },
     changeTab (e) {
       this.loading = true
