@@ -145,7 +145,8 @@ export default {
             // 优惠码失效
             if (err.code === 2102 || err.code === 2103) {
               if (err.code === 2102) {
-                this.$toast('优惠失效')
+                // 活动已结束
+                this.$toast(err.message)
               }
               this.discountAmount = this.table.price
               // 更新路由
@@ -320,14 +321,14 @@ export default {
           this.$router.push('/test-more')
         })
       } else if (err.code === 2102) { // 通知优惠失效
-        this.thisDialog('优惠失效，请重新核对金额').then(() => {
+        this.thisDialog(err.message).then(() => {
           const path = `${this.$route.path}?tableCode=${this.$route.query.tableCode}`
           this.$router.replace(path)
           // 处理页面刷新
           this.$router.go(0)
         })
       } else if (err.code === 2104) { // 优惠错误
-        this.thisDialog('优惠信息错误，请刷新重试', '刷新').then(() => {
+        this.thisDialog(err.message, '刷新').then(() => {
           this.$router.go(0)
         })
       }

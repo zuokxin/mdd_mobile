@@ -72,7 +72,7 @@ export default {
       this.showDailog = false
       orgBindAdd(form).then(res => {
         this.thisDialog('您已成功绑定机构，可以开始做题啦~').then(() => {
-          this.$emit('bindSuccess')
+          this.$emit('bindSuccess', res.data)
           this.batchId = ''
           this.userNumber = ''
         })
