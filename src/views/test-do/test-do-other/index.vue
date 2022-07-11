@@ -148,7 +148,7 @@ export default {
   },
   watch: {
     '$route' (to, from) {
-      this.$router.go(0)
+      window.location.reload()
     }
   },
   mounted () {
