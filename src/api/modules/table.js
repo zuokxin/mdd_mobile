@@ -12,7 +12,7 @@ export const getTableDiscount = (tableCode, discountCode) => fetch({
   url: '/api/user/table/discountPrice',
   method: 'get',
   params: { tableCode, discountCode }
-})
+}, false)
 
 // 量表收藏
 export const postTablecoll = data => fetch({
