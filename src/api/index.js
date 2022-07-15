@@ -39,7 +39,7 @@ export const postTableOrder = data => fetch({
   url: '/api/user/v2/table/order',
   method: 'post',
   data
-})
+}, false)
 
 // 提交微信授权code
 export const postUserCode = code => fetch({
