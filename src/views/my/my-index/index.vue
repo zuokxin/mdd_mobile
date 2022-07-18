@@ -109,7 +109,8 @@
                 <div class="cardBox">
                   <img :src="item.tableLogo" alt="tableLogo">
                   <div class="msg">
-                    <div class="name">{{item.tableName}}</div>
+                    <div class="name clollectName">{{item.tableName}}</div>
+                    <div class="clollectName intros">{{item.tableIntroduction}}</div>
                     <div class="time">
                       <span>￥{{item.price}}</span>
                     </div>
@@ -455,6 +456,15 @@ export default {
             .name{
               font-size: .373333rem;;
               color: #333333;
+            }
+            .clollectName{
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            .intros{
+              font-size: 12rem / @w;
+              color: #666;
             }
           }
           .van-button{
