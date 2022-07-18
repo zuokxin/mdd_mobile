@@ -20,6 +20,7 @@
             <img :src="item.tableLogo" alt="">
             <div class="b_content">
               <div class="b_title">{{item.tableName}}</div>
+              <div class="b_title b_intros">{{item.tableIntroduction}}</div>
               <div class="b_price">￥{{item.price}}</div>
             </div>
           </div>
@@ -124,6 +125,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@w: 37.5;
 .main{
   display: flex;
   flex-direction: column;
@@ -208,6 +210,14 @@ export default {
             width: 4.906667rem;
             font-size: .373333rem;
             color: #333333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .b_intros{
+            font-size: 12rem / @w;
+            color: #666;
+            margin-top: 5rem /@w;
           }
           .b_price{
             font-size: .32rem;
