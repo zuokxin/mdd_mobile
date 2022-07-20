@@ -61,7 +61,7 @@ export default {
         const { data } = res
         this.orgMsg = data
       }).catch(err => {
-        this.thisDialog(err.response.data.message)
+        this.thisDialog(err.message)
       })
     },
     sureAdd () {
@@ -77,10 +77,10 @@ export default {
           this.userNumber = ''
         })
       }).catch(err => {
-        if (err.response.data.code === 2302) {
+        if (err.code === 2302) {
           this.showKefu = true
         } else {
-          this.thisDialog(err.response.data.message)
+          this.thisDialog(err.message)
         }
       })
     },
