@@ -6,8 +6,8 @@
       <span v-show="discountAmountInfo !== price" class="normal normal-price">￥{{ price }}</span>
     </div>
     <van-row>
-      <van-col class="content-box">
-        <div class="normal-num">{{ questionNumber }}</div>
+      <van-col class="content-box" :class="{'normal-ding': questions === '定制题数'}">
+        <div class="normal-num">{{ questions }}</div>
         <div class="normal normal-title">题数</div>
       </van-col>
       <van-col class="content-box">
@@ -58,6 +58,14 @@ export default {
         if (tenThousand >= 10000) return '9999.9w'
         const curString = tenThousand.toFixed(1)
         return curString + 'w'
+      }
+    },
+    // 题数显示
+    questions () {
+      if (this.tableCode === 'hama' || this.tableCode === 'hamd' || this.tableCode === 'MINI' || this.tableCode === 'FADI') {
+        return '定制题数'
+      } else {
+        return this.questionNumber
       }
     }
   },
@@ -128,10 +136,13 @@ export default {
   .normal-title {
     color: #999999;
   }
+  .normal-ding{
+    margin-top: -4px;
+  }
   .normal-num {
     margin-bottom: .25em;
     font-size: 16rem / @w;
-    font-weight: 700;
+    // font-weight: 700;
     color: #666666;
   }
   .content-box {
