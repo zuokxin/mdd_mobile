@@ -34,7 +34,13 @@ const educateArr = [
 ]
 const marriageArr = [
   {
-    name: '未婚'
+    name: '单身'
+  },
+  {
+    name: '恋爱关系稳定没有同居'
+  },
+  {
+    name: '恋爱关系稳定并同居'
   },
   {
     name: '已婚'
