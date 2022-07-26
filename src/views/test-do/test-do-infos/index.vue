@@ -24,8 +24,8 @@
        <van-action-sheet  v-model="birthShow">
         <van-datetime-picker
         v-model="currentDate"
-        type="year-month"
-        title="选择年月"
+        type="date"
+        title="选择年月日"
         @confirm="disposeTime"
         @cancel="birthShow = false"
         :min-date="minDate"
@@ -91,11 +91,10 @@ export default {
       birthShow: false,
       currentDate: new Date(),
       maxDate: new Date(),
-      minDate1: new Date(),
       eduShow: false,
       eduList: [{ name: '文盲' }, { name: '小学' }, { name: '初中' }, { name: '高中' }, { name: '中专' }, { name: '大专' }, { name: '本科' }, { name: '研究生' }],
       marShow: false,
-      marList: [{ name: '未婚' }, { name: '已婚' }, { name: '离异' }, { name: '丧偶' }, { name: '分居' }],
+      marList: [{ name: '单身' }, { name: '恋爱关系稳定没有同居' }, { name: '恋爱关系稳定并同居' }, { name: '已婚' }, { name: '离异' }, { name: '丧偶' }, { name: '分居' }],
       tasteShow: false,
       tasteList: [{ name: '酸' }, { name: '甜' }, { name: '苦' }, { name: '辣' }, { name: '咸' }, { name: '不确定' }],
       colorShow: false,
@@ -105,9 +104,10 @@ export default {
   computed: {
     minDate () {
       const date = new Date()
-      const d = date.getFullYear() - 100
-      const m = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1)
-      return new Date(d, m, 1)
+      const y = date.getFullYear() - 100
+      const m = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 0) : (date.getMonth() + 0)
+      const d = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      return new Date(y, m, d)
     },
     configTables () {
       return sessionStorage.tables ? JSON.parse(sessionStorage.tables) : []
@@ -128,6 +128,9 @@ export default {
       const res = await getUserCreate({ sessionId: this.sessionId })
       if (res.code === 0) {
         this.info = res.data.info
+        if (this.info.maritalStatus === '未婚') {
+          this.info.maritalStatus = ''
+        }
         delete this.info.identifier
       }
     },
@@ -147,7 +150,7 @@ export default {
     // 处理时间
     disposeTime () {
       const d = new Date(this.currentDate)
-      const datetime = d.getFullYear() + '-' + ((d.getMonth() + 1) < 10 ? '0' + (d.getMonth() + 1) : d.getMonth() + 1)
+      const datetime = d.getFullYear() + '-' + ((d.getMonth() + 1) < 10 ? '0' + (d.getMonth() + 1) : d.getMonth() + 1) + '-' + (d.getDate() < 10 ? '0' + d.getDate() : d.getDate())
       this.haveSameSelect({ name: datetime }, 'birthday', 'birthShow')
     },
     // 不同的弹窗

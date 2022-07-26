@@ -15,7 +15,7 @@
       <van-cell  is-link title="颜色喜好" :value="form.preferableColor" @click="showColor = true" />
       <van-popup v-model="showBirth" position="bottom">
         <van-datetime-picker
-          type="year-month"
+          type="date"
           :min-date="minDate"
           :max-date="maxDate"
           v-model="currentDate"
@@ -73,8 +73,7 @@ export default {
       sexArr: sexArr,
       showBirth: false, // 出生年月
       currentDate: new Date(),
-      minDate: '',
-      maxDate: '',
+      maxDate: new Date(),
       showEducate: false, // 教育程度
       educateArr: educateArr,
       showMarry: false, // 婚姻状况
@@ -85,10 +84,19 @@ export default {
       colorArr: colorArr
     }
   },
+  computed: {
+    minDate () {
+      const date = new Date()
+      const y = date.getFullYear() - 100
+      const m = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 0) : (date.getMonth() + 0)
+      const d = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      return new Date(y, m, d)
+    }
+  },
   mounted () {
-    const minTime = new Date().setTime(new Date().getTime() - 1000 * 3600 * 24 * 365 * 100)
-    this.minDate = new Date(minTime)
-    this.maxDate = new Date()
+    // const minTime = new Date().setTime(new Date().getTime() - 1000 * 3600 * 24 * 365 * 100)
+    // this.minDate = new Date(minTime)
+    // this.maxDate = new Date()
     this.getInfo()
     wxShare.share(false)
   },
@@ -101,6 +109,9 @@ export default {
           this.currentDate = new Date(this.form.birthday)
         } else {
           this.currentDate = new Date()
+        }
+        if (this.form.maritalStatus === '未婚') {
+          this.form.maritalStatus = ''
         }
         this.name = this.form.name
       }
@@ -151,7 +162,7 @@ export default {
     },
     onConfirm (date) {
       this.showBirth = false
-      this.form.birthday = moment(date).format('YYYY-MM')
+      this.form.birthday = moment(date).format('YYYY-MM-DD')
       this.postInfo()
     },
     onClickLeft () {
