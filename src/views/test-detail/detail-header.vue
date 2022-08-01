@@ -137,7 +137,7 @@ export default {
     color: #999999;
   }
   .normal-ding{
-    margin-top: -4px;
+    // margin-top: -4px;
   }
   .normal-num {
     margin-bottom: .25em;
