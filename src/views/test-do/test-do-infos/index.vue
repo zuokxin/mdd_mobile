@@ -128,8 +128,12 @@ export default {
       const res = await getUserCreate({ sessionId: this.sessionId })
       if (res.code === 0) {
         this.info = res.data.info
-        if (this.info.maritalStatus === '未婚') {
-          this.info.maritalStatus = ''
+        let arr = []
+        if (res.data.info.birthday) {
+          arr = res.data.info.birthday.split('-')
+        }
+        if (arr.length === 2) {
+          this.info.birthday = ''
         }
         delete this.info.identifier
       }
