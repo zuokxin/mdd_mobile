@@ -110,9 +110,6 @@ export default {
         } else {
           this.currentDate = new Date()
         }
-        if (this.info.maritalStatus === '未婚') {
-          this.info.maritalStatus = ''
-        }
         this.name = this.form.name
       }
     },

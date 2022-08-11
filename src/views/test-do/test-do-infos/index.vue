@@ -135,6 +135,9 @@ export default {
         if (arr.length === 2) {
           this.info.birthday = ''
         }
+        if (this.info.maritalStatus === '未婚') {
+          this.info.maritalStatus = ''
+        }
         delete this.info.identifier
       }
     },
