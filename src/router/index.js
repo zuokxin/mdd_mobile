@@ -22,6 +22,12 @@ const routes = [
     component: resolve => require(['../views/test-more/index.vue'], resolve)
   },
   {
+    path: '/search',
+    name: '搜索',
+    meta: { title: '测试' },
+    component: resolve => require(['../views/search/search.vue'], resolve)
+  },
+  {
     path: '/test-oldIndex',
     name: '更多测试',
     meta: { title: '测试' },
