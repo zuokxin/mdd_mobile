@@ -174,6 +174,9 @@ export default {
           background: #FFFFFF;
           -webkit-appearance: none;
         }
+        input[type=search]::-webkit-search-cancel-button{
+          -webkit-appearance: none;
+        }
       }
       .right{
         display: flex;
