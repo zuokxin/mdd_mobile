@@ -20,3 +20,9 @@ export const postTablecoll = data => fetch({
   method: 'post',
   data
 })
+// 量表模糊搜索
+export const searchTable = params => fetch({
+  url: '/api/user/fuzzy/search/table',
+  method: 'get',
+  params
+})
