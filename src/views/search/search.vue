@@ -263,7 +263,7 @@ export default {
       margin-bottom: .27rem;
     }
     .card{
-      padding: 0 .27rem 1rem;
+      padding: 0 .27rem 0rem;
       background: #FFFFFF;
       overflow: hidden;
       border-radius: .32rem;
