@@ -89,23 +89,16 @@ export default {
           }
         })
         this.typeList = typeAll
-        this.getTableList()
-      })
-    },
-    getTableList () {
-      getAllTable().then(res => {
-        if (res.code === 0) {
-          this.tableAll = res.data.filter(v => v.tableCode !== 'psqi').filter(v => {
-            if (v.tableType === 2) {
-              return v.tableCode === 'hama' || v.tableCode === 'hamd'
-            } else {
-              return v
-            }
-          })
-          const id = this.typeList[0].id
-          this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
-          this.loading = false
-        }
+        this.tableAll = table.data.filter(v => v.tableCode !== 'psqi').filter(v => {
+          if (v.tableType === 2) {
+            return v.tableCode === 'hama' || v.tableCode === 'hamd'
+          } else {
+            return v
+          }
+        })
+        const id = this.typeList[0].id
+        this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
+        this.loading = false
       })
     },
     showAll () {
