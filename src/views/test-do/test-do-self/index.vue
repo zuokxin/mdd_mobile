@@ -10,10 +10,10 @@
         <!-- {{end}}{{allData.id}} -->
         <div class="question">{{allData.id + 1}}.{{allData.title}}</div>
         <div  v-for="(it,index) in options" :key="index">
-          <div class="each-choice">
+          <div class="each-choice" @click="dispose(index)">
             <span class="left-title">{{it.name}}</span>
             <span class="right-choice">
-              <img class="uncheck" v-if="!it.checked" @click="dispose(index)" src="@/assets/uncheck.png">
+              <img class="uncheck" v-if="!it.checked"  src="@/assets/uncheck.png">
               <img class="check" v-else src="@/assets/checked.png">
             </span>
           </div>
