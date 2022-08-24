@@ -83,7 +83,7 @@ export default {
       if (str !== null && str !== '') {
         let arr = str.split(',').reverse()
         arr = Array(...new Set(arr))
-        arr = arr.splice(0, 10)
+        arr = arr.filter(e => e.trim()).splice(0, 10)
         this.historyList = arr
       } else {
         this.historyList = []
