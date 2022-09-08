@@ -80,6 +80,7 @@ export default {
     this.$store.dispatch('getInfo').then(res => {
       if (res.data.isNewUser && !res.data.isRXMUReward) {
         this.newPersonFlag = true
+        // 这是满足新人有礼条件
       }
     })
   },

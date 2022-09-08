@@ -334,6 +334,7 @@ export default {
         this.noData = true
       }
     },
+    // 签到
     async getCoins () {
       const res = await signInFind()
       if (res.code === 0) {
@@ -341,14 +342,15 @@ export default {
         this.signInData = res.data.signInData
       }
     },
+    // 点了新人有礼刷新币
     reloadCoins () {
       // 刷新云愈币
-      console.log('刷新云愈b')
       this.newPersonFlag = false
       this.$store.dispatch('getInfo').then(res => {
         this.yunyu_coins = res.data.yunyu_coins
       })
     },
+    // 签到的逻辑
     signCoins () {
       if (!this.isLogin) {
         this.login()

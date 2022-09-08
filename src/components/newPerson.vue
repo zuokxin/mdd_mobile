@@ -26,6 +26,7 @@ export default {
     }
   },
   methods: {
+    // 新人有礼的其中一个页面需要刷新
     personGetCoins () {
       if (this.type === 'main') {
         this.$emit('reloadCoins')
