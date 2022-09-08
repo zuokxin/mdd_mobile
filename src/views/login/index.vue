@@ -98,6 +98,7 @@ export default {
             this.$router.push({ path: '/test-more' })
           }
           sessionStorage.phone = res.data.phone
+          sessionStorage.isNewUser = res.data.isNewUser
           sessionStorage.userId = res.data.userId
           res.data.openid && (sessionStorage.openid = res.data.openid) // 微信内授权状态
         }

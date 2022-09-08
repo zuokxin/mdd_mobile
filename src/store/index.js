@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import test from './modules/test'
 import { getUserAuth } from '@/api/index'
+import { getUserInfo } from '@/api/modules/user'
 
 Vue.use(Vuex)
 
@@ -43,6 +44,15 @@ export default new Vuex.Store({
             }
           }
         )
+      })
+    },
+    getInfo () {
+      return new Promise((resolve, reject) => {
+        getUserInfo().then(res => {
+          resolve(res)
+        }).catch(err => {
+          reject(err)
+        })
       })
     }
   },
