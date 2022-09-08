@@ -562,7 +562,7 @@ export default {
     overflow: hidden;
     .get-coins{
       position: relative;
-      height: 211px;
+      height: 5.7027rem;
       padding: .4324rem .2703rem;
       border-radius: .3243rem;
       background: #7ECECE;
