@@ -50,15 +50,19 @@
         </div>
       </div>
     <div class="footer"><MainTabbar></MainTabbar></div>
+    <NewPersonGift :flag="newPersonFlag"/>
   </div>
 </template>
 
 <script>
 import { tableTypeList, getAllTable } from '@/api/modules/user'
 import MainTabbar from '@/components/MainTabbar'
+import NewPersonGift from '@/components/newPerson'
+
 export default {
   components: {
-    MainTabbar
+    MainTabbar,
+    NewPersonGift
   },
   data () {
     return {
@@ -67,11 +71,17 @@ export default {
       active: 0,
       typeList: [],
       tableList: [],
-      tableAll: []
+      tableAll: [],
+      newPersonFlag: false
     }
   },
   mounted () {
     this.getTypeList()
+    this.$store.dispatch('getInfo').then(res => {
+      if (res.data.isNewUser && !res.data.isRXMUReward) {
+        this.newPersonFlag = true
+      }
+    })
   },
   methods: {
     async getTypeList () {

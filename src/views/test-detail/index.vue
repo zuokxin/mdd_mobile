@@ -41,6 +41,8 @@
       />
     </van-goods-action>
     <CameraDialog :show.sync="otherTestDialog" @needOpenCamera="needOpenCamera"></CameraDialog>
+    <NewPersonGift :flag="newPersonFlag"/>
+
   </div>
 </template>
 
@@ -49,6 +51,7 @@ import DetailHeader from './detail-header.vue'
 import DetailContent from './detail-content.vue'
 import PayAction from './pay-action.vue'
 import CameraDialog from './camera-dialog.vue'
+import NewPersonGift from '@/components/newPerson'
 import { Dialog } from 'vant'
 import { tableInfo, postUserCode, getOrderState, wxSignatures } from '@/api/index'
 import { postTablecoll, getTableDiscount } from '@/api/modules/table'
@@ -61,7 +64,8 @@ export default {
     DetailHeader,
     DetailContent,
     PayAction,
-    CameraDialog
+    CameraDialog,
+    NewPersonGift
   },
   data () {
     return {
@@ -84,6 +88,7 @@ export default {
         tableLogo: '',
         tableType: 1
       },
+      newPersonFlag: false, // 新人有礼
       discountAmount: 0, // 折扣价格
       showPay: false, // 付款弹窗
       code: '', // 微信code
@@ -133,6 +138,11 @@ export default {
     // if (this.continue) this.go = true
     // 量表信息
     this.tableCode = this.$route.query.tableCode
+    this.$store.dispatch('getInfo').then(res => {
+      if (res.data.isNewUser && !res.data.isRXMUReward) {
+        this.newPersonFlag = true
+      }
+    })
     tableInfo(this.tableCode).then(
       res => {
         this.table = Object.assign(this.table, res.data)
