@@ -385,7 +385,7 @@ export default {
       return new File(blobArr, `${fileName}${suffix}`, { type, lastModified: dateNow })
     },
     // 提交回答-纯音频
-    async postQueResAudio () {
+    postQueResAudio () {
       const curData = {
         token: this.questionData.qiniuToken,
         customVars: {
@@ -394,26 +394,29 @@ export default {
           'x:qIndex': this.questionData.id + ''
         }
       }
-      try {
-        const audio = await uploader({ file: this.audioFile, ...curData })
-        try {
-          // 提交回答
-          const res = await posTableQues(this.postFormat({ video: '', audio: audio.url }))
-          if (res.code === 0) {
+      // 提交回答
+      uploader({ file: this.audioFile, ...curData }).then(audio => {
+        console.log(audio)
+        posTableQues(this.postFormat({ video: '', audio: audio.url })).then(re => {
+          if (re.code === 0) {
             this.init()
           }
-        } catch (err) {
-          if (err.response.data.code === 546) {
-            // 没有说话重新回答 弹出错误提示 再点击确定后做题
+        }).catch(errr => {
+          // 没有说话重新回答 弹出错误提示 再点击确定后做题
+          if (errr.code === 546) {
             if (!this.noFace) {
               this.errPopout = true
             }
+          } else {
+            this.sureToAnswer()
           }
+        })
+      }).catch(err => {
+        if (!this.errPopout) {
+          this.$toast.fail(`上传失败(${err})`)
         }
-      } catch (err) {
         this.sureToAnswer()
-        this.$toast.fail(`上传失败(${err})`)
-      }
+      })
     },
     // 提交回答两个
     async postQuesRes () {
@@ -429,29 +432,29 @@ export default {
       Promise.all([
         uploader({ file: this.videoFile, ...curData }),
         uploader({ file: this.audioFile, ...curData })
-      ]).then(
-        async res => {
-          const [video, audio] = res
-          try {
-            // 提交回答
-            const res = await posTableQues(this.postFormat({ video: video.url, audio: audio.url }))
-            if (res.code === 0) {
-              this.init()
-            }
-          } catch (err) {
-            if (err.response.data.code === 546) {
-              // 没有说话重新回答 弹出错误提示 再点击确定后做题
-              if (!this.noFace) {
-                this.errPopout = true
-              }
-            }
+      ]).then(res => {
+        const [video, audio] = res
+        posTableQues(this.postFormat({ video: video.url, audio: audio.url })).then(re => {
+          if (re.code === 0) {
+            this.init()
           }
-        }
+        }).catch(err => {
+          if (err.code === 546) {
+            // 没有说话重新回答 弹出错误提示 再点击确定后做题
+            if (!this.noFace) {
+              this.errPopout = true
+            }
+          } else {
+            this.sureToAnswer()
+          }
+        })
+      }
       ).catch(
         err => {
-          console.log(err)
+          if (!this.errPopout) {
+            this.$toast.fail(`上传失败(${err})`)
+          }
           this.sureToAnswer()
-          this.$toast.fail(`上传失败(${err})`)
         }
       )
     },
@@ -505,7 +508,7 @@ export default {
     },
     // 检查脸
     onPlay () {
-      const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.6 })
+      const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
       const el = this.$refs.videoBox
       faceapi.detectSingleFace(el, options).then(
         detection => {

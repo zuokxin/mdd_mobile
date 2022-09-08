@@ -45,9 +45,10 @@ http.interceptors.response.use(
     }
   },
   err => {
-    // console.log('err' + err) // for debug
+    console.log('err' + err) // for debug
     const { status, data, config } = err.response || {}
-    // console.log(config)
+    console.log(status, data, config, 'responseresponseresponseresponseresponseresponseresponseresponseresponseresponseresponse')
+    console.log(config, 'configconfigconfigconfigconfig')
     if (!err.response || !status) { // 无网提示
       thisMessage('哎哟，网络出小差了~')
     } else if (status === 400 && config.pushErrMessage) { // 部分400清空下后端返回业务提示
@@ -89,7 +90,7 @@ function thisMessageBox () {
 
 export default (request = {}, err = true) => {
   request.pushErrMessage = err
-  // console.log(err, 'err')
-  // console.log(request)
+  console.log(err, 'errerrerr')
+  console.log(request, 'requestrequestrequestrequestrequest')
   return http(request)
 }
