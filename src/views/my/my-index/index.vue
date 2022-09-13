@@ -154,7 +154,7 @@
     <div class="popout_box">
       <p>恭喜获得{{reward}}云愈币</p>
       <div class="btn">
-        <van-button round type="success" @click="showCoins = false">明日继续</van-button>
+        <van-button round type="success" @click="refreshshowCoins">明日继续</van-button>
       </div>
     </div>
     </div>
@@ -346,6 +346,13 @@ export default {
     reloadCoins () {
       // 刷新云愈币
       this.newPersonFlag = false
+      this.publicUse()
+    },
+    refreshshowCoins () {
+      this.showCoins = false
+      this.publicUse()
+    },
+    publicUse () {
       this.$store.dispatch('getInfo').then(res => {
         this.yunyu_coins = res.data.yunyu_coins
       })
