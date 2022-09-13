@@ -287,7 +287,7 @@ export default {
       this.getCoins()
       this.$store.dispatch('getInfo').then(res => {
         this.yunyu_coins = res.data.yunyu_coins
-        if (res.data.isNewUser && !res.data.isRXMUReward) {
+        if (res.data.isNewUser && !res.data.isRxNUReward) {
           this.newPersonFlag = true
         }
       })

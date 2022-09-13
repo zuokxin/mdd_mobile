@@ -139,7 +139,7 @@ export default {
     // 量表信息
     this.tableCode = this.$route.query.tableCode
     this.$store.dispatch('getInfo').then(res => {
-      if (res.data.isNewUser && !res.data.isRXMUReward) {
+      if (res.data.isNewUser && !res.data.isRxNUReward) {
         this.newPersonFlag = true
         // 这是满足新人有礼条件
       }
