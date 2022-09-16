@@ -5,11 +5,26 @@
       <div class="progress-bar">
         <div class="title">测试进度：{{questionData.proDisplay}}</div>
         <!-- <van-progress :percentage="questionData.progress + 20" stroke-width="5px" color="#34B7B9"  :show-pivot="false" /> -->
-        <van-progress :percentage="toPoint(questionData.proDisplay)" stroke-width="5px" color="#34B7B9"  :show-pivot="false" />
+        <van-progress :percentage="toPoint(questionData.proDisplay , tableCode === 'MINI'? 'MINI' : '')" stroke-width="5px" color="#34B7B9"  :show-pivot="false" />
       </div>
       <!-- 题目这块 -->
-      <div class="question-box">
-        <div class="question-text">{{questionData.title}}</div>
+      <div class="question-box-update" v-if= "tableCode === 'MINI' && questionData.miniQInfo.type !== 'audioYN' && questionData.miniQInfo.type !== 'audio'">
+        <div class="top">
+          <div class="question-topic">{{questionData.topic}}</div>
+          <div class="question-text question-mini">{{questionData.title}}</div>
+          <miniBox ref="minibox" v-if="tableCode === 'MINI'" @sendFalse="sendFalse" @sendData="sendData" :miniQInfo="questionData.miniQInfo"  :mid="questionData.id"></miniBox>
+        </div>
+        <div class="under">
+          <van-button round block type="primary" :disabled="miniNextFlag" @click="postAnswer">下一题</van-button>
+          <!-- <van-button round block type="primary" :disabled="miniNextFlag" @click="sendMini">下一题</van-button> -->
+        </div>
+      </div>
+      <!-- 题目这块 -->
+      <div class="question-box" v-else>
+        <div class="question-topic" v-if= "tableCode === 'MINI'">{{questionData.topic}}</div>
+        <div class="question-text" :class="{'question-mini': tableCode === 'MINI'}">{{questionData.title}}</div>
+        <div class="question-textyn" v-if= "tableCode === 'MINI' && questionData.miniQInfo.type === 'audioYN'">(请回答 "是" 或 "不是")</div>
+        <p class="question-intro" v-if="tableCode === 'MINI' && questionData.intro">{{questionData.intro}}</p>
         <!-- 底部提交按钮 -->
         <div class="under-btn">
           <div class="line"></div>
@@ -56,6 +71,16 @@
         <van-button class="sure-btn" type="primary" @click="sureToAnswer">确定</van-button>
       </template>
     </errpopout>
+    <!-- mini没有回答是否 -->
+    <errpopout class="errpopout" :errPopout="yesNoMiniDialogFlag">
+      <template slot="text">
+        <div class="text">无法识别您的回答，请重新作答</div>
+        <div class="yellow-text">注意！请回答“是”或“不是”</div>
+      </template>
+      <template slot="btn">
+        <van-button class="sure-btn" type="primary" @click="sureToAnswer">确定</van-button>
+      </template>
+    </errpopout>
     <!-- 无人脸 -->
      <errpopout class="errpopout" :errPopout="noFace">
       <template slot="text">
@@ -73,6 +98,7 @@ import Recorder from '@/utils/media/recorder'
 import * as faceapi from 'face-api.js'
 // import Recorder from 'js-audio-recorder'
 import { uploader } from '@/utils/uploader'
+import miniBox from '@/components/miniChoice.vue'
 import { getTableQues, batchInfo, posTableQues, postTableRes } from '@/api/modules/user'
 import popout from './popout'
 import errpopout from './errpopout'
@@ -84,7 +110,8 @@ export default {
   components: {
     popout,
     errpopout,
-    voice
+    voice,
+    miniBox
   },
   data () {
     return {
@@ -102,6 +129,7 @@ export default {
       popoutShow: false,
       readOver: false,
       questionData: {}, // 当前题目的信息
+      copyquestionData: {},
       stream: null, // 流？
       recorder: null, // 录音&下面2个
       audioFiles: [],
@@ -112,6 +140,7 @@ export default {
       videoSrc: null,
       videoChunk: null,
       canUpload: false,
+      onceFlag: false,
       aiEvalCamEnabled: false, // 是否需要开始摄像头的
       voicePopout: false, // 每个题目播报弹窗
       errPopout: false, // 回答有问题的弹窗
@@ -120,7 +149,11 @@ export default {
       stopFlag: true, // next-question
       error: false, // 设备error
       waitwait: false,
-      textFlag: false
+      textFlag: false,
+      miniData: '', // mini特殊题型
+      miniNextFlag: true,
+      miniType: ['check', 'select', 'radio', 'selectRange', 'radioGroup', 'dateRange'],
+      yesNoMiniDialogFlag: false // mini 回答是否的错误弹窗
     }
   },
   computed: {
@@ -202,7 +235,8 @@ export default {
           this.canUpload = false
           this.audioFiles = []
           this.videoFiles = []
-          this.questionData = res.data
+          this.questionData = JSON.parse(JSON.stringify(res.data))
+          this.copyquestionData = JSON.parse(JSON.stringify(res.data))
           this.voicePopout = true
           this.$refs.voice.playAudio(this.questionData.qAudioUrl)
         }
@@ -384,6 +418,44 @@ export default {
       const dateNow = Date.now()
       return new File(blobArr, `${fileName}${suffix}`, { type, lastModified: dateNow })
     },
+    // 提交mini
+    sendData (d) {
+      this.miniData = d
+      console.log(this.miniData)
+      this.miniNextFlag = false
+    },
+    sendFalse () {
+      // 不可以点
+      this.miniNextFlag = true
+    },
+    clearSendData () {
+      this.miniData = ''
+      this.miniNextFlag = true
+    },
+    sendMini () {
+      // 这儿用不着视频 音频 丢弃
+      const data = {
+        sessionId: this.sessionId,
+        tableCode: this.tableCode,
+        miniQInfo: this.miniData,
+        id: this.questionData.id,
+        title: this.questionData.title,
+        topic: this.questionData.topic
+      }
+      posTableQues(data).then(res => {
+        console.log(res)
+        if (res.code === 0) {
+          this.clearSendData()
+          this.init()
+        }
+      }).catch(err => {
+        // 707时间选项非法
+        console.log(err)
+        if (err.code) {
+          this.$toast(err.message)
+        }
+      })
+    },
     // 提交回答-纯音频
     postQueResAudio () {
       const curData = {
@@ -397,9 +469,13 @@ export default {
       // 提交回答
       uploader({ file: this.audioFile, ...curData }).then(audio => {
         console.log(audio)
+        // 当你不想说话进行测试的时候填入这个吧
+        // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
+        // posTableQues(this.postFormat({ video: '', audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
         posTableQues(this.postFormat({ video: '', audio: audio.url })).then(re => {
           if (re.code === 0) {
             this.init()
+            this.clearSendData()
           }
         }).catch(errr => {
           // 没有说话重新回答 弹出错误提示 再点击确定后做题
@@ -407,7 +483,13 @@ export default {
             if (!this.noFace) {
               this.errPopout = true
             }
+          } else if (errr.code === 547) {
+            // 547是 mini回答是否的问题
+            if (!this.noFace) {
+              this.yesNoMiniDialogFlag = true
+            }
           } else {
+            this.$toast(errr.message)
             this.sureToAnswer()
           }
         })
@@ -433,10 +515,14 @@ export default {
         uploader({ file: this.videoFile, ...curData }),
         uploader({ file: this.audioFile, ...curData })
       ]).then(res => {
+        // const [video] = res
         const [video, audio] = res
+        // 当你不想说话进行测试的时候填入这个吧
         posTableQues(this.postFormat({ video: video.url, audio: audio.url })).then(re => {
+        // posTableQues(this.postFormat({ video: video.url, audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
           if (re.code === 0) {
             this.init()
+            this.clearSendData()
           }
         }).catch(err => {
           if (err.code === 546) {
@@ -444,7 +530,13 @@ export default {
             if (!this.noFace) {
               this.errPopout = true
             }
+          } else if (err.code === 547) {
+            // 547是 mini回答是否的问题
+            if (!this.noFace) {
+              this.yesNoMiniDialogFlag = true
+            }
           } else {
+            this.$toast(err.message)
             this.sureToAnswer()
           }
         })
@@ -464,6 +556,10 @@ export default {
     },
     // 重新回答不播放语音
     sureToAnswer () {
+      // mini
+      if (this.yesNoMiniDialogFlag) {
+        this.yesNoMiniDialogFlag = false
+      }
       // 状态恢复数据清空
       this.audioFiles = []
       this.videoFiles = []
@@ -477,7 +573,8 @@ export default {
       if (this.aiEvalCamEnabled) {
         // 如果开启摄像头 要活动 并且做人脸识别检查
         this.mediaRecorder.start()
-        setTimeout(() => { this.onPlay() }, 1500)
+        this.onceFlag = false
+        setTimeout(() => { this.onPlay() }, 2000)
       }
     },
     postFormat (urls = {}) {
@@ -490,10 +587,23 @@ export default {
         ...urls
       }
       // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
+      if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type)) {
+        data.miniQInfo = this.miniData
+        // 非必传
+        delete data.audio
+      }
       return data
     },
-    toPoint (str) {
-      const point = str.replace('%', '')
+    toPoint (str, tablename) {
+      let point = ''
+      if (tablename === 'MINI') {
+        // mini进度条
+        const a = str.split('/')[0] / str.split('/')[1] * 100
+        point = a.toFixed(0)
+      } else {
+        // 其他进度条
+        point = str.replace('%', '')
+      }
       return point
     },
     // face的功能
@@ -510,15 +620,26 @@ export default {
     onPlay () {
       const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
       const el = this.$refs.videoBox
+      if (this.onceFlag) {
+        return false
+      }
       faceapi.detectSingleFace(el, options).then(
         detection => {
+          this.onceFlag = true
           console.log(detection)
           if (detection) {
-            setTimeout(() => { this.onPlay() }, 1500)
+            setTimeout(() => {
+              this.onceFlag = false
+              this.onPlay()
+            }, 2000)
           } else {
             // 无脸弹窗  注意其他弹窗
             if (!this.errPopout && !this.waitwait) {
               this.noFace = true
+              if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type)) {
+                this.$refs.minibox.clearData()
+                this.miniNextFlag = true
+              }
             }
             this.$refs.videoBox.pause()
           }
@@ -532,6 +653,7 @@ export default {
     // 没脸的处理->一些东西重新开始 && 状态恢复
     getFace () {
       // 去找人脸重新录制===状态===
+      this.questionData = JSON.parse(JSON.stringify(this.copyquestionData))
       this.noFace = false
       this.$refs.videoBox.play()
       if (this.aiEvalCamEnabled) {
@@ -605,6 +727,7 @@ export default {
     margin: 0 .5405rem;
     box-sizing: border-box;
     height: 100%;
+    overflow: hidden;
     .progress-bar{
       height: 1.6757rem;
       padding: .4324rem .3243rem 0;
@@ -617,6 +740,7 @@ export default {
       }
     }
   }
+  // 正常的
   .question-box{
     position: relative;
     overflow: hidden;
@@ -626,9 +750,31 @@ export default {
     .question-text{
       font-size: 16px;
       padding: .4324rem .3243rem;
-      color: 333333;
+      color: #333333;
       font-weight: 500;
       line-height: 28px;
+    }
+    .question-intro{
+      font-size: 13px;
+      padding: 0 .3243rem;
+      color: #999999;
+      line-height: 28px;
+    }
+    .question-topic{
+      font-size: 16px;
+      padding: .4324rem .3243rem 0rem;
+      color: #333333;
+      font-weight: 500;
+      line-height: 28px;
+    }
+    .question-mini{
+      padding-top: .2703rem;
+    }
+    .question-textyn{
+      color: #FFB56B;
+      font-size: 14px;
+      line-height: 14px;
+      padding: 0rem .3243rem ;
     }
     .under-btn{
       background: #FFFFFF;
@@ -682,6 +828,53 @@ export default {
       }
     }
   }
+  // 不正常的
+  .question-box-update{
+    height: calc(100% - 1.6757rem);
+    position: relative;
+    padding-bottom: 2.7027rem;
+    box-sizing: border-box;
+    .top{
+      background: #FFFFFF;
+      border-radius: .2703rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+      height: 100%;
+      .question-text{
+        font-size: 13px;
+        padding: .4324rem .3243rem;
+        color: #333333;
+        line-height: 28px;
+      }
+      .question-topic{
+        font-size: 15px;
+        padding: .4324rem .3243rem 0rem;
+        color: #333333;
+        font-weight: 500;
+        line-height: 28px;
+      }
+      .question-mini{
+        padding-top: .2703rem;
+      }
+    }
+    .under{
+      height: 2.7027rem;
+      position: absolute;
+      overflow: hidden;
+      padding: 0 .3514rem;
+      box-sizing: border-box;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      .van-button{
+        margin-top: .4324rem;
+      }
+      .van-button--disabled{
+        background: #D5D5D5;
+        border-color: #D5D5D5;
+      }
+    }
+  }
   .face-box{
     position: absolute;
     z-index: 10;
@@ -704,6 +897,12 @@ export default {
       .text{
         color: #000000;
         margin-top: 1.7027rem;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .yellow-text{
+        color: #FFB56B;
+        margin-top: .3243rem;
         font-size: 16px;
         font-weight: 600;
       }

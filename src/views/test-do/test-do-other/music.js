@@ -105,10 +105,13 @@ class Music {
       that.initSource(e.target.response)
     })
     xhr.addEventListener('error', function (error) {
+      console.log(error, '音频加载出错了')
+      that.loadMusic()
       const event = that.handle.error
       if (event) {
         event.map(v => v.call(that, error))
       }
+      console.log(event)
     })
   }
 }
