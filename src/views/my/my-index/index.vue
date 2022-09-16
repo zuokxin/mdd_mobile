@@ -324,10 +324,11 @@ export default {
           if (this.tableList.length > 0) {
             this.showTextAll()
           }
-          const contentHeight = document.querySelector('.content').clientHeight
-          const tableHeight = contentHeight - 172
-          const tableDom = this.$refs.tableHeight
-          tableDom.style.height = tableHeight + 'px'
+          // const contentHeight = document.querySelector('.content').clientHeight
+          // const tableHeight = contentHeight - 172
+          // const tableHeight = 186
+          // const tableDom = this.$refs.tableHeight
+          // tableDom.style.height = tableHeight + 'px'
         })
         // console.log(this.tableList, this.moreListName)
       } else {
@@ -484,7 +485,7 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh;
+  // height: 100vh;
   overflow: hidden;
   .header{
     height: 2.053333rem;
@@ -696,6 +697,7 @@ export default {
       }
       .tableList{
         overflow-y: auto;
+        // height: 5.027rem;
         // height: 500px;
       }
       .tableCard{
