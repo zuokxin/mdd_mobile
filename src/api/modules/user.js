@@ -175,3 +175,21 @@ export const cbtCourse = (params) => fetch({
   method: 'get',
   params
 })
+
+// 签到领取云愈币list
+export const signInFind = () => fetch({
+  url: '/api/user/sign-in/find',
+  method: 'get'
+})
+
+// 签到云愈币
+export const signInCreate = () => fetch({
+  url: '/api/user/sign-in/create',
+  method: 'post'
+}, false)
+
+// 新人有礼
+export const newUserReward = () => fetch({
+  url: '/api/user/newUserReward',
+  method: 'post'
+}, false)

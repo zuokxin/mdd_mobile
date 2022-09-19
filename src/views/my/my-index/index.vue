@@ -2,12 +2,29 @@
   <div class="main">
     <div class="header">
       <img src="@/assets/img/my/touxiang.png" alt="touxiang">
-      <div class="name" @click="login">
+      <!-- <div class="name" @click="login">
         <span v-if="!isLogin">点击登录</span>
         <span v-else>{{phone}}</span>
+      </div> -->
+      <div class="name">
+        <div class="top"><span v-if="!isLogin" @click="login">点击登录</span><span v-else>{{phone}}</span> </div>
+        <div class="center"><img src="../../../assets/img/yunyuicon.png" alt=""><span>云愈币 {{isLogin ?  yunyu_coins : '***'}}</span></div>
+        <!-- scale -->
+        <div class="under"><span class="round"><span>i</span> </span><span class="last"> <span>云愈币仅可在复变云愈APP中消费，暂不支持网页消费</span> </span></div>
       </div>
     </div>
     <div class="content">
+      <div class="get-coins">
+        <div class="top">签到领云愈币</div>
+        <div class="center">
+          <div class="blocks" v-for="(item,index) in signInData" :key="index">
+            <div class="block-top"><span>{{myDays[index]}}</span></div>
+            <div class="block-center"><img v-if="!item.isSignIn" :src="urlData[index]" alt=""> <img v-if="item.isSignIn" src="../../../assets/img/签到后.png" alt=""> </div>
+            <div class="block-under"> <span :class="{'ed': item.isSignIn}">+{{item.coin}}</span> </div>
+          </div>
+        </div>
+        <div class="under"><van-button round type="success" :class="{'van-ed': todayIsSignIn}" @click="signCoins">{{todayIsSignIn ? '今天已签到，明天继续' : '签到领云愈币'}}</van-button></div>
+      </div>
       <div class="cardList">
         <div class="card" @click="$router.push('/my-infos').catch(() => {})">
           <img src="@/assets/img/my/info.png" alt="info">
@@ -133,13 +150,23 @@
         <span @click="phoneClick('0512-6856-5993')">0512-6856-5993</span>
       </div>
     </van-dialog>
+    <div class="popout" v-if="showCoins">
+    <div class="popout_box">
+      <p>恭喜获得{{reward}}云愈币</p>
+      <div class="btn">
+        <van-button round type="success" @click="refreshshowCoins">明日继续</van-button>
+      </div>
+    </div>
+    </div>
+    <NewPersonGift :flag="newPersonFlag" type="main" @reloadCoins="reloadCoins" />
   </div>
 </template>
 
 <script>
-import { getIndividual, getCollect } from '@/api/modules/user'
+import { getIndividual, getCollect, signInFind, signInCreate } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
 import MainTabbar from '@/components/MainTabbar'
+import NewPersonGift from '@/components/newPerson'
 import moment from 'moment'
 import { findIndexByKeyValue } from '@/utils/checkFinish'
 export default {
@@ -157,11 +184,57 @@ export default {
       moreList: [],
       moreListName: [],
       textOpenFlag: false, // 展开收起
-      textHeight: '' // 文本高度
+      textHeight: '', // 文本高度
+      myDays: ['第一天', '第二天', '第三天', '第四天', '第五天', '第六天', '第七天'],
+      signInData: [
+        {
+          isSignIn: false,
+          coin: 0.2
+        },
+        {
+          isSignIn: false,
+          coin: 0.2
+        },
+        {
+          isSignIn: false,
+          coin: 0.36
+        },
+        {
+          isSignIn: false,
+          coin: 0.2
+        },
+        {
+          isSignIn: false,
+          coin: 0.2
+        },
+        {
+          isSignIn: false,
+          coin: 0.2
+        },
+        {
+          isSignIn: false,
+          coin: 0.56
+        }
+      ],
+      urlData: [
+        'https://oss-fubian-yunyu.fubianmed.com/banner/coin1.png',
+        'https://oss-fubian-yunyu.fubianmed.com/banner/coin1.png',
+        'https://oss-fubian-yunyu.fubianmed.com/banner/coin2.png',
+        'https://oss-fubian-yunyu.fubianmed.com/banner/coin1.png',
+        'https://oss-fubian-yunyu.fubianmed.com/banner/coin1.png',
+        'https://oss-fubian-yunyu.fubianmed.com/banner/coin1.png',
+        'https://oss-fubian-yunyu.fubianmed.com/banner/coin2.png'
+      ],
+      todayIsSignIn: false,
+      showCoins: false,
+      reward: '',
+      yunyu_coins: '',
+      newPersonFlag: false
     }
   },
   components: {
-    MainTabbar
+    MainTabbar,
+    NewPersonGift
   },
   computed: {
     // 判断能否在H5做量表
@@ -211,6 +284,13 @@ export default {
     this.phone = sessionStorage.getItem('phone')
     if (this.phone) {
       this.getTableList()
+      this.getCoins()
+      this.$store.dispatch('getInfo').then(res => {
+        this.yunyu_coins = res.data.yunyu_coins
+        if (res.data.isNewUser && !res.data.isRxNUReward) {
+          this.newPersonFlag = true
+        }
+      })
     } else {
       this.isLogin = false
     }
@@ -244,14 +324,55 @@ export default {
           if (this.tableList.length > 0) {
             this.showTextAll()
           }
-          const contentHeight = document.querySelector('.content').clientHeight
-          const tableHeight = contentHeight - 172
-          const tableDom = this.$refs.tableHeight
-          tableDom.style.height = tableHeight + 'px'
+          // const contentHeight = document.querySelector('.content').clientHeight
+          // const tableHeight = contentHeight - 172
+          // const tableHeight = 186
+          // const tableDom = this.$refs.tableHeight
+          // tableDom.style.height = tableHeight + 'px'
         })
         // console.log(this.tableList, this.moreListName)
       } else {
         this.noData = true
+      }
+    },
+    // 签到
+    async getCoins () {
+      const res = await signInFind()
+      if (res.code === 0) {
+        this.todayIsSignIn = res.data.todayIsSignIn
+        this.signInData = res.data.signInData
+      }
+    },
+    // 点了新人有礼刷新币
+    reloadCoins () {
+      // 刷新云愈币
+      this.newPersonFlag = false
+      this.publicUse()
+    },
+    refreshshowCoins () {
+      this.showCoins = false
+      this.publicUse()
+    },
+    publicUse () {
+      this.$store.dispatch('getInfo').then(res => {
+        this.yunyu_coins = res.data.yunyu_coins
+      })
+    },
+    // 签到的逻辑
+    signCoins () {
+      if (!this.isLogin) {
+        this.login()
+      } else {
+        if (this.todayIsSignIn) {
+        } else {
+          signInCreate().then(res => {
+            if (res.code === 0) {
+              this.reward = res.data.reward
+              this.showCoins = true
+              this.getCoins()
+            }
+          })
+        }
       }
     },
     async getCollection () {
@@ -364,7 +485,7 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh;
+  // height: 100vh;
   overflow: hidden;
   .header{
     height: 2.053333rem;
@@ -377,11 +498,71 @@ export default {
     .name{
       margin-left: .4rem;
       height: 1.6rem;
-      display: flex;
-      align-items: center;
       font-size: .426667rem;
       font-weight: 600;
       color: #333333;
+      .top{
+        height: .5946rem;
+        margin-bottom: .0541rem;
+        span{
+          color: #333333;
+          font-weight: 500;
+        }
+      }
+      .center{
+        border-radius: .3784rem;
+        display: inline-block;
+        background: rgba(52,183,185,0.15);
+        height: .7568rem;
+        padding: .1081rem .3243rem;
+        box-sizing: border-box;
+        img{
+          width: .5135rem;
+          height: .5135rem;
+        }
+        span{
+          font-size: 14px;
+          color: #333333;
+          font-weight: 500;
+          vertical-align: top;
+          padding-left: .1622rem;
+        }
+      }
+      .under{
+        height: .3784rem;
+        display: flex;
+        margin-top: 2px;
+        span{
+          display: inline-block;
+        }
+        .round{
+          width: .3243rem;
+          height: .3243rem;
+          border-radius: 50%;
+          background: #34B7B9;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          span{
+            font-size: 12px;
+            scale: 0.83;
+            color: #FFFFFF;
+            text-align: center;
+          }
+        }
+        .last{
+          padding-left: 2px;
+          span{
+            width: 10rem;
+            display: block;
+            font-size: 12px;
+            color: #333333;
+            transform: scale(0.83);
+            transform-origin: left top;
+            font-weight: 400;
+          }
+        }
+      }
     }
   }
   .content{
@@ -389,6 +570,93 @@ export default {
     padding: .48rem .533333rem;
     height: inherit;
     overflow: hidden;
+    .get-coins{
+      position: relative;
+      height: 5.7027rem;
+      padding: .4324rem .2703rem;
+      border-radius: .3243rem;
+      background: #7ECECE;
+      margin-bottom: .4324rem;
+      box-sizing: border-box;
+      .top{
+        font-size: 14px;
+        color: #FFFFFF;
+        font-weight: 500;
+        margin-bottom: .2703rem;
+      }
+      .center{
+        display: flex;
+        justify-content: space-around;
+        .blocks{
+          width: 1.0811rem;
+          height: 2.027rem;
+          font-size: 10px;
+          border-radius: .2162rem;
+          padding: .1622rem .1351rem;
+          background: #FFFFFF;
+          overflow: hidden;
+          box-sizing: border-box;
+          .block-top{
+            width: 100%;
+            display: flex;
+            height: .3784rem;
+            justify-content: center;
+            margin-bottom: .1081rem;
+            span{
+              display: inline-block;
+              font-size: 20px;
+              transform: scale(0.5);
+              word-break: keep-all;
+              color: #666666;
+            }
+          }
+          .block-center{
+            text-align: center;
+            img{
+              width: .8108rem;
+              height: .8108rem;
+            }
+          }
+          .block-under{
+            height: .3243rem;
+            display: flex;
+            justify-content: center;
+            align-items: top;
+            span{
+              display: inline-block;
+              color: #F19F38;
+              font-size: 20px;
+              scale: 0.5;
+            }
+            .ed{
+              color: #999999;
+            }
+          }
+        }
+      }
+      .under{
+        position: absolute;
+        bottom: .4865rem;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .van-ed{
+          background: #D5D5D5 !important;
+          color: #FFFFFF !important;
+        }
+        .van-button{
+          width: 8.3784rem;
+          height: 1.3514rem;
+          border: none;
+          background: #FFFFFF;
+          font-size: 16px;
+          color: #333333;
+          font-weight: 500;
+        }
+      }
+    }
     .cardList{
       height: 2.213333rem;
       background: #FFFFFF;
@@ -429,6 +697,7 @@ export default {
       }
       .tableList{
         overflow-y: auto;
+        // height: 5.027rem;
         // height: 500px;
       }
       .tableCard{
@@ -602,6 +871,42 @@ export default {
       }
     }
   }
+  .popout{
+    z-index: 999;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .popout_box{
+      width: 8.7568rem;
+      height: 6.5676rem;
+      border-radius: .5405rem;
+      background-color: #FFFFFF;
+      position: relative;
+      p{
+        margin-top: 1.7027rem;
+        color: #000000;
+        font-weight: 600;
+        text-align: center;
+      }
+      .btn{
+        position: absolute;
+        bottom: 1.0811rem;
+        width: 100%;
+        text-align: center;
+        .van-button{
+          border: none;
+          background: #34B7B9;
+          color: #FFFFFF;
+        }
+      }
+    }
+  }
 }
 </style>
 
@@ -627,5 +932,4 @@ export default {
       }
   }
 }
-
 </style>
