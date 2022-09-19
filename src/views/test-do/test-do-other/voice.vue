@@ -81,6 +81,9 @@ export default {
       }
       // this.player.source.stop()
       this.$emit('voiceClose')
+    },
+    onErrorCaptured (err) {
+      console.log('Caught error', err.message)
     }
   },
   beforeDestroy () {
