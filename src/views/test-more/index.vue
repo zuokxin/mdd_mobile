@@ -204,9 +204,6 @@ export default {
         padding: 3rem/@w 7rem/@w;
       }
     }
-    .hideType{
-      // height: 30rem/@w;
-    }
     .right{
       width: 34rem/@w;
       height: auto;
