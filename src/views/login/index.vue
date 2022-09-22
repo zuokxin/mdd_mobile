@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { getCode, postUserLogin, newUserReward } from '@/api/modules/login'
+import { getCode, postUserLogin } from '@/api/modules/login'
 export default {
   name: 'login',
   data () {
@@ -88,10 +88,10 @@ export default {
       }
       postUserLogin(data).then(res => {
         if (res.code === 0) {
-          if (res.data.isNewUser && !res.data.isRxNUReward) {
-            newUserReward().then(resp => {
-            })
-          }
+          // if (res.data.isNewUser && !res.data.isRxNUReward) {
+          //   newUserReward().then(resp => {
+          //   })
+          // }
           if (this.$route.query.url) {
             this.$router.push({ path: this.$route.query.url, query: this.$route.query })
           } else {

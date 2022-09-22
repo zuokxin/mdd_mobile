@@ -10,7 +10,7 @@
         <div class="top"><span v-if="!isLogin" @click="login">点击登录</span><span v-else>{{phone}}</span> </div>
         <div class="center"><img src="../../../assets/img/yunyuicon.png" alt=""><span>云愈币 {{isLogin ?  yunyu_coins : '***'}}</span></div>
         <!-- scale -->
-        <div class="under"><span class="round"><span>i</span> </span><span class="last"> <span>云愈币仅可在复变云愈APP中消费，暂不支持网页消费</span> </span></div>
+        <div class="under"><span class="round"><span>i</span> </span><span class="last"> <span>云愈币仅可在云愈心理APP中消费，暂不支持网页消费</span> </span></div>
       </div>
     </div>
     <div class="content">
@@ -625,8 +625,8 @@ export default {
             span{
               display: inline-block;
               color: #F19F38;
-              font-size: 20px;
-              scale: 0.5;
+              font-size: .2703rem;
+              transform: scale(0.83);
             }
             .ed{
               color: #999999;
@@ -890,6 +890,7 @@ export default {
       position: relative;
       p{
         margin-top: 1.7027rem;
+        font-size: .4324rem;
         color: #000000;
         font-weight: 600;
         text-align: center;
