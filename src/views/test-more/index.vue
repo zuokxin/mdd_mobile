@@ -102,7 +102,7 @@ export default {
         this.typeList = typeAll
         this.tableAll = table.data.filter(v => v.tableCode !== 'psqi').filter(v => {
           if (v.tableType === 2) {
-            return v.tableCode === 'hama' || v.tableCode === 'hamd'
+            return v.tableCode === 'hama' || v.tableCode === 'hamd' || v.tableCode === 'MINI'
           } else {
             return v
           }
