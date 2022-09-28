@@ -163,7 +163,7 @@
 </template>
 
 <script>
-import { getIndividual, getCollect, signInFind, signInCreate } from '@/api/modules/user'
+import { getIndividual, getCollect, signInFind, signInCreate, newUserReward } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
 import MainTabbar from '@/components/MainTabbar'
 import NewPersonGift from '@/components/newPerson'
@@ -347,7 +347,11 @@ export default {
     reloadCoins () {
       // 刷新云愈币
       this.newPersonFlag = false
-      this.publicUse()
+      newUserReward().then(res => {
+        if (res.code === 0) {
+          this.publicUse()
+        }
+      })
     },
     refreshshowCoins () {
       this.showCoins = false
