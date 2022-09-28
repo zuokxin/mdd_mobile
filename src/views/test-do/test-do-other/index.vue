@@ -489,7 +489,9 @@ export default {
               this.yesNoMiniDialogFlag = true
             }
           } else {
-            // this.$toast(errr.message)
+            if (!this.noFace) {
+              this.$toast(errr.message)
+            }
             this.sureToAnswer()
           }
         })
@@ -536,6 +538,9 @@ export default {
               this.yesNoMiniDialogFlag = true
             }
           } else {
+            if (!this.noFace) {
+              this.$toast(err.message)
+            }
             // this.$toast(err.message)
             this.sureToAnswer()
           }
