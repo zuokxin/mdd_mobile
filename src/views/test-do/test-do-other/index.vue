@@ -489,7 +489,7 @@ export default {
               this.yesNoMiniDialogFlag = true
             }
           } else {
-            this.$toast(errr.message)
+            // this.$toast(errr.message)
             this.sureToAnswer()
           }
         })
@@ -536,7 +536,7 @@ export default {
               this.yesNoMiniDialogFlag = true
             }
           } else {
-            this.$toast(err.message)
+            // this.$toast(err.message)
             this.sureToAnswer()
           }
         })
