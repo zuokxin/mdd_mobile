@@ -329,7 +329,7 @@ export default {
       this.choice = ''
       this.selectShow = false
       this.selectRangeShow = false
-      console.log(this.miniQInfo)
+      // console.log(this.miniQInfo)
     }
   }
 }

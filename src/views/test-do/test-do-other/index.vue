@@ -349,8 +349,8 @@ export default {
             this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
             this.videoFiles.push(this.videoFile)
             // 音频文件处理
-            this.audioCreate()
             // 上传文件
+            this.audioCreate()
             this.postQuesRes()
           }
         }
@@ -625,7 +625,7 @@ export default {
     onPlay () {
       const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
       const el = this.$refs.videoBox
-      if (this.onceFlag) {
+      if (this.onceFlag || this.voicePopout) {
         return false
       }
       faceapi.detectSingleFace(el, options).then(
@@ -661,7 +661,7 @@ export default {
       this.questionData = JSON.parse(JSON.stringify(this.copyquestionData))
       this.noFace = false
       this.$refs.videoBox.play()
-      if (this.aiEvalCamEnabled) {
+      if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type))) {
         this.mediaRecorder.stop()
         this.recorder.pause()
       }

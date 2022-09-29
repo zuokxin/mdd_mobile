@@ -285,12 +285,14 @@ export default {
     if (this.phone) {
       this.getTableList()
       this.getCoins()
-      this.$store.dispatch('getInfo').then(res => {
-        this.yunyu_coins = res.data.yunyu_coins
-        if (res.data.isNewUser && !res.data.isRxNUReward) {
-          this.newPersonFlag = true
-        }
-      })
+      if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+        this.$store.dispatch('getInfo').then(res => {
+          this.yunyu_coins = res.data.yunyu_coins
+          if (res.data.isNewUser && !res.data.isRxNUReward) {
+            this.newPersonFlag = true
+          }
+        })
+      }
     } else {
       this.isLogin = false
     }
