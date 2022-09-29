@@ -18,7 +18,7 @@ export default {
 
 <style lang="less" scoped>
 .popout{
-  z-index: 100;
+  z-index: 99999;
   width: 100vw;
   font-size: 16px;
   height: 100vh;
