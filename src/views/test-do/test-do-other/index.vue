@@ -153,7 +153,8 @@ export default {
       miniData: '', // mini特殊题型
       miniNextFlag: true,
       miniType: ['check', 'select', 'radio', 'selectRange', 'radioGroup', 'dateRange'],
-      yesNoMiniDialogFlag: false // mini 回答是否的错误弹窗
+      yesNoMiniDialogFlag: false, // mini 回答是否的错误弹窗
+      getFaceFlag: true
     }
   },
   computed: {
@@ -239,6 +240,7 @@ export default {
           this.copyquestionData = JSON.parse(JSON.stringify(res.data))
           this.voicePopout = true
           this.$refs.voice.playAudio(this.questionData.qAudioUrl)
+          this.getFaceFlag = true
         }
       }
     },
@@ -344,7 +346,7 @@ export default {
         }
         this.mediaRecorder.onstop = e => {
           console.log(e, '停止录像。。。', this.videoChunk)
-          if (this.canUpload && !this.noFace) {
+          if (this.canUpload && !this.noFace && this.getFaceFlag) {
             // 视频文件处理
             this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
             this.videoFiles.push(this.videoFile)
@@ -383,6 +385,7 @@ export default {
         return
       }
       this.waitwait = true // 提交有个过程
+      this.getFaceFlag = true
       this.textFlag = true
       if (this.stopFlag) {
         // 这个按钮不能疯狂点击
@@ -661,6 +664,7 @@ export default {
       this.questionData = JSON.parse(JSON.stringify(this.copyquestionData))
       this.noFace = false
       this.$refs.videoBox.play()
+      this.getFaceFlag = false
       if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type))) {
         this.mediaRecorder.stop()
         this.recorder.pause()
