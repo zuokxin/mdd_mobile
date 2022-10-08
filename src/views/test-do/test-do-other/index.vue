@@ -24,7 +24,7 @@
         <div class="question-topic" v-if= "tableCode === 'MINI'">{{questionData.topic}}</div>
         <div class="question-text" :class="{'question-mini': tableCode === 'MINI'}">{{questionData.title}}</div>
         <div class="question-textyn" v-if= "tableCode === 'MINI' && questionData.miniQInfo.type === 'audioYN'">(请回答 "是" 或 "不是")</div>
-        <p class="question-intro" v-if="tableCode === 'MINI' && questionData.intro">{{questionData.intro}}</p>
+        <p class="question-intro" v-if="tableCode === 'MINI' && questionData.miniQInfo.intro">{{questionData.miniQInfo.intro}}</p>
         <!-- 底部提交按钮 -->
         <div class="under-btn">
           <div class="line"></div>
