@@ -259,68 +259,26 @@ export default {
         // console.log(e)
         const buffer = e.inputBuffer.getChannelData(0)
         this.recorder.audioBuffers.push(new Float32Array(buffer))
-        const samples = this.compress([new Float32Array(buffer)])
-        const db = this.getDB(samples)
-        // let maxVal = 0
-        // buffer.forEach(e => {
-        //   if (maxVal < e) {
-        //     maxVal = e
-        //   }
-        // })
+        let maxVal = 0
+        buffer.forEach(e => {
+          if (maxVal < e) {
+            maxVal = e
+          }
+        })
         if (this.waitwait) {
           this.left_Voice = []
           this.right_Voice = []
         } else {
-          // console.log(maxVal * 100)
-          // this.left_Voice = this.voiceLevel(maxVal * 100).reverse()
-          this.left_Voice = this.voiceLevel(db).reverse()
-          // this.right_Voice = this.voiceLevel(maxVal * 100)
-          this.right_Voice = this.voiceLevel(db)
+          this.left_Voice = this.voiceLevel(maxVal * 100).reverse()
+          // this.left_Voice = this.voiceLevel(db).reverse()
+          this.right_Voice = this.voiceLevel(maxVal * 100)
+          // this.right_Voice = this.voiceLevel(db)
         }
         // console.log('录音中。。。', buffer)
       }
       if (this.aiEvalCamEnabled) {
         this.mediaRecorder = new MediaRecorder(stream)
         // this.$refs.videoBox.srcObject = this.stream
-      }
-    },
-    compress (inputData) {
-      let size = 0
-      for (let i = 0; i < inputData.length; i++) {
-        size += inputData[i].length
-      }
-      var data = new Float32Array(size)
-      var offset = 0
-      for (var i = 0; i < inputData.length; i++) {
-        data.set(inputData[i], offset)
-        offset += inputData[i].length
-      }
-      return data
-    },
-    getDB (samples) {
-      // const bitDepth = 16
-      // const bytesPerSample = bitDepth / 8
-      const offset = 0
-      const buffer = new ArrayBuffer(samples.length * 2)
-      const view = new DataView(buffer)
-      this.floatTo16BitPCM(view, offset, samples)
-
-      const int16Audio = new Int16Array(buffer)
-
-      let avgEnergy = 0
-      int16Audio.forEach(fragment => {
-        avgEnergy += fragment * fragment
-      })
-
-      avgEnergy = Math.sqrt(avgEnergy / int16Audio.length)
-      // const db = 20 * Math.log10(avgEnergy / 32767)
-      const db = 20 * Math.log10(avgEnergy)
-      return parseInt(db)
-    },
-    floatTo16BitPCM (output, offset, input) {
-      for (let i = 0; i < input.length; i++, offset += 2) {
-        const s = Math.max(-1, Math.min(1, input[i]))
-        output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true)
       }
     },
     initUserMedia () {
@@ -419,10 +377,10 @@ export default {
       const list = [
         { min: 0, max: 10 }, { min: 10, max: 20 }, { min: 20, max: 30 }, { min: 30, max: 40 }, { min: 40, max: 50 }, { min: 50, max: 60 }, { min: 60, max: 70 }, { min: 70, max: 80 }, { min: 80, max: 90 }, { min: 90, max: 100 }
       ]
-      const newN = n / 84 * 100
+      // const newN = n / 84 * 100
       const arr = []
       list.forEach(e => {
-        if (e.min <= Math.round(newN)) {
+        if (e.min <= Math.round(n)) {
           arr.push(true)
         } else {
           arr.push(false)
