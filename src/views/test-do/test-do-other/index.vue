@@ -105,10 +105,12 @@ import errpopout from './errpopout'
 import voice from './voice'
 import { mapGetters } from 'vuex'
 import { Dialog } from 'vant'
-document.addEventListener('webkitvisibilitychange', function () {
-  if (document.webkitVisibilityState === 'hidden') {
-    window.location.reload()
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'hidden') {
+    // window.location.reload()
+    // 隐藏就不刷新了
   } else {
+    // 可见刷新
     window.location.reload()
   }
 })
