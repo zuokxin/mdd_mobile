@@ -118,7 +118,7 @@
       </div>
       <span>{{miniQInfo.miniSelectRange.suffix}}</span>
     </div>
-    <van-action-sheet v-model="selectRangeShow" :actions="selectRangeList" cancel-text="取消" close-on-click-action @select="selectSelectRange($event)" />
+    <van-action-sheet v-model="selectRangeShow" :actions="selectRangeList" cancel-text="取消" close-on-click-action  @select="selectSelectRange($event)" />
   </div>
 </template>
 
@@ -170,6 +170,20 @@ export default {
     mid (newV, oldV) {
       if (newV !== oldV) {
         this.clearData()
+      }
+    },
+    timeFlag1 (newV, oldV) {
+      if (newV) {
+        if (!this.time1) {
+          this.time1 = new Date()
+        }
+      }
+    },
+    timeFlag2 (newV, oldV) {
+      if (newV) {
+        if (!this.time2) {
+          this.time2 = new Date()
+        }
       }
     }
   },
@@ -315,7 +329,7 @@ export default {
       this.choice = ''
       this.selectShow = false
       this.selectRangeShow = false
-      console.log(this.miniQInfo)
+      // console.log(this.miniQInfo)
     }
   }
 }

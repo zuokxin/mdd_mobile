@@ -24,7 +24,7 @@
         <div class="question-topic" v-if= "tableCode === 'MINI'">{{questionData.topic}}</div>
         <div class="question-text" :class="{'question-mini': tableCode === 'MINI'}">{{questionData.title}}</div>
         <div class="question-textyn" v-if= "tableCode === 'MINI' && questionData.miniQInfo.type === 'audioYN'">(请回答 "是" 或 "不是")</div>
-        <p class="question-intro" v-if="tableCode === 'MINI' && questionData.intro">{{questionData.intro}}</p>
+        <p class="question-intro" v-if="tableCode === 'MINI' && questionData.miniQInfo.intro">{{questionData.miniQInfo.intro}}</p>
         <!-- 底部提交按钮 -->
         <div class="under-btn">
           <div class="line"></div>
@@ -105,6 +105,15 @@ import errpopout from './errpopout'
 import voice from './voice'
 import { mapGetters } from 'vuex'
 import { Dialog } from 'vant'
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'hidden') {
+    // window.location.reload()
+    // 隐藏就不刷新了
+  } else {
+    // 可见刷新
+    window.location.reload()
+  }
+})
 export default {
   name: 'do-other',
   components: {
@@ -153,7 +162,8 @@ export default {
       miniData: '', // mini特殊题型
       miniNextFlag: true,
       miniType: ['check', 'select', 'radio', 'selectRange', 'radioGroup', 'dateRange'],
-      yesNoMiniDialogFlag: false // mini 回答是否的错误弹窗
+      yesNoMiniDialogFlag: false, // mini 回答是否的错误弹窗
+      getFaceFlag: true
     }
   },
   computed: {
@@ -243,6 +253,7 @@ export default {
           this.copyquestionData = JSON.parse(JSON.stringify(res.data))
           this.voicePopout = true
           this.$refs.voice.playAudio(this.questionData.qAudioUrl)
+          this.getFaceFlag = true
         }
       }
     },
@@ -265,7 +276,9 @@ export default {
           this.right_Voice = []
         } else {
           this.left_Voice = this.voiceLevel(maxVal * 100).reverse()
+          // this.left_Voice = this.voiceLevel(db).reverse()
           this.right_Voice = this.voiceLevel(maxVal * 100)
+          // this.right_Voice = this.voiceLevel(db)
         }
         // console.log('录音中。。。', buffer)
       }
@@ -348,13 +361,13 @@ export default {
         }
         this.mediaRecorder.onstop = e => {
           console.log(e, '停止录像。。。', this.videoChunk)
-          if (this.canUpload && !this.noFace) {
+          if (this.canUpload && !this.noFace && this.getFaceFlag) {
             // 视频文件处理
             this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
             this.videoFiles.push(this.videoFile)
             // 音频文件处理
-            this.audioCreate()
             // 上传文件
+            this.audioCreate()
             this.postQuesRes()
           }
         }
@@ -370,6 +383,7 @@ export default {
       const list = [
         { min: 0, max: 10 }, { min: 10, max: 20 }, { min: 20, max: 30 }, { min: 30, max: 40 }, { min: 40, max: 50 }, { min: 50, max: 60 }, { min: 60, max: 70 }, { min: 70, max: 80 }, { min: 80, max: 90 }, { min: 90, max: 100 }
       ]
+      // const newN = n / 84 * 100
       const arr = []
       list.forEach(e => {
         if (e.min <= Math.round(n)) {
@@ -387,6 +401,7 @@ export default {
         return
       }
       this.waitwait = true // 提交有个过程
+      this.getFaceFlag = true
       this.textFlag = true
       if (this.stopFlag) {
         // 这个按钮不能疯狂点击
@@ -493,7 +508,9 @@ export default {
               this.yesNoMiniDialogFlag = true
             }
           } else {
-            this.$toast(errr.message)
+            if (!this.noFace) {
+              this.$toast(errr.message)
+            }
             this.sureToAnswer()
           }
         })
@@ -540,7 +557,10 @@ export default {
               this.yesNoMiniDialogFlag = true
             }
           } else {
-            this.$toast(err.message)
+            if (!this.noFace) {
+              this.$toast(err.message)
+            }
+            // this.$toast(err.message)
             this.sureToAnswer()
           }
         })
@@ -624,7 +644,7 @@ export default {
     onPlay () {
       const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
       const el = this.$refs.videoBox
-      if (this.onceFlag) {
+      if (this.onceFlag || this.voicePopout) {
         return false
       }
       faceapi.detectSingleFace(el, options).then(
@@ -660,7 +680,8 @@ export default {
       this.questionData = JSON.parse(JSON.stringify(this.copyquestionData))
       this.noFace = false
       this.$refs.videoBox.play()
-      if (this.aiEvalCamEnabled) {
+      this.getFaceFlag = false
+      if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type))) {
         this.mediaRecorder.stop()
         this.recorder.pause()
       }

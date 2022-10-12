@@ -10,7 +10,7 @@
         <div class="top"><span v-if="!isLogin" @click="login">点击登录</span><span v-else>{{phone}}</span> </div>
         <div class="center"><img src="../../../assets/img/yunyuicon.png" alt=""><span>云愈币 {{isLogin ?  yunyu_coins : '***'}}</span></div>
         <!-- scale -->
-        <div class="under"><span class="round"><span>i</span> </span><span class="last"> <span>云愈币仅可在复变云愈APP中消费，暂不支持网页消费</span> </span></div>
+        <div class="under"><span class="round"><span>i</span> </span><span class="last"> <span>云愈币仅可在云愈心理APP中消费，暂不支持网页消费</span> </span></div>
       </div>
     </div>
     <div class="content">
@@ -163,7 +163,7 @@
 </template>
 
 <script>
-import { getIndividual, getCollect, signInFind, signInCreate } from '@/api/modules/user'
+import { getIndividual, getCollect, signInFind, signInCreate, newUserReward } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
 import MainTabbar from '@/components/MainTabbar'
 import NewPersonGift from '@/components/newPerson'
@@ -281,12 +281,14 @@ export default {
     if (this.phone) {
       this.getTableList()
       this.getCoins()
-      this.$store.dispatch('getInfo').then(res => {
-        this.yunyu_coins = res.data.yunyu_coins
-        if (res.data.isNewUser && !res.data.isRxNUReward) {
-          this.newPersonFlag = true
-        }
-      })
+      if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+        this.$store.dispatch('getInfo').then(res => {
+          this.yunyu_coins = res.data.yunyu_coins
+          if (res.data.isNewUser && !res.data.isRxNUReward) {
+            this.newPersonFlag = true
+          }
+        })
+      }
     } else {
       this.isLogin = false
     }
@@ -343,7 +345,11 @@ export default {
     reloadCoins () {
       // 刷新云愈币
       this.newPersonFlag = false
-      this.publicUse()
+      newUserReward().then(res => {
+        if (res.code === 0) {
+          this.publicUse()
+        }
+      })
     },
     refreshshowCoins () {
       this.showCoins = false
@@ -621,8 +627,8 @@ export default {
             span{
               display: inline-block;
               color: #F19F38;
-              font-size: 20px;
-              scale: 0.5;
+              font-size: .2703rem;
+              transform: scale(0.83);
             }
             .ed{
               color: #999999;
@@ -887,6 +893,7 @@ export default {
       position: relative;
       p{
         margin-top: 1.7027rem;
+        font-size: .4324rem;
         color: #000000;
         font-weight: 600;
         text-align: center;

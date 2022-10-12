@@ -77,12 +77,14 @@ export default {
   },
   mounted () {
     this.getTypeList()
-    this.$store.dispatch('getInfo').then(res => {
-      if (res.data.isNewUser && !res.data.isRxNUReward) {
-        this.newPersonFlag = true
-        // 这是满足新人有礼条件
-      }
-    })
+    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+      this.$store.dispatch('getInfo').then(res => {
+        if (res.data.isNewUser && !res.data.isRxNUReward) {
+          this.newPersonFlag = true
+          // 这是满足新人有礼条件
+        }
+      })
+    }
   },
   methods: {
     async getTypeList () {
