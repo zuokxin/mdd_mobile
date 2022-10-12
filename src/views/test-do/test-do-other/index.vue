@@ -172,7 +172,11 @@ export default {
         if (next.table.tableType === 1) {
           return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
         } else {
-          return `/test-do-other?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+          if (next.table.tableCode === 'FADI') {
+            return `/test-do-fadi?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+          } else {
+            return `/test-do-other?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+          }
         }
       } else {
         return `/test-do-wait?sessionId=${this.sessionId}`

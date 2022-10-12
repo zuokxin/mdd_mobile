@@ -29,7 +29,7 @@ const routes = [
   },
   {
     path: '/test-oldIndex',
-    name: '更多测试',
+    name: '更多测试-old',
     meta: { title: '测试' },
     component: resolve => require(['../views/test-more/oldIndex.vue'], resolve)
   },
@@ -56,6 +56,12 @@ const routes = [
     name: '测试-他评量表',
     meta: { title: '测试' },
     component: resolve => require(['../views/test-do/test-do-other/index.vue'], resolve)
+  },
+  {
+    path: '/test-do-fadi',
+    name: '测试-他评量表-fadi',
+    meta: { title: '测试' },
+    component: resolve => require(['../views/test-do/test-do-fadi/index.vue'], resolve)
   },
   {
     path: '/test-report',

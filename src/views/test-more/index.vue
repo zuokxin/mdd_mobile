@@ -100,13 +100,7 @@ export default {
           }
         })
         this.typeList = typeAll
-        this.tableAll = table.data.filter(v => v.tableCode !== 'psqi').filter(v => {
-          if (v.tableType === 2) {
-            return v.tableCode === 'hama' || v.tableCode === 'hamd'
-          } else {
-            return v
-          }
-        })
+        this.tableAll = table.data.filter(v => v.tableCode !== 'psqi')
         const id = this.typeList[0].id
         this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
         this.loading = false
@@ -160,8 +154,9 @@ export default {
   }
   .game{
     margin: 10rem/@w 0 16rem/@w 0;
-    width: 335rem/@w;
-    height: 98rem/@w;
+    // width: 335rem/@w;
+    // height: 98rem/@w;
+    width: 100%;
   }
   .testTitle{
     display: flex;
@@ -232,7 +227,7 @@ export default {
   background: #F4F4F4;
   padding: 2rem/@w 20rem/@w 10rem/@w 20rem/@w;
   .tableList{
-    width: 315rem/@w;
+    // width: 315rem/@w;
     background: #FFFFFF;
     border-radius: 12rem/@w;
     padding: 6rem/@w 10rem/@w;
