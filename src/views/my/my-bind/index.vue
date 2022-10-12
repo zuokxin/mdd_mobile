@@ -140,11 +140,7 @@ export default {
     isCanDo () {
       return (arr) => {
         const flag = arr.some(v => {
-          if (v.table.tableType === 2) {
-            return v.tableCode !== 'hamd' && v.tableCode !== 'hama'
-          } else {
-            return v.tableCode === 'psqi'
-          }
+          return v.tableCode === 'psqi'
         })
         return flag
       }

@@ -277,8 +277,9 @@ export default {
       return parseInt(db)
     },
     start () {
+      const path = this.$route.query.tableCode === 'FADI' ? '/test-do-fadi' : '/test-do-other'
       this.$router.replace({
-        path: '/test-do-other',
+        path,
         query: this.$route.query
       })
     },
