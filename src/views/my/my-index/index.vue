@@ -241,11 +241,7 @@ export default {
     isCanDo () {
       return (arr) => {
         const flag = arr.some(v => {
-          if (v.table.tableType === 2) {
-            return v.tableCode !== 'hamd' && v.tableCode !== 'hama'
-          } else {
-            return v.tableCode === 'psqi'
-          }
+          return v.tableCode === 'psqi'
         })
         return flag
       }
@@ -702,7 +698,7 @@ export default {
       }
       .tableCard{
         .cardBox{
-          width: 8.4rem;
+          // width: 8.4rem;
           height: 1.813333rem;
           padding: .266667rem;
           background: #FFFFFF;
@@ -716,7 +712,8 @@ export default {
             height: 1.813333rem;
           }
           .msg{
-            width: 4.4rem;
+            // width: 4.4rem;
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: space-around;
