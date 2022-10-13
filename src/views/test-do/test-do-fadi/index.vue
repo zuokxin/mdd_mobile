@@ -216,15 +216,12 @@ export default {
     openFacrTips () {
       if (this.loading) return
       // 不上传标志位
-      this.canUpload = false
-      this.toNext()
+      this.toNext(() => {
+        // 有500ms防抖
+        this.canUpload = false
+      })
       setTimeout(() => {
         this.faceShow = true
-        // this.thisDialog('未识别到全部人脸，请重做本题').then(
-        //   () => {
-        //     this.colseFaceTips()
-        //   }
-        // )
       }, 0)
     },
     // 关闭人脸提示
@@ -367,7 +364,8 @@ export default {
       this.queLoading = true
       getTableQues({
         sessionId: this.sessionId,
-        tableCode: this.tableCode
+        tableCode: this.tableCode,
+        midwayBackBool: this.midwayBackBool
       }).then(
         res => {
           const {
@@ -472,10 +470,11 @@ export default {
         this.recorder.start()
         if (this.aiEvalCamEnabled) this.mediaRecorder.start()
         this.recorderShow = true
+        console.log('recorderShow', this.recorderShow)
       }
     },
     // 下一题
-    toNext: throttle(function () {
+    toNext: throttle(function (cb) {
       // 禁用无法进入
       if (this.loading || !this.canUpload) return
       if (this.error) {
@@ -485,6 +484,7 @@ export default {
       if (this.mediaRecorder && this.mediaRecorder.state === 'inactive') {
         return
       }
+      if (cb) cb()
       // 是否用摄像头
       if (this.aiEvalCamEnabled) {
         this.$refs.dragVideo.$children[0].pause()

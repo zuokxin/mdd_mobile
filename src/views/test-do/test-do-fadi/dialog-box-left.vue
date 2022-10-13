@@ -70,7 +70,8 @@ export default {
   max-width: 70%;
   min-height: 30px;
   padding: 6px 14px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   position: relative;
   background: #FFFFFF;
   border-radius: 8px;

@@ -116,7 +116,6 @@ export default {
       }
     },
     onPlay () {
-      console.log('2')
       if (!this.faceDetection) return
       if (this.videoBox.paused) return
       const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
