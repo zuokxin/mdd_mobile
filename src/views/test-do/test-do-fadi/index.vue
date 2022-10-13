@@ -32,8 +32,8 @@
           </div>
         </div>
       </div>
-      <div class="bottom" :class="{'isEnd': isEnd}">
-        <div v-if="!isEnd && recorderShow" class="bot_box">
+      <div v-show="recorderShow" class="bottom" :class="{'isEnd': isEnd}">
+        <div v-if="!isEnd" class="bot_box">
           <p class="tips-01">{{ btnText }}</p>
           <p class="tips-02">{{ btnText2 }}</p>
           <div class="submit-btn">
@@ -43,7 +43,7 @@
           </div>
         </div>
         <van-button
-          v-if="isEnd && recorderShow"
+          v-if="isEnd"
           class="main-btn-dark mx-auto my-5"
           type="primary"
           size="large"
@@ -568,7 +568,7 @@ export default {
           })
         } catch (err) {
           if (err.code === 546) {
-            this.thisDialog('未听到您的回答,请重新回答题目').then(
+            this.thisDialog('未听到您的回答,请重新回答题目', '重新做题').then(
               () => {
                 this.loading = false
                 this.handleDialog()
@@ -650,7 +650,7 @@ export default {
           ).catch(
             err => {
               if (err.code === 546) {
-                this.thisDialog('未听到您的回答,请重新回答题目').then(
+                this.thisDialog('未听到您的回答,请重新回答题目', '重新做题').then(
                   () => {
                     this.loading = false
                     this.handleDialog()
