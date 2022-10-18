@@ -38,7 +38,7 @@
           <p class="tips-02">{{ btnText2 }}</p>
           <div class="submit-btn">
             <VolumeIcon class="mr-3" v-show="!loading" :value="volumeVal" style="transform: rotateZ(180deg);"></VolumeIcon>
-            <XyButton :disabled="loading || !canUpload" @click.native="toNext"></XyButton>
+            <XyButton :disabled="loading || !canUpload" @click.native="toNext()"></XyButton>
             <VolumeIcon class="ml-3" v-show="!loading" :value="volumeVal" style="margin-bottom: -5px;"></VolumeIcon>
           </div>
         </div>
@@ -89,7 +89,7 @@ import { getTableQues, batchInfo, posTableQues, postTableRes } from '@/api/modul
 import { uploader } from '@/utils/uploader'
 // import { encodeWav } from '@/utils/media/audio'
 import { mediaErrorTypes } from '@/utils/types'
-import { throttle } from '@/utils/throttle'
+// import { throttle } from '@/utils/throttle'
 import Recorder from '@/utils/media/recorder'
 import { mapGetters } from 'vuex'
 export default {
@@ -110,12 +110,7 @@ export default {
       textRight: '',
       volumeVal: 0,
       queLoading: false,
-      storeData: null,
       midwayBackBool: true, // true代表着中途返回
-      submitPercent: 0,
-      faceStatus: true,
-      otherDialg: true,
-      // dialogVisible: false, // music dialog
       quesUrl: '',
       error: true,
       audioFiles: [],
@@ -128,12 +123,10 @@ export default {
       timer: null,
       isEnd: false,
       queObj: {},
-      noAnswerOnj: {},
       titleIndex: 0,
       videoFile: null,
       audioFile: null,
       loading: false,
-      wrongFollowup: 0,
       init: true,
       finishBtnDisable: true,
       lastTime: 0,
@@ -156,9 +149,6 @@ export default {
     },
     btnText2 () {
       return this.loading ? '正在提交测试结果，请勿关闭或刷新页面' : '点击下方，停止说话'
-    },
-    btnTipsText () {
-      return this.isEnd ? '请在回答完毕后，点击完成' : '请在回答完毕后，点击下一题'
     },
     // 当前表名
     thisTable () {
@@ -183,7 +173,6 @@ export default {
   },
   created () {
     this.getBatchInfo()
-    // this.initUserMedia()
   },
   methods: {
     /******************************************
@@ -217,7 +206,6 @@ export default {
       if (this.loading) return
       // 不上传标志位
       this.toNext(() => {
-        // 有500ms防抖
         this.canUpload = false
       })
       setTimeout(() => {
@@ -277,11 +265,6 @@ export default {
 
       console.log('Media stream created.')
       this.recorder = new Recorder({ stream })
-      // this.audioctx = new AudioContext()
-      // this.audioinput = this.audioctx.createMediaStreamSource(stream)
-      // this.scriptNode = this.audioctx.createScriptProcessor(4096, 1, 1)
-      // this.audioinput.connect(this.audioctx.createGain())
-      // this.audioinput.connect(this.scriptNode)
       console.log('录音初始化。。。')
       // if (!this.init) {
       //   this.init = true
@@ -347,7 +330,6 @@ export default {
       this.lastTime = timeStamp
       timeJson.timeShow = true
       return timeJson
-      // this.chatRecords.push({ component: 'time', text: timeStamp, type })
     },
     // 是否需要打开摄像头&&需要做哪些量表的信息
     async getBatchInfo () {
@@ -470,11 +452,10 @@ export default {
         this.recorder.start()
         if (this.aiEvalCamEnabled) this.mediaRecorder.start()
         this.recorderShow = true
-        console.log('recorderShow', this.recorderShow)
       }
     },
     // 下一题
-    toNext: throttle(function (cb) {
+    toNext (cb) {
       // 禁用无法进入
       if (this.loading || !this.canUpload) return
       if (this.error) {
@@ -501,7 +482,7 @@ export default {
           }
         })
       }
-    }, 500),
+    },
     // 无须回答
     async notAnswer () {
       const data = {
@@ -512,29 +493,6 @@ export default {
       await posTableQues(data)
       this.midwayBackBool = false
       this.getCurQue()
-    },
-    // 音频文件处理
-    audioCreate () {
-      this.audioFile = this.recorder.createFile(`${this.tableCode}_${this.queObj.id}_${this.sessionId}`)
-      this.audioFiles.push(this.audioFile)
-      // 时间计算
-      this.audioDuration = this.recorder.getDuration()
-      if (this.audioDuration > 60) {
-        this.textRight = parseInt(this.audioDuration / 60) + " ' " + (this.audioDuration % 60) + " '' "
-      } else {
-        this.textRight = this.audioDuration + " '' "
-      }
-    },
-    // 视频文件处理
-    videoCreate () {
-      this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
-      this.videoFiles.push(this.videoFile)
-    },
-    // 创建文件
-    fileCreate (blobArr, suffix, type) {
-      const fileName = `${this.tableCode}_${this.queObj.id}_${this.sessionId}`
-      const dateNow = Date.now()
-      return new File(blobArr, `${fileName}${suffix}`, { type, lastModified: dateNow })
     },
     // 提交回答-纯音频
     async postQueResAudio () {
@@ -604,11 +562,6 @@ export default {
           'x:qIndex': this.queObj.id + ''
         }
       }
-      // this.submitPercent = 0
-      // 等等1S显示加载进度条
-      // const waitTimer = setTimeout(() => {
-      //   this.FilterBoxLoading = true
-      // }, 1000)
       // 上传音频、视频
       Promise.all([
         uploader({ file: this.videoFile, ...curData }),
@@ -679,15 +632,6 @@ export default {
         }
       )
     },
-    thisDialog (message, btnText = '确定') {
-      return Dialog.alert({
-        message,
-        theme: 'round-button',
-        className: 'detail-dialog',
-        confirmButtonText: btnText,
-        confirmButtonColor: '#34B7B9'
-      })
-    },
     // 提交结果
     submit () {
       postTableRes({
@@ -698,6 +642,38 @@ export default {
           this.$router.replace(this.routerPath)
         }
       )
+    },
+    // 音频文件处理
+    audioCreate () {
+      this.audioFile = this.recorder.createFile(`${this.tableCode}_${this.queObj.id}_${this.sessionId}`)
+      this.audioFiles.push(this.audioFile)
+      // 时间计算
+      this.audioDuration = this.recorder.getDuration()
+      if (this.audioDuration > 60) {
+        this.textRight = parseInt(this.audioDuration / 60) + " ' " + (this.audioDuration % 60) + " '' "
+      } else {
+        this.textRight = this.audioDuration + " '' "
+      }
+    },
+    // 视频文件处理
+    videoCreate () {
+      this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
+      this.videoFiles.push(this.videoFile)
+    },
+    // 创建文件
+    fileCreate (blobArr, suffix, type) {
+      const fileName = `${this.tableCode}_${this.queObj.id}_${this.sessionId}`
+      const dateNow = Date.now()
+      return new File(blobArr, `${fileName}${suffix}`, { type, lastModified: dateNow })
+    },
+    thisDialog (message, btnText = '确定') {
+      return Dialog.alert({
+        message,
+        theme: 'round-button',
+        className: 'detail-dialog',
+        confirmButtonText: btnText,
+        confirmButtonColor: '#34B7B9'
+      })
     }
   }
 }
