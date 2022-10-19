@@ -291,7 +291,7 @@ export default {
       if (!this.aiEvalCamEnabled) return
 
       this.$refs.dragVideo.videoObject.videoBox.srcObject = stream
-      this.videoPlayer = this.$refs.dragVideo.videoObject
+      // this.videoPlayer = this.$refs.dragVideo.videoObject
       this.$refs.dragVideo.$children[0].play()
       this.mediaRecorder = new MediaRecorder(stream)
       console.log('录像初始化。。。')
@@ -424,6 +424,7 @@ export default {
                 })
               }
             }
+            this.midwayBackBool = false
             // 让滚动条始终在最底部
             this.$nextTick(() => {
               this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
@@ -509,7 +510,7 @@ export default {
         const audio = await uploader({ file: this.audioFile, ...curData })
         try {
           // 提交回答
-          await posTableQues({
+          const queRes = await posTableQues({
             sessionId: this.sessionId,
             tableCode: this.tableCode,
             video: '',
@@ -518,6 +519,10 @@ export default {
             ...this.queObj
           })
           this.loading = false
+          // 添加回答
+          const answer = queRes.data || ''
+          const timeJson = this.setTime()
+          this.chatRecords.push({ component: 'right', text: answer, time: this.textRight, ...timeJson })
           this.getCurQue()
           this.recorderShow = false
           // 让滚动条始终在最底部
