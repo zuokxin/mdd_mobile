@@ -33,12 +33,12 @@ class Recorder {
     const status = true
     if (this.init) {
       this.audioctx.resume().then(e => {
-        this.timeStart = this.audioctx.getOutputTimestamp().performanceTime
+        this.timeStart = this.audioctx.getOutputTimestamp().contextTime
         if (cb) cb(status, e)
       })
     } else {
       this.process.connect(this.audioctx.destination)
-      this.timeStart = this.audioctx.getOutputTimestamp().performanceTime
+      this.timeStart = this.audioctx.getOutputTimestamp().contextTime
       this.init = true
       if (cb) cb(status)
     }
@@ -47,7 +47,8 @@ class Recorder {
   pause (cb) {
     this.audioctx.suspend().then(() => {
       const status = true
-      this.timeEnd = this.audioctx.getOutputTimestamp().performanceTime
+      console.log(this.audioctx.getOutputTimestamp(), '2')
+      this.timeEnd = this.audioctx.getOutputTimestamp().contextTime
       if (cb) cb(status)
     })
   }
@@ -76,7 +77,7 @@ class Recorder {
   getDuration () {
     const timeStart = parseInt(this.timeStart)
     const timeEnd = parseInt(this.timeEnd)
-    return Math.ceil((timeEnd - timeStart) / 1000)
+    return Math.ceil((timeEnd - timeStart))
   }
 
   // onaudioprocess () {
