@@ -745,7 +745,7 @@ export default {
         }
         .tips-01 {
           line-height: 1;
-          font-size: 20px;
+          font-size: 14px;
           font-weight: 500;
           color: #555555;
           margin-bottom: 0;
