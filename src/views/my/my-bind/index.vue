@@ -48,9 +48,9 @@
                     <van-button v-else-if="item.status === 2" round  type="info"
                       @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)"
                     >继续测试</van-button>
-                    <van-button v-else-if="item.status === 9" round plain type="info"
+                    <!-- <van-button v-else-if="item.status === 9" round plain type="info"
                     @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)"
-                    >查看报告</van-button>
+                    >查看报告</van-button> -->
                   </div>
                   <div v-if="!isCanDo(item.evalRecords) && item.evalRecords.length > 1" class="btnBox">
                     <van-button v-if="item.status === 1" round type="info"
@@ -59,9 +59,9 @@
                     <van-button v-if="item.status === 2" round  type="info"
                       @click="startTest(item.sessionId, item.evalRecords, item.status)"
                     >继续测试</van-button>
-                    <van-button v-if="item.status === 9 || hasFinish(item.evalRecords)" round plain type="info"
+                    <!-- <van-button v-if="item.status === 9 || hasFinish(item.evalRecords)" round plain type="info"
                     @click="readReport(item.sessionId, second(item.evalRecords) ? 2 : 1)"
-                    style="margin-left: 10px">查看报告</van-button>
+                    style="margin-left: 10px">查看报告</van-button> -->
                   </div>
                   <div v-if="isCanDo(item.evalRecords)" class="btnBox app">仅支持在APP中测试</div>
               </div>
