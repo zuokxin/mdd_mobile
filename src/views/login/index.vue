@@ -93,7 +93,8 @@ export default {
           //   })
           // }
           if (this.$route.query.url) {
-            this.$router.push({ path: this.$route.query.url, query: this.$route.query })
+            const { url, ...otherQuery } = this.$route.query
+            this.$router.push({ path: url, query: otherQuery })
           } else {
             this.$router.push({ path: '/test-more' })
           }

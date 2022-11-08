@@ -86,13 +86,14 @@ export default {
   methods: {
     finish () {
       clearInterval(this.timer)
-      this.$router.replace({
-        path: '/test-report',
-        query: {
-          sessionId: this.sessionId,
-          tableType: this.second ? 2 : 1
-        }
-      })
+      this.$router.go(-1)
+      // this.$router.replace({
+      //   path: '/test-report',
+      //   query: {
+      //     sessionId: this.sessionId,
+      //     tableType: this.second ? 2 : 1
+      //   }
+      // })
     }
   }
 }
