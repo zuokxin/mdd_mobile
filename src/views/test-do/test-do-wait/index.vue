@@ -86,14 +86,17 @@ export default {
   methods: {
     finish () {
       clearInterval(this.timer)
-      this.$router.go(-1)
-      // this.$router.replace({
-      //   path: '/test-report',
-      //   query: {
-      //     sessionId: this.sessionId,
-      //     tableType: this.second ? 2 : 1
-      //   }
-      // })
+      if (sessionStorage.canViewReport === 'fasle') {
+        this.$router.go(-1)
+        return
+      }
+      this.$router.replace({
+        path: '/test-report',
+        query: {
+          sessionId: this.sessionId,
+          tableType: this.second ? 2 : 1
+        }
+      })
     }
   }
 }
