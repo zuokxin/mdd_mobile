@@ -48,7 +48,7 @@
                     <van-button v-else-if="item.status === 2" round  type="info"
                       @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode, item.canViewReport)"
                     >继续测试</van-button>
-                    <van-button v-else-if="item.status === 9 && tiem.canViewReport" round plain type="info"
+                    <van-button v-else-if="item.status === 9 && item.canViewReport" round plain type="info"
                     @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)"
                     >查看报告</van-button>
                   </div>
