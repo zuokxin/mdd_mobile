@@ -229,6 +229,7 @@ export default {
     },
     // 开始测试
     goTest () {
+      sessionStorage.canViewReport = 'true'
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }

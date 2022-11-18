@@ -43,21 +43,21 @@
                   </div>
                   <div v-if="item.evalRecords.length === 1 && !isCanDo(item.evalRecords)" class="btnBox">
                     <van-button v-if="item.status === 1" round type="info"
-                      @click="startTest(item.sessionId, item.evalRecords, item.status)"
+                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.canViewReport)"
                     >开始测试</van-button>
                     <van-button v-else-if="item.status === 2" round  type="info"
-                      @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)"
+                      @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode, item.canViewReport)"
                     >继续测试</van-button>
-                    <!-- <van-button v-else-if="item.status === 9" round plain type="info"
+                    <van-button v-else-if="item.status === 9 && item.canViewReport" round plain type="info"
                     @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)"
-                    >查看报告</van-button> -->
+                    >查看报告</van-button>
                   </div>
                   <div v-if="!isCanDo(item.evalRecords) && item.evalRecords.length > 1" class="btnBox">
                     <van-button v-if="item.status === 1" round type="info"
-                      @click="startTest(item.sessionId, item.evalRecords, item.status)"
+                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.canViewReport)"
                     >开始测试</van-button>
                     <van-button v-if="item.status === 2" round  type="info"
-                      @click="startTest(item.sessionId, item.evalRecords, item.status)"
+                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.canViewReport)"
                     >继续测试</van-button>
                     <!-- <van-button v-if="item.status === 9 || hasFinish(item.evalRecords)" round plain type="info"
                     @click="readReport(item.sessionId, second(item.evalRecords) ? 2 : 1)"
@@ -204,7 +204,8 @@ export default {
       }
     },
     // 单个量表开始测试 & 多个量表开始和继续测试
-    startTest (sessionId, tables, status) {
+    startTest (sessionId, tables, status, canViewReport) {
+      sessionStorage.canViewReport = canViewReport
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }
@@ -222,7 +223,8 @@ export default {
       }
     },
     // 单个量表继续测试
-    goOnTable (type, sessionId, tableCode) {
+    goOnTable (type, sessionId, tableCode, canViewReport) {
+      sessionStorage.canViewReport = canViewReport
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }

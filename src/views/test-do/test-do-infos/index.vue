@@ -2,21 +2,21 @@
   <div class="container">
     <div class="main">
       <!-- --------------------------- -->
-      <div class="title">姓名</div>
-      <div class="row">
+      <div v-if="info.hasOwnProperty('name')" class="title">姓名</div>
+      <div v-if="info.hasOwnProperty('name')" class="row">
         <van-field v-model="info.name" placholder="请输入" @blur="checkName" />
       </div>
       <!-- --------------------------- -->
-      <div class="title">性别</div>
-      <div class="row" @click="sheetShow('genderShow')">
+      <div v-if="info.hasOwnProperty('gender')" class="title">性别</div>
+      <div v-if="info.hasOwnProperty('gender')" class="row" @click="sheetShow('genderShow')">
         <span class="has" v-if="info.gender">{{info.gender}}</span>
         <span class="tip" v-else>请选择</span>
         <van-icon name="arrow-down"/>
       </div>
       <van-action-sheet v-model="genderShow" :actions="genderList" cancel-text="取消" close-on-click-action @select="haveSameSelect($event, 'gender', 'genderShow')" />
       <!-- --------------------------- -->
-      <div class="title">出生年月</div>
-      <div class="row" @click="sheetShow('birthShow')">
+      <div v-if="info.hasOwnProperty('birthday')" class="title">出生年月</div>
+      <div v-if="info.hasOwnProperty('birthday')" class="row" @click="sheetShow('birthShow')">
         <span class="has" v-if="info.birthday">{{info.birthday}}</span>
         <span class="tip" v-else>请选择</span>
         <van-icon name="arrow-down"/>
@@ -34,32 +34,32 @@
         />
       </van-action-sheet>
       <!-- --------------------------- -->
-      <div class="title">教育程度</div>
-      <div class="row"  @click="eduShow = true">
+      <div v-if="info.hasOwnProperty('education')" class="title">教育程度</div>
+      <div v-if="info.hasOwnProperty('education')" class="row"  @click="eduShow = true">
         <span class="has" v-if="info.education">{{info.education}}</span>
         <span class="tip" v-else>请选择</span>
         <van-icon name="arrow-down"/>
       </div>
       <van-action-sheet v-model="eduShow" :actions="eduList" cancel-text="取消" close-on-click-action @select="haveSameSelect($event, 'education', 'eduShow')" />
       <!-- --------------------------- -->
-      <div class="title">婚姻状况</div>
-      <div class="row" @click="sheetShow('marShow')">
+      <div v-if="info.hasOwnProperty('maritalStatus')" class="title">婚姻状况</div>
+      <div v-if="info.hasOwnProperty('maritalStatus')" class="row" @click="sheetShow('marShow')">
         <span class="has" v-if="info.maritalStatus">{{info.maritalStatus}}</span>
         <span class="tip" v-else>请选择</span>
         <van-icon name="arrow-down"/>
       </div>
       <van-action-sheet v-model="marShow" :actions="marList" cancel-text="取消" close-on-click-action @select="haveSameSelect($event, 'maritalStatus', 'marShow')" />
       <!-- --------------------------- -->
-      <div class="title">口味喜好</div>
-      <div class="row" @click="sheetShow('tasteShow')">
+      <div v-if="info.hasOwnProperty('preferableTaste')" class="title">口味喜好</div>
+      <div v-if="info.hasOwnProperty('preferableTaste')" class="row" @click="sheetShow('tasteShow')">
         <span class="has" v-if="info.preferableTaste">{{info.preferableTaste}}</span>
         <span class="tip" v-else>请选择</span>
         <van-icon name="arrow-down"/>
       </div>
       <van-action-sheet v-model="tasteShow" :actions="tasteList" cancel-text="取消" close-on-click-action @select="haveSameSelect($event, 'preferableTaste', 'tasteShow')" />
       <!-- --------------------------- -->
-      <div class="title">颜色喜好</div>
-      <div class="row" @click="sheetShow('colorShow')">
+      <div v-if="info.hasOwnProperty('preferableColor')" class="title">颜色喜好</div>
+      <div v-if="info.hasOwnProperty('preferableColor')" class="row" @click="sheetShow('colorShow')">
         <span class="has" v-if="info.preferableColor">{{info.preferableColor}}</span>
         <span class="tip" v-else>请选择</span>
         <van-icon name="arrow-down"/>
@@ -176,23 +176,23 @@ export default {
     // 下一步去做题
     sure () {
       const reg = /^[\u4e00-\u9fa5a-zA-Z]+$/
-      if (!this.info.name) {
+      if (Object.prototype.hasOwnProperty.call(this.info, 'name') && !this.info.name) {
         this.$toast('请输入姓名')
-      } else if (!this.info.gender) {
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'gender') && !this.info.gender) {
         this.$toast('请选择性别')
-      } else if (!this.info.birthday) {
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'birthday') && !this.info.birthday) {
         this.$toast('请选择出生年月')
-      } else if (!this.info.education) {
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'education') && !this.info.education) {
         this.$toast('请选择教育程度')
-      } else if (!this.info.maritalStatus) {
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'maritalStatus') && !this.info.maritalStatus) {
         this.$toast('请选择婚姻状况')
-      } else if (!this.info.preferableTaste) {
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'preferableTaste') && !this.info.preferableTaste) {
         this.$toast('请选择口味喜好')
-      } else if (!this.info.preferableColor) {
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'preferableColor') && !this.info.preferableColor) {
         this.$toast('请选择颜色喜好')
-      } else if (this.info.name.length > 25) {
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'name') && this.info.name.length > 25) {
         this.$toast('姓名过长，请重新输入')
-      } else if (!reg.test(this.info.name)) {
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'name') && !reg.test(this.info.name)) {
         this.$toast('支持输入中文、英文')
       } else {
         userCreate({ sessionId: this.sessionId, info: this.info }).then(res => {
