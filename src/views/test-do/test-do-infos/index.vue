@@ -1,6 +1,11 @@
 <template>
   <div class="container">
     <div class="main">
+      <!-- identifier -->
+      <div v-if="info.hasOwnProperty('identifier')" class="title">编号</div>
+      <div v-if="info.hasOwnProperty('identifier')" class="row">
+        <van-field v-model="info.identifier" placholder="请输入" @blur="checkIdentifier" />
+      </div>
       <!-- --------------------------- -->
       <div v-if="info.hasOwnProperty('name')" class="title">姓名</div>
       <div v-if="info.hasOwnProperty('name')" class="row">
@@ -108,9 +113,6 @@ export default {
       const m = (date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 0) : (date.getMonth() + 0)
       const d = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
       return new Date(y, m, d)
-    },
-    configTables () {
-      return sessionStorage.tables ? JSON.parse(sessionStorage.tables) : []
     }
   },
   mounted () {
@@ -128,6 +130,10 @@ export default {
       const res = await getUserCreate({ sessionId: this.sessionId })
       if (res.code === 0) {
         this.info = res.data.info
+        // 机构用户无需填写信息的情况
+        // if (Object.keys(res.data.info).length === 0) {
+        // this.sure()
+        // }
         let arr = []
         if (res.data.info.birthday) {
           arr = res.data.info.birthday.split('-')
@@ -138,7 +144,7 @@ export default {
         if (this.info.maritalStatus === '未婚') {
           this.info.maritalStatus = ''
         }
-        delete this.info.identifier
+        // delete this.info.identifier
       }
     },
     formatter (type, val) {
@@ -164,6 +170,16 @@ export default {
     sheetShow (flag) {
       this[flag] = true
     },
+    // 检查编号
+    checkIdentifier () {
+      const reg = /[^\w/]/
+      if (reg.test(this.info.identifier)) {
+        this.$toast('编号只能是数字、英文')
+      }
+      if (this.info.identifier.length > 14) {
+        this.$toast('编号过长，请重新输入')
+      }
+    },
     // 检查名字
     checkName () {
       const reg = /^[\u4e00-\u9fa5a-zA-Z]+$/
@@ -176,7 +192,10 @@ export default {
     // 下一步去做题
     sure () {
       const reg = /^[\u4e00-\u9fa5a-zA-Z]+$/
-      if (Object.prototype.hasOwnProperty.call(this.info, 'name') && !this.info.name) {
+      const reg1 = /[^\w/]/
+      if (Object.prototype.hasOwnProperty.call(this.info, 'identifier') && !this.info.identifier) {
+        this.$toast('请输入编号')
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'name') && !this.info.name) {
         this.$toast('请输入姓名')
       } else if (Object.prototype.hasOwnProperty.call(this.info, 'gender') && !this.info.gender) {
         this.$toast('请选择性别')
@@ -194,25 +213,21 @@ export default {
         this.$toast('姓名过长，请重新输入')
       } else if (Object.prototype.hasOwnProperty.call(this.info, 'name') && !reg.test(this.info.name)) {
         this.$toast('支持输入中文、英文')
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'identifier') && reg1.test(this.info.identifier)) {
+        this.$toast('编号只能是数字、英文')
+      } else if (Object.prototype.hasOwnProperty.call(this.info, 'identifier') && this.info.identifier.length > 14) {
+        this.$toast('编号过长，请重新输入')
       } else {
         userCreate({ sessionId: this.sessionId, info: this.info }).then(res => {
           if (res.code === 0) {
             // this.$router.replace({ path: `/test-do-${this.$route.query.type}`, query: { sessionId: this.sessionId, tableCode: this.tableCode } })
             // 1 自评
-            if (this.configTables.length) {
-              if (this.configTables[0].table.tableType === 1) {
-                this.$router.replace({ path: '/test-do-self', query: { sessionId: this.sessionId, tableCode: this.configTables[0].tableCode } })
-              } else {
-                this.$router.replace({ path: '/environment', query: { sessionId: this.sessionId, tableCode: this.configTables[0].tableCode } })
-              }
-            } else {
-              if (this.$route.query.tableType === '1') {
-                this.$router.replace({ path: '/test-do-self', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
-              }
-              // 2 他评
-              if (this.$route.query.tableType === '2') {
-                this.$router.replace({ path: '/environment', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
-              }
+            if (this.$route.query.tableType === '1') {
+              this.$router.replace({ path: '/test-do-self', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
+            }
+            // 2 他评
+            if (this.$route.query.tableType === '2') {
+              this.$router.replace({ path: '/environment', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
             }
           } else {
             this.$toast(res.message)

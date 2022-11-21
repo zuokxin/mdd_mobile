@@ -55,6 +55,7 @@
           完成
         </van-button>
       </div>
+      <div v-show="!recorderShow" class="bottom" style="background-color: #F4F4F4;"></div>
     </div>
     <!-- 人脸 -->
     <DragVideo
