@@ -35,6 +35,7 @@ import { mediaErrorTypes } from '@/utils/types'
 import Recorder from '@/utils/media/recorder'
 // import adapter from 'webrtc-adapter'
 import { Dialog } from 'vant'
+import browser from '@/utils/browser'
 export default {
   name: 'ToolsTest',
   beforeRouteLeave (to, from, next) {
@@ -91,6 +92,9 @@ export default {
   },
   methods: {
     initUserMedia () {
+      const message = browser().weixin
+        ? '您的微信版本/系统版本无法满足此量表测试。建议您在商店中升级微信版本或者升级系统版本并退出重新进入网页，也可以购买后下载云愈心理App测试。'
+        : '打开摄像头失败，您无法在当前网页测试此量表，您可以购买后在云愈心理App内进行测试。'
       try {
         // 使用前置摄像头
         navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: 'user' } })
@@ -101,11 +105,11 @@ export default {
               this.curMessage = '您已禁止调用摄像头或麦克风设备，当前网页无法满足此量表测试。建议您在设置中打开应用权限并退出重新进入网页，也可以购买后下载复变云愈App测试～'
               this.hasPermission = false
             } else {
-              this.curMessage = '打开摄像头失败，您无法在当前网页测试此量表，您可以购买后在复变云愈App内进行测试，是否继续购买？'
+              this.curMessage = message
             }
           })
       } catch (err) {
-        this.curMessage = '打开摄像头失败，您无法在当前网页测试此量表，您可以购买后在复变云愈App内进行测试，是否继续购买？'
+        this.curMessage = message
         console.log(err)
       }
     },

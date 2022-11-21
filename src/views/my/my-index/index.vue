@@ -278,6 +278,9 @@ export default {
   },
   mounted () {
     this.phone = sessionStorage.getItem('phone')
+    setTimeout(() => {
+      // this.$router.push('/order-detail?batchId=4GrD2CA7oTb')
+    }, 5000)
     if (this.phone) {
       this.getTableList()
       this.getCoins()
@@ -442,7 +445,7 @@ export default {
     },
     // 单个量表开始测试 & 多个量表开始和继续测试
     startTest (sessionId, tables, status) {
-      sessionStorage.canViewReport = 'true'
+      sessionStorage.reportDisplayEnabled = 'true'
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }
@@ -461,7 +464,7 @@ export default {
     },
     // 单个量表继续测试
     goOnTable (type, sessionId, tableCode) {
-      sessionStorage.canViewReport = 'true'
+      sessionStorage.reportDisplayEnabled = 'true'
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }

@@ -34,6 +34,12 @@ const routes = [
     component: resolve => require(['../views/test-more/oldIndex.vue'], resolve)
   },
   {
+    path: '/order-detail',
+    name: '订单详情',
+    meta: { title: '订单详情' },
+    component: resolve => require(['../views/order-detail/index.vue'], resolve)
+  },
+  {
     path: '/test-detail',
     name: '量表详情',
     meta: { title: '量表详情' },
