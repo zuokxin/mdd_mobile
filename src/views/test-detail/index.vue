@@ -49,8 +49,8 @@
 <script>
 import DetailHeader from './detail-header.vue'
 import DetailContent from './detail-content.vue'
-import PayAction from './pay-action.vue'
-import CameraDialog from './camera-dialog.vue'
+import PayAction from '@/components/PayAction.vue'
+import CameraDialog from '@/components/CameraDialog.vue'
 import NewPersonGift from '@/components/newPerson'
 import { Dialog } from 'vant'
 import { tableInfo, postUserCode, getOrderState, wxSignatures } from '@/api/index'
@@ -125,7 +125,7 @@ export default {
     },
     // 支付按钮文案
     btnInfo () {
-      return `￥${this.discountAmountInfo} 立即测试`
+      return `确认支付（${this.discountAmountInfo}）`
     },
     // 去测试按钮文案
     btnGoInfo () {
@@ -229,7 +229,7 @@ export default {
     },
     // 开始测试
     goTest () {
-      sessionStorage.canViewReport = 'true'
+      sessionStorage.reportDisplayEnabled = 'true'
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }

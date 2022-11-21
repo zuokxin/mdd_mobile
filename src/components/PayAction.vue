@@ -54,13 +54,18 @@
 
 <script>
 import { Dialog } from 'vant'
-import { postTableOrder } from '@/api/index'
+import { postTableOrder, postOrganOrder } from '@/api/index'
 import browser from '@/utils/browser'
 export default {
   name: '',
   props: {
-    payInfo: Object,
-    visible: Boolean
+    payInfo: Object, // 支付信息
+    visible: Boolean,
+    // 支付方式（普通用户normal，机构用户organ）
+    userPayType: {
+      type: String,
+      default: 'normal'
+    }
   },
   data () {
     return {
@@ -95,6 +100,7 @@ export default {
         }
       }
     },
+    // 控制支付弹窗显示和隐藏
     payVisible: {
       get () {
         return this.visible
@@ -129,12 +135,12 @@ export default {
         const redirect = window.location.origin + window.location.pathname + window.location.hash + '&redirect=alipay&orderid='
         const paramRes = await this.getParam('alipay', redirect)
         this.orderId = paramRes.data.orderId
+        // 折扣价为0元处理
         if (this.payInfo.discountAmount === '0.00') {
           this.$emit('finishPay', this.orderId)
           return
         }
         const h5Url = paramRes.data.alipayOrderInfo
-        console.log(h5Url)
         window.location.href = h5Url
       } catch (err) {
         // 错误处理
@@ -155,6 +161,7 @@ export default {
           signType: 'RSA',
           paySign: wxPayInfo.paySign
         }
+        // 折扣价为0元处理
         if (this.payInfo.discountAmount === '0.00') {
           this.$emit('finishPay', this.orderId)
           return
@@ -189,6 +196,7 @@ export default {
       try {
         const paramRes = await this.getParam('wxpay')
         this.orderId = paramRes.data.orderId
+        // 折扣价为0元处理
         if (this.payInfo.discountAmount === '0.00') {
           this.$emit('finishPay', this.orderId)
           return
@@ -203,14 +211,11 @@ export default {
     },
     // 提交订单信息
     getParam (type, url) {
-      const params = {
-        tables: this.payInfo.tables,
-        aiEvalCamEnabled: this.payInfo.aiEvalCamEnabled,
+      let params = {
         totalAmount: this.payInfo.discountAmount,
         // totalAmount: '0.99',
         payMethod: type,
         originAmount: this.payInfo.price,
-        couponsId: 0,
         wxPayType: '',
         alipayType: ''
       }
@@ -218,11 +223,27 @@ export default {
       if (this.$route.query.discountCode) {
         params.discountCode = this.$route.query.discountCode
       }
+      // 支付方式处理
       if (type === 'wxpay') {
         params.wxPayType = this.weixin ? 'jsapi' : 'h5'
       } else {
         params.alipayType = 'h5'
         params.aliPayH5Url = url
+      }
+      // 机构支付方式
+      if (this.userPayType === 'organ') {
+        params = {
+          ...params,
+          sessionId: this.payInfo.sessionId
+        }
+        return postOrganOrder(params)
+      }
+      // 普通用户支付方式
+      params = {
+        ...params,
+        tables: this.payInfo.tables,
+        aiEvalCamEnabled: this.payInfo.aiEvalCamEnabled,
+        couponsId: 0
       }
       return postTableOrder(params)
     }

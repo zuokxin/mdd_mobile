@@ -34,9 +34,16 @@ export const tableInfo = tableCode => fetch({
   }
 })
 
-// 提交订单信息
+// 提交订单信息-普通用户
 export const postTableOrder = data => fetch({
   url: '/api/user/v2/table/order',
+  method: 'post',
+  data
+}, false)
+
+// 提交订单信息-机构用户
+export const postOrganOrder = data => fetch({
+  url: '/api/user/org/personal/order',
   method: 'post',
   data
 }, false)
