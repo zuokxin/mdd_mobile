@@ -100,26 +100,6 @@ export const getHistory = (params) => fetch({
   params
 })
 
-// 医院内部系统获取历史记录&艾滋海默
-export const recordList = (params) => fetch({
-  url: '/api/batch/users/list',
-  method: 'get',
-  params
-})
-
-// 医院内部系统获取结果(自评量表)
-export const getResult = (id) => fetch({
-  url: `/api/user/batch/report?sessionId=${id}`,
-  method: 'get'
-})
-
-// 更改报告状态
-export const changeReportStatus = data => fetch({
-  url: '/api/batch/user/update',
-  method: 'post',
-  data
-})
-
 // 全部量表分类
 export const tableTypeList = (params) => fetch({
   url: '/api/table/selfTableType/retrieveType',

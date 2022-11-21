@@ -86,7 +86,7 @@ export default {
   methods: {
     finish () {
       clearInterval(this.timer)
-      if (sessionStorage.canViewReport === 'fasle') {
+      if (sessionStorage.reportDisplayEnabled === 'false') {
         this.$router.go(-1)
         return
       }
@@ -113,7 +113,7 @@ export default {
     height: 6.053333rem;
     margin: 3.2rem 1.973333rem 2.133333rem;
     border-radius: 50%;
-    border: 1px solid #34b7b9;
+    // border: 1px solid #34b7b9;
     img{
       width: 100%;
       height: 100%;

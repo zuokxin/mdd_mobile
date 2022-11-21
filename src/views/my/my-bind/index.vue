@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <van-nav-bar
-      title="我的机构"
+      title="机构绑定"
       left-arrow
       @click-left="onClickLeft"
     />
@@ -42,26 +42,32 @@
                     </span>
                   </div>
                   <div v-if="item.evalRecords.length === 1 && !isCanDo(item.evalRecords)" class="btnBox">
+                    <van-button v-if="item.status === 0" round type="info"
+                      @click="pay(item)"
+                    >支付</van-button>
                     <van-button v-if="item.status === 1" round type="info"
-                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.canViewReport)"
+                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)"
                     >开始测试</van-button>
                     <van-button v-else-if="item.status === 2" round  type="info"
-                      @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode, item.canViewReport)"
+                      @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode, item.reportDisplayEnabled)"
                     >继续测试</van-button>
-                    <van-button v-else-if="item.status === 9 && item.canViewReport" round plain type="info"
+                    <van-button v-else-if="item.status === 9 && item.reportDisplayEnabled" round plain type="info"
                     @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)"
                     >查看报告</van-button>
                   </div>
                   <div v-if="!isCanDo(item.evalRecords) && item.evalRecords.length > 1" class="btnBox">
+                    <van-button v-if="item.status === 0" round type="info"
+                      @click="pay(item)"
+                    >支付</van-button>
                     <van-button v-if="item.status === 1" round type="info"
-                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.canViewReport)"
+                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)"
                     >开始测试</van-button>
                     <van-button v-if="item.status === 2" round  type="info"
-                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.canViewReport)"
+                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)"
                     >继续测试</van-button>
-                    <!-- <van-button v-if="item.status === 9 || hasFinish(item.evalRecords)" round plain type="info"
+                    <van-button v-if="(item.status === 9 || hasFinish(item.evalRecords)) && item.reportDisplayEnabled" round plain type="info"
                     @click="readReport(item.sessionId, second(item.evalRecords) ? 2 : 1)"
-                    style="margin-left: 10px">查看报告</van-button> -->
+                    style="margin-left: 10px">查看报告</van-button>
                   </div>
                   <div v-if="isCanDo(item.evalRecords)" class="btnBox app">仅支持在APP中测试</div>
               </div>
@@ -171,7 +177,9 @@ export default {
   methods: {
     // 返回我的首页
     onClickLeft () {
-      this.$router.push('/my-index')
+      // this.$router.push('/my-index')
+      // 从哪里来返回到哪里
+      this.$router.back()
     },
     // 获取机构测试记录
     async organization () {
@@ -204,8 +212,8 @@ export default {
       }
     },
     // 单个量表开始测试 & 多个量表开始和继续测试
-    startTest (sessionId, tables, status, canViewReport) {
-      sessionStorage.canViewReport = canViewReport
+    startTest (sessionId, tables, status, reportDisplayEnabled) {
+      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }
@@ -223,8 +231,8 @@ export default {
       }
     },
     // 单个量表继续测试
-    goOnTable (type, sessionId, tableCode, canViewReport) {
-      sessionStorage.canViewReport = canViewReport
+    goOnTable (type, sessionId, tableCode, reportDisplayEnabled) {
+      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }
@@ -237,6 +245,12 @@ export default {
     // 查看报告
     readReport (sessionId, tableType) {
       this.$router.push({ path: '/test-report', query: { sessionId, tableType } })
+    },
+    // 支付去
+    pay (item) {
+      // console.log(item)
+      this.$router.push(`/order-detail?batchId=${item.batchId}`)
+      // 跳转去订单详情
     }
   }
 }

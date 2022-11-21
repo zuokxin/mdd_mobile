@@ -30,14 +30,14 @@ export default {
   overflow: hidden;
   justify-content: center;
   align-items: center;
-   .popout_box{
-      position: relative;
-      border-radius: 20px;
-      width: 80%;
-      // width: calc(100% - 2rem);
-      height: 6.5676rem;
-      background-color: #FFFFFF;
-      overflow: hidden;
+  .popout_box{
+    position: relative;
+    border-radius: 20px;
+    width: 80%;
+    // width: calc(100% - 2rem);
+    height: 6.5676rem;
+    background-color: #FFFFFF;
+    overflow: hidden;
   }
 }
 </style>
