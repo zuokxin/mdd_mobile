@@ -112,7 +112,11 @@ export default {
     this.batchId = this.$route.query.batchId
     this.organ = this.$route.query.organ
     this.getBatch()
-    this.getBatchTables()
+    if (this.$route.query.sessionId) {
+      this.sessionId = this.$route.query.sessionId
+    } else {
+      this.getBatchTables()
+    }
   },
   methods: {
     // 订单获取图
@@ -138,12 +142,12 @@ export default {
               userSelect.push({ table: item, tableType: item.tableType, tableCode: item.tableCode })
               // userSelect.push(item)
             })
-            console.log(userSelect)
+            // console.log(userSelect)
             this.tableName = this.tableName.substring(0, this.tableName.length - 1)
             this.userSelect = userSelect
             this.hasOtherTable = userSelect.some(e => e.table.tableType === 2)
             // console.log(this.hasOtherTable, '是否有他评')
-            console.log(this.userSelect, '用户选择的复杂详细表')
+            // console.log(this.userSelect, '用户选择的复杂详细表')
             // console.log(this.tables, '用户选择的简单表')
             sessionStorage.setItem('tables', JSON.stringify(this.userSelect))
           })
