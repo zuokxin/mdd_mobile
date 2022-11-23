@@ -51,6 +51,7 @@ import ContactService from './contactService'
 
 import { Dialog } from 'vant'
 import { getOrderState } from '@/api/index'
+import { newUserReward } from '@/api/modules/user'
 import { batchInfo, batchTables, createAndBind, getAllTable } from '@/api/modules/order-detail'
 // import wxShare from '@/utils/wxShare'
 import browser from '@/utils/browser'
@@ -112,6 +113,13 @@ export default {
     this.batchId = this.$route.query.batchId
     this.organ = this.$route.query.organ
     this.getBatch()
+    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+      this.$store.dispatch('getInfo').then(res => {
+        if (res.data.isNewUser && !res.data.isRxNUReward) {
+          newUserReward()
+        }
+      })
+    }
     if (this.$route.query.sessionId) {
       this.sessionId = this.$route.query.sessionId
     } else {
