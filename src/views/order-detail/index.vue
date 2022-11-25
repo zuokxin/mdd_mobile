@@ -41,6 +41,12 @@
         <van-button class="service-sure-btn" type="primary" @click="contactServiceFlag = false">确定</van-button>
       </template>
     </ContactService>
+    <!-- 错误批次弹窗 -->
+    <popout v-if="errPopout"  :popoutText="errText">
+      <template slot="btn">
+        <van-button class="sure-btn" type="primary" @click="errPopout = false">确定</van-button>
+      </template>
+    </popout>
   </div>
 </template>
 
@@ -80,7 +86,9 @@ export default {
       errCode: 0,
       customImage: '',
       organ: '',
-      amount: '0.00' // 价钱
+      amount: '0.00', // 价钱
+      errPopout: false,
+      errText: ''
     }
   },
   computed: {
@@ -120,11 +128,6 @@ export default {
         }
       })
     }
-    if (this.$route.query.sessionId) {
-      this.sessionId = this.$route.query.sessionId
-    } else {
-      this.getBatchTables()
-    }
   },
   methods: {
     // 订单获取图
@@ -138,6 +141,11 @@ export default {
               sessionStorage.setItem('reportDisplayEnabled', 'true')
             } else {
               sessionStorage.setItem('reportDisplayEnabled', 'false')
+            }
+            if (this.$route.query.sessionId) {
+              this.sessionId = this.$route.query.sessionId
+            } else {
+              this.getBatchTables()
             }
           }
           getAllTable().then(rsp => {
@@ -160,6 +168,9 @@ export default {
             sessionStorage.setItem('tables', JSON.stringify(this.userSelect))
           })
         }
+      }).catch(err => {
+        this.errText = err.message
+        this.errPopout = true
       })
     },
     // 是否绑定+弹窗
@@ -208,12 +219,16 @@ export default {
         return
       }
       // 微信内未授权
-      if (browser().weixin && !sessionStorage.openid) {
-        const appid = 'wxb073a9d513bbcd43'
-        const redirect = encodeURIComponent(window.location.href)
-        window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`
+      if (this.errText) {
+        this.errPopout = true
       } else {
-        this.showPay = true
+        if (browser().weixin && !sessionStorage.openid) {
+          const appid = 'wxb073a9d513bbcd43'
+          const redirect = encodeURIComponent(window.location.href)
+          window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`
+        } else {
+          this.showPay = true
+        }
       }
     },
     // 开始测试

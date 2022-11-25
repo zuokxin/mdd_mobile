@@ -1,14 +1,17 @@
 <template>
   <div class="popout" >
     <div class="popout_box">
-      <div class="text">请认真阅读并支付后开始测评</div>
+      <div class="text">{{popoutText || '请认真阅读并支付后开始测评'}}</div>
       <slot name="btn"></slot>
     </div>
   </div>
 </template>
 <script>
 export default {
-  name: 'popout'
+  name: 'popout',
+  props: {
+    popoutText: String
+  }
 }
 </script>
 
