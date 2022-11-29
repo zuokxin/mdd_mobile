@@ -172,6 +172,8 @@ export default {
     }
   },
   mounted () {
+    // 路由重定向后不再执行下去
+    if (!sessionStorage.getItem('phone')) return
     this.organization()
   },
   methods: {
