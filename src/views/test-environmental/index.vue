@@ -227,17 +227,11 @@ export default {
       }
     },
     getTimer () {
-      let index = 0
       this.timer = setInterval(() => {
         if (this.db > 40) {
-          index = 0
           this.volumeWarn = true
         } else {
-          index++
-          if (index > 30) {
-            this.volumeWarn = false
-            // clearInterval(this.timer)
-          }
+          this.volumeWarn = false
         }
       }, 100)
     },
