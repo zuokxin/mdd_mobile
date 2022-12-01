@@ -70,7 +70,7 @@ export default {
       db: 0,
       volumeWarn: true,
       timer: null,
-      face: false,
+      face: true,
       faceSuccess: false,
       faceTimer: null,
       faceIndex: 0,
