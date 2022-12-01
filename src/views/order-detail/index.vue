@@ -54,13 +54,13 @@
 import PayAction from '@/components/PayAction.vue'
 import popout from './popout'
 import ContactService from './contactService'
-
 import { Dialog } from 'vant'
 import { getOrderState, postUserCode } from '@/api/index'
 import { newUserReward } from '@/api/modules/user'
 import { batchInfo, batchTables, createAndBind, getAllTable } from '@/api/modules/order-detail'
 // import wxShare from '@/utils/wxShare'
 import browser from '@/utils/browser'
+const params = new URLSearchParams(window.location.search)
 export default {
   name: 'test-detail',
   components: {
