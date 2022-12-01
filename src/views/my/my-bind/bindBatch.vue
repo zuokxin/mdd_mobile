@@ -61,7 +61,20 @@ export default {
         const { data } = res
         this.orgMsg = data
       }).catch(err => {
-        this.thisDialog(err.message)
+        if (err.code === 606) {
+          this.thisDialog(err.message).then(
+            () => {
+              this.$router.push({
+                path: '/login',
+                query: {
+                  url: '/my-bind'
+                }
+              })
+            }
+          )
+        } else {
+          this.thisDialog(err.message)
+        }
       })
     },
     sureAdd () {
@@ -79,6 +92,17 @@ export default {
       }).catch(err => {
         if (err.code === 2302) {
           this.showKefu = true
+        } else if (err.code === 606) {
+          this.thisDialog(err.message).then(
+            () => {
+              this.$router.push({
+                path: '/login',
+                query: {
+                  url: '/my-bind'
+                }
+              })
+            }
+          )
         } else {
           this.thisDialog(err.message)
         }
