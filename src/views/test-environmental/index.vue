@@ -167,7 +167,7 @@ export default {
     initUserMedia () {
       const message = browser().weixin
         ? '您的微信版本/系统版本无法满足此量表测试。建议您在商店中升级微信版本或者升级系统版本并退出重新进入网页，也可以购买后下载云愈心理App测试～'
-        : '打开摄像头失败，您无法在当前网页测试此量表，您可以下载云愈心理App进行测试～'
+        : `打开${this.aiEvalCamEnabled ? '摄像头或麦克风' : '麦克风'}失败，您无法在当前网页测试此量表，您可以下载云愈心理App进行测试～`
       try {
         // 使用前置摄像头
         navigator.mediaDevices.getUserMedia(this.userMediaOptions)
