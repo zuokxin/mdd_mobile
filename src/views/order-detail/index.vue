@@ -56,7 +56,7 @@ import popout from './popout'
 import ContactService from './contactService'
 
 import { Dialog } from 'vant'
-import { getOrderState } from '@/api/index'
+import { getOrderState, postUserCode } from '@/api/index'
 import { newUserReward } from '@/api/modules/user'
 import { batchInfo, batchTables, createAndBind, getAllTable } from '@/api/modules/order-detail'
 // import wxShare from '@/utils/wxShare'
@@ -128,6 +128,33 @@ export default {
         }
       })
     }
+    this.$nextTick(async () => {
+      // 微信授权
+      this.code = params.get('code') || ''
+      if (!sessionStorage.openid && this.code) {
+        await postUserCode(this.code).then(res => {
+          sessionStorage.openid = res.data.openid
+        })
+      }
+      // 支付页面回调
+      const redirect = this.$route.query.redirect
+      const orderid = this.$route.query.orderid
+      // h5支付
+      if (redirect === 'h5pay' && orderid) {
+        this.thisDialog('刚才的订单支付了吗？', '已支付', 'confirm').then(() => {
+          this.finishPay(orderid)
+        }).catch(() => {
+          this.payReplace()
+        })
+      } else if (redirect === 'alipay' && orderid) { // 支付宝支付
+        if (this.$route.query.type === 'return') {
+          this.finishPay(orderid)
+        } else {
+          // 取消支付的情况直接返回
+          this.$router.go(-1)
+        }
+      }
+    })
   },
   methods: {
     // 订单获取图
