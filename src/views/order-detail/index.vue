@@ -57,7 +57,7 @@ import ContactService from './contactService'
 import { Dialog } from 'vant'
 import { getOrderState, postUserCode } from '@/api/index'
 import { newUserReward } from '@/api/modules/user'
-import { batchInfo, batchTables, createAndBind, getAllTable } from '@/api/modules/order-detail'
+import { batchInfo, batchTables, createAndBind, userBatchInfo } from '@/api/modules/order-detail'
 // import wxShare from '@/utils/wxShare'
 import browser from '@/utils/browser'
 const params = new URLSearchParams(window.location.search)
@@ -84,6 +84,7 @@ export default {
       popoutFlag: false,
       contactServiceFlag: false,
       errCode: 0,
+      continue: false,
       customImage: '',
       organ: '',
       amount: '0.00', // 价钱
@@ -114,8 +115,10 @@ export default {
     },
     // 去测试按钮文案
     btnGoInfo () {
-      return '开始测试'
+      return this.continue ? '继续测试' : '开始测试'
     }
+  },
+  watch: {
   },
   mounted () {
     this.batchId = this.$route.query.batchId
@@ -171,29 +174,11 @@ export default {
             }
             if (this.$route.query.sessionId) {
               this.sessionId = this.$route.query.sessionId
+              this.getNeedTests()
             } else {
               this.getBatchTables()
             }
           }
-          getAllTable().then(rsp => {
-            this.tables = res.data.evalSelection
-            const userSelect = []
-            res.data.evalSelection.forEach(e => {
-              const item = rsp.data.find(x => x.tableCode === e)
-              this.tableName += item.tableName + '、'
-              // item.table = item
-              userSelect.push({ table: item, tableType: item.tableType, tableCode: item.tableCode })
-              // userSelect.push(item)
-            })
-            // console.log(userSelect)
-            this.tableName = this.tableName.substring(0, this.tableName.length - 1)
-            this.userSelect = userSelect
-            this.hasOtherTable = userSelect.some(e => e.table.tableType === 2)
-            // console.log(this.hasOtherTable, '是否有他评')
-            // console.log(this.userSelect, '用户选择的复杂详细表')
-            // console.log(this.tables, '用户选择的简单表')
-            sessionStorage.setItem('tables', JSON.stringify(this.userSelect))
-          })
         }
       }).catch(err => {
         this.errText = err.message
@@ -209,6 +194,7 @@ export default {
             // this.payStatus = res.data.payStatus
           } else {
             this.sessionId = res.data.sessionId
+            this.getNeedTests()
             if (res.data.payStatus === 'success') {
               this.go = true
             }
@@ -230,6 +216,7 @@ export default {
         if (res.code === 0) {
           this.popoutFlag = false
           this.sessionId = res.data
+          this.getNeedTests()
         }
       })
     },
@@ -257,6 +244,32 @@ export default {
           this.showPay = true
         }
       }
+    },
+    // 调接口存下需要做的表
+    getNeedTests () {
+      userBatchInfo({ sessionId: this.sessionId }).then(response => {
+        if (response.code === 0) {
+          const userSelect = []
+          this.tables = []
+          this.continue = response.data.evalRecords.some(e => e.finishedAt > 0)
+          response.data.evalRecords.forEach(e => {
+            this.tableName += e.table.tableName + '、'
+            if (e.finishedAt === 0) {
+              // this.tables.push(e.table.tableCode)
+              userSelect.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode })
+            }
+            this.tables.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode })
+          })
+          this.hasOtherTable = userSelect.some(e => e.table.tableType === 2)
+          this.userSelect = userSelect
+          sessionStorage.setItem('tables', JSON.stringify(this.tables))
+          // console.log(this.continue)
+          // console.log(this.tableName)
+          // console.log(this.tables, '用户选择的简单表')
+          // console.log(this.hasOtherTable, '是否有他评')
+          // console.log(this.userSelect, '用户选择的复杂详细表')
+        }
+      })
     },
     // 开始测试
     goTest () {

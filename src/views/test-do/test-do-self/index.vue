@@ -63,8 +63,9 @@ export default {
     ]),
     routerPath () {
       // 测试表未完成
-      const next = this.nextTable(this.thisTable)
-      console.log(next, '自评')
+      // console.log(this.thisTable, 'this.$route.query.tableCode')
+      const next = this.nextTable(this.thisTable, '1111')
+      // console.log(next, '自评')
       if (next) {
         if (next.table.tableType === 1) {
           return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
@@ -74,11 +75,6 @@ export default {
       } else {
         return `/test-do-wait?sessionId=${this.sessionId}&s=5`
       }
-    }
-  },
-  watch: {
-    '$route' () {
-      window.location.reload()
     }
   },
   mounted () {
