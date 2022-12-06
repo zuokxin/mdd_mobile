@@ -256,7 +256,7 @@ export default {
             this.tableName += e.table.tableName + '、'
             if (e.finishedAt === 0) {
               // this.tables.push(e.table.tableCode)
-              userSelect.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode })
+              userSelect.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode, finishedAt: e.finishedAt })
             }
             this.tables.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode, finishedAt: e.finishedAt })
           })
@@ -274,13 +274,17 @@ export default {
     // 开始测试
     goTest () {
       // console.log(this.tables)
-      if (this.tables[0].finishedAt === 0) {
-        this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
+      // console.log(this.userSelect[0])
+      if (this.tables.length > this.userSelect.length) {
+        if (this.userSelect[0].tableType === 1) {
+          this.$router.push(`/test-do-self?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
+        }
+        if (this.userSelect[0].tableType === 2) {
+          this.$router.push(`/environment?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}`)
+        }
       } else {
-        this.$router.push(`/test-do-self?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
+        this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
       }
-      // this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
-      // this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.tableCode}&tableType=${this.table.tableType}`)
     },
     // 支付回调刷新
     refresh (state = 0) {
