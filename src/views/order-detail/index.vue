@@ -258,7 +258,7 @@ export default {
               // this.tables.push(e.table.tableCode)
               userSelect.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode })
             }
-            this.tables.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode })
+            this.tables.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode, finishedAt: e.finishedAt })
           })
           this.hasOtherTable = userSelect.some(e => e.table.tableType === 2)
           this.userSelect = userSelect
@@ -273,7 +273,13 @@ export default {
     },
     // 开始测试
     goTest () {
-      this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
+      // console.log(this.tables)
+      if (this.tables[0].finishedAt === 0) {
+        this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
+      } else {
+        this.$router.push(`/test-do-self?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
+      }
+      // this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
       // this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.tableCode}&tableType=${this.table.tableType}`)
     },
     // 支付回调刷新
