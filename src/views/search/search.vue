@@ -105,6 +105,8 @@ export default {
           this.searched = true
           if (res.data.tables) {
             this.list = res.data.tables.filter(e => !this.filterArr.includes(e.tableCode)) || []
+          } else {
+            this.list = []
           }
           let str = localStorage.getItem('knames')
           if (str === null || str === '') {
