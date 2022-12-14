@@ -103,7 +103,9 @@ export default {
         if (res.code === 0) {
           this.$refs.myInput.blur()
           this.searched = true
-          this.list = res.data.tables.filter(e => !this.filterArr.includes(e.tableCode)) || []
+          if (res.data.tables) {
+            this.list = res.data.tables.filter(e => !this.filterArr.includes(e.tableCode)) || []
+          }
           let str = localStorage.getItem('knames')
           if (str === null || str === '') {
             str = this.keyWord
