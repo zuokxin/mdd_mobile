@@ -4,7 +4,11 @@ export const batchInfo = params => fetch({
   url: '/api/batch/info',
   method: 'get',
   params
+<<<<<<< HEAD
 })
+=======
+}, false)
+>>>>>>> master
 // 订单详情获取下是否需要绑定
 export const batchTables = params => fetch({
   url: '/api/user/last/batch/tables',

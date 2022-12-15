@@ -41,6 +41,12 @@
         <van-button class="service-sure-btn" type="primary" @click="contactServiceFlag = false">确定</van-button>
       </template>
     </ContactService>
+    <!-- 错误批次弹窗 -->
+    <popout v-if="errPopout"  :popoutText="errText">
+      <template slot="btn">
+        <van-button class="sure-btn" type="primary" @click="errPopout = false">确定</van-button>
+      </template>
+    </popout>
   </div>
 </template>
 
@@ -48,12 +54,13 @@
 import PayAction from '@/components/PayAction.vue'
 import popout from './popout'
 import ContactService from './contactService'
-
 import { Dialog } from 'vant'
-import { getOrderState } from '@/api/index'
-import { batchInfo, batchTables, createAndBind, getAllTable } from '@/api/modules/order-detail'
+import { getOrderState, postUserCode } from '@/api/index'
+import { newUserReward } from '@/api/modules/user'
+import { batchInfo, batchTables, createAndBind, userBatchInfo } from '@/api/modules/order-detail'
 // import wxShare from '@/utils/wxShare'
 import browser from '@/utils/browser'
+const params = new URLSearchParams(window.location.search)
 export default {
   name: 'test-detail',
   components: {
@@ -77,9 +84,12 @@ export default {
       popoutFlag: false,
       contactServiceFlag: false,
       errCode: 0,
+      continue: false,
       customImage: '',
       organ: '',
-      amount: '0.00' // 价钱
+      amount: '0.00', // 价钱
+      errPopout: false,
+      errText: ''
     }
   },
   computed: {
@@ -105,14 +115,49 @@ export default {
     },
     // 去测试按钮文案
     btnGoInfo () {
-      return '开始测试'
+      return this.continue ? '继续测试' : '开始测试'
     }
+  },
+  watch: {
   },
   mounted () {
     this.batchId = this.$route.query.batchId
     this.organ = this.$route.query.organ
     this.getBatch()
-    this.getBatchTables()
+    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+      this.$store.dispatch('getInfo').then(res => {
+        if (res.data.isNewUser && !res.data.isRxNUReward) {
+          newUserReward()
+        }
+      })
+    }
+    this.$nextTick(async () => {
+      // 微信授权
+      this.code = params.get('code') || ''
+      if (!sessionStorage.openid && this.code) {
+        await postUserCode(this.code).then(res => {
+          sessionStorage.openid = res.data.openid
+        })
+      }
+      // 支付页面回调
+      const redirect = this.$route.query.redirect
+      const orderid = this.$route.query.orderid
+      // h5支付
+      if (redirect === 'h5pay' && orderid) {
+        this.thisDialog('刚才的订单支付了吗？', '已支付', 'confirm').then(() => {
+          this.finishPay(orderid)
+        }).catch(() => {
+          this.payReplace()
+        })
+      } else if (redirect === 'alipay' && orderid) { // 支付宝支付
+        if (this.$route.query.type === 'return') {
+          this.finishPay(orderid)
+        } else {
+          // 取消支付的情况直接返回
+          this.$router.go(-1)
+        }
+      }
+    })
   },
   methods: {
     // 订单获取图
@@ -127,27 +172,17 @@ export default {
             } else {
               sessionStorage.setItem('reportDisplayEnabled', 'false')
             }
+            if (this.$route.query.sessionId) {
+              this.sessionId = this.$route.query.sessionId
+              this.getNeedTests()
+            } else {
+              this.getBatchTables()
+            }
           }
-          getAllTable().then(rsp => {
-            this.tables = res.data.evalSelection
-            const userSelect = []
-            res.data.evalSelection.forEach(e => {
-              const item = rsp.data.find(x => x.tableCode === e)
-              this.tableName += item.tableName + '、'
-              // item.table = item
-              userSelect.push({ table: item, tableType: item.tableType, tableCode: item.tableCode })
-              // userSelect.push(item)
-            })
-            console.log(userSelect)
-            this.tableName = this.tableName.substring(0, this.tableName.length - 1)
-            this.userSelect = userSelect
-            this.hasOtherTable = userSelect.some(e => e.table.tableType === 2)
-            // console.log(this.hasOtherTable, '是否有他评')
-            console.log(this.userSelect, '用户选择的复杂详细表')
-            // console.log(this.tables, '用户选择的简单表')
-            sessionStorage.setItem('tables', JSON.stringify(this.userSelect))
-          })
         }
+      }).catch(err => {
+        this.errText = err.message
+        this.errPopout = true
       })
     },
     // 是否绑定+弹窗
@@ -159,6 +194,7 @@ export default {
             // this.payStatus = res.data.payStatus
           } else {
             this.sessionId = res.data.sessionId
+            this.getNeedTests()
             if (res.data.payStatus === 'success') {
               this.go = true
             }
@@ -180,6 +216,7 @@ export default {
         if (res.code === 0) {
           this.popoutFlag = false
           this.sessionId = res.data
+          this.getNeedTests()
         }
       })
     },
@@ -196,18 +233,58 @@ export default {
         return
       }
       // 微信内未授权
-      if (browser().weixin && !sessionStorage.openid) {
-        const appid = 'wxb073a9d513bbcd43'
-        const redirect = encodeURIComponent(window.location.href)
-        window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`
+      if (this.errText) {
+        this.errPopout = true
       } else {
-        this.showPay = true
+        if (browser().weixin && !sessionStorage.openid) {
+          const appid = 'wxb073a9d513bbcd43'
+          const redirect = encodeURIComponent(window.location.href)
+          window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`
+        } else {
+          this.showPay = true
+        }
       }
+    },
+    // 调接口存下需要做的表
+    getNeedTests () {
+      userBatchInfo({ sessionId: this.sessionId }).then(response => {
+        if (response.code === 0) {
+          const userSelect = []
+          this.tables = []
+          this.continue = response.data.evalRecords.some(e => e.finishedAt > 0)
+          response.data.evalRecords.forEach(e => {
+            this.tableName += e.table.tableName + '、'
+            if (e.finishedAt === 0) {
+              // this.tables.push(e.table.tableCode)
+              userSelect.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode, finishedAt: e.finishedAt })
+            }
+            this.tables.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode, finishedAt: e.finishedAt })
+          })
+          this.hasOtherTable = userSelect.some(e => e.table.tableType === 2)
+          this.userSelect = userSelect
+          sessionStorage.setItem('tables', JSON.stringify(this.tables))
+          // console.log(this.continue)
+          // console.log(this.tableName)
+          // console.log(this.tables, '用户选择的简单表')
+          // console.log(this.hasOtherTable, '是否有他评')
+          // console.log(this.userSelect, '用户选择的复杂详细表')
+        }
+      })
     },
     // 开始测试
     goTest () {
-      this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
-      // this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.tableCode}&tableType=${this.table.tableType}`)
+      // console.log(this.tables)
+      // console.log(this.userSelect[0])
+      if (this.tables.length > this.userSelect.length) {
+        if (this.userSelect[0].tableType === 1) {
+          this.$router.push(`/test-do-self?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
+        }
+        if (this.userSelect[0].tableType === 2) {
+          this.$router.push(`/environment?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}`)
+        }
+      } else {
+        this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
+      }
     },
     // 支付回调刷新
     refresh (state = 0) {

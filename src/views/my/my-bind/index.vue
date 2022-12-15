@@ -172,6 +172,8 @@ export default {
     }
   },
   mounted () {
+    // 路由重定向后不再执行下去
+    if (!sessionStorage.getItem('phone')) return
     this.organization()
   },
   methods: {
@@ -249,7 +251,11 @@ export default {
     // 支付去
     pay (item) {
       // console.log(item)
+<<<<<<< HEAD
       this.$router.push(`/order-detail?batchId=${item.batchId}`)
+=======
+      this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+>>>>>>> master
       // 跳转去订单详情
     }
   }

@@ -131,9 +131,9 @@ export default {
       if (res.code === 0) {
         this.info = res.data.info
         // 机构用户无需填写信息的情况
-        // if (Object.keys(res.data.info).length === 0) {
-        // this.sure()
-        // }
+        if (Object.keys(res.data.info).length === 0) {
+          this.sure()
+        }
         let arr = []
         if (res.data.info.birthday) {
           arr = res.data.info.birthday.split('-')
