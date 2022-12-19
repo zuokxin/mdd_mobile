@@ -94,7 +94,7 @@ export const postTableRes = data => fetch({
 // })
 
 // 获取用户历史批次列表
-export const getHistory = (params) => fetch({
+export const getOrganization = (params) => fetch({
   url: '/api/user/history/organization',
   method: 'get',
   params
@@ -173,3 +173,10 @@ export const newUserReward = () => fetch({
   url: '/api/user/newUserReward',
   method: 'post'
 }, false)
+
+// 获取H5营销活动列表
+export const h5ActivitylList = params => fetch({
+  url: '/api/h5Activity/list',
+  method: 'get',
+  params
+})

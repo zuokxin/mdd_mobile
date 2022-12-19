@@ -6,9 +6,15 @@
         <img src="@/assets/img/test/search.png" alt="search">
         <span>请输入您要找的量表名</span>
       </div>
-      <div  @click.stop="playGame">
-        <img class="game" src="@/assets/img/test/game.png" alt="game">
-      </div>
+      <!-- 轮播图 -->
+      <van-swipe :autoplay="5000">
+        <van-swipe-item>
+          <img class="game" @click.stop="playGame" src="@/assets/img/test/game.png" alt="game">
+        </van-swipe-item>
+        <van-swipe-item v-for="(item, index) in swipList" :key="index">
+          <img :src="item.imageLink" @click="toDeatil(item)" />
+        </van-swipe-item>
+      </van-swipe>
       <div class="testTitle">
         <img src="@/assets/img/test/deng.png" alt="deng">
         <span>小愈测试</span>
@@ -55,7 +61,7 @@
 </template>
 
 <script>
-import { tableTypeList, getAllTable } from '@/api/modules/user'
+import { tableTypeList, getAllTable, h5ActivitylList } from '@/api/modules/user'
 import MainTabbar from '@/components/MainTabbar'
 import NewPersonGift from '@/components/newPerson'
 
@@ -72,11 +78,13 @@ export default {
       typeList: [],
       tableList: [],
       tableAll: [],
+      swipList: [],
       newPersonFlag: false
     }
   },
   mounted () {
     this.getTypeList()
+    this.geth5ActivitylList()
     if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
@@ -107,6 +115,17 @@ export default {
         this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
         this.loading = false
       })
+    },
+    geth5ActivitylList () {
+      h5ActivitylList({ status: 2 }).then(res => {
+        if (res.code === 0) {
+          this.swipList = res.data.activityBasicInfo.filter(e => e.imageLink)
+        }
+        // console.log(this.swipList)
+      })
+    },
+    toDeatil (item) {
+      this.$router.push(`/test-detail?tableCode=${item.tables[0]}&discountCode=${item.discountCode}`)
     },
     showAll () {
       this.hide = !this.hide
@@ -154,11 +173,15 @@ export default {
       margin-left: 10rem/@w;
     }
   }
-  .game{
+  .van-swipe{
     margin: 10rem/@w 0 16rem/@w 0;
-    // width: 335rem/@w;
-    // height: 98rem/@w;
     width: 100%;
+    .van-swipe-item{
+      img{
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
   .testTitle{
     display: flex;
