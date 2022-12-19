@@ -25,14 +25,30 @@
         </div>
         <div class="under"><van-button round type="success" :class="{'van-ed': todayIsSignIn}" @click="signCoins">{{todayIsSignIn ? '今天已签到，明天继续' : '签到领云愈币'}}</van-button></div>
       </div>
-      <div class="cardList">
-        <div class="card" @click="$router.push('/my-infos').catch(() => {})">
-          <img src="@/assets/img/my/info.png" alt="info">
-          <div class="tip">个人信息</div>
+      <div class="to-test">
+        <div class="to-test-left">
+          <img src="@/assets/img/my/list.png" alt="info">
         </div>
+        <div class="to-test-center" @click="jump('/my-record')">
+          <div class="top">量表测试记录</div>
+          <div class="under">专业测试 客观评估</div>
+        </div>
+        <div class="to-test-right">
+          <img src="@/assets/img/my/go.png" alt="info">
+        </div>
+      </div>
+      <div class="cardList">
         <div class="card" @click="$router.push('/my-bind').catch(() => {})">
           <img src="@/assets/img/my/bind.png" alt="bind">
           <div class="tip">机构绑定</div>
+        </div>
+        <div class="card" @click="jump('/my-star')">
+          <img src="@/assets/img/my/star.png" alt="bind">
+          <div class="tip">我的收藏</div>
+        </div>
+        <div class="card" @click="$router.push('/my-infos').catch(() => {})">
+          <img src="@/assets/img/my/info.png" alt="info">
+          <div class="tip">个人信息</div>
         </div>
         <div class="card" @click="showKefu = true">
           <img src="@/assets/img/my/kefu.png" alt="kefu">
@@ -42,101 +58,6 @@
           <img src="@/assets/img/my/app.png" alt="app">
           <div class="tip">下载APP</div>
         </div>
-      </div>
-      <div class="ceping">
-        <van-tabs v-model="active" @click="changeTab">
-          <van-tab title="我的测评">
-            <div class="noLogin" v-if="!isLogin">
-              <img src="@/assets/img/my/login.png" alt="login">
-              <span>登录查看我的测评~</span>
-            </div>
-            <div class="noLogin" v-else-if="isLogin && noData">
-              <img src="@/assets/img/my/nodata.png" alt="login">
-              <span>暂无测评记录~</span>
-            </div>
-            <div class="tableList" ref="tableHeight" v-else-if="isLogin && !noData">
-              <div v-for="(item, index) in tableList" :key="item.index" :class="{'tableCard': showStyle(item.evalRecords), 'more': !showStyle(item.evalRecords) }">
-                <div class="cardBox" v-if="showStyle(item.evalRecords)" ref="textContainer">
-                  <img :src="item.evalRecords[0].table.tableLogo" alt="tableLogo">
-                  <div class="msg">
-                    <div class="name">{{item.evalRecords[0].table.tableName}}</div>
-                    <div class="time">
-                      <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
-                      <span>￥{{item.price}}</span>
-                    </div>
-                  </div>
-                  <van-button v-if="item.status === 1" round type="info"
-                    @click="startTest(item.sessionId, item.evalRecords, item.status)"
-                  >开始测试</van-button>
-                  <van-button v-else-if="item.status === 2" round plain type="info"
-                    @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)"
-                  >继续测试</van-button>
-                  <van-button v-else-if="item.status === 9" round plain type="info"
-                  @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)"
-                  >查看报告</van-button>
-                </div>
-                <div class="moreBox" v-else>
-                  <div class="top">
-                    <span
-                    :style="{'max-height': item.textOpenFlag ? textHeight : ''}"
-                    :class="{hiddenText: item.textOpenFlag}"
-                    class="textMore"
-                    ref="textContainer"
-                    >{{moreListName[index].join('、')}}</span>
-                    <span
-                    v-if="item.textOpenFlag !== null"
-                    @click="item.textOpenFlag = !item.textOpenFlag"
-                    class="btnMore"
-                    >{{item.textOpenFlag ? '【展开】':'【收起】'}}</span>
-                  </div>
-                  <div class="bottom">
-                    <div class="time moreTime">
-                      <span>{{moment(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span>
-                      <span>￥{{item.price}}</span>
-                    </div>
-                    <div v-if="!isCanDo(item.evalRecords)" class="btnBox">
-                      <van-button v-if="item.status === 1" round type="info"
-                        @click="startTest(item.sessionId, item.evalRecords, item.status)"
-                      >开始测试</van-button>
-                      <van-button v-if="item.status === 2" round  type="info"
-                        @click="startTest(item.sessionId, item.evalRecords, item.status)"
-                      >继续测试</van-button>
-                      <van-button v-if="item.status === 9 || hasFinish(item.evalRecords)" round plain type="info"
-                      @click="readReport(item.sessionId, second(item.evalRecords) ? 2 : 1)"
-                      style="margin-left: 10px">查看报告</van-button>
-                    </div>
-                    <div v-if="isCanDo(item.evalRecords)" class="app">仅支持在APP中测试</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </van-tab>
-          <van-tab title="收藏">
-            <div class="noLogin" v-if="!isLogin">
-              <img src="@/assets/img/my/login.png" alt="login">
-              <span>登录查看我的收藏~</span>
-            </div>
-            <div class="noLogin" v-else-if="isLogin && noCollect">
-              <img src="@/assets/img/my/nodata.png" alt="login">
-              <span>暂无收藏~</span>
-            </div>
-            <div class="tableList" ref="tableHeight" v-else-if="isLogin && !noCollect">
-              <div class="tableCard cllect" v-for="item in collectList" :key="item.index"
-              @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
-                <div class="cardBox">
-                  <img :src="item.tableLogo" alt="tableLogo">
-                  <div class="msg">
-                    <div class="name clollectName">{{item.tableName}}</div>
-                    <div class="clollectName intros">{{item.tableIntroduction}}</div>
-                    <div class="time">
-                      <span>￥{{item.price}}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </van-tab>
-        </van-tabs>
       </div>
     </div>
     <div style="height:50px"><MainTabbar></MainTabbar></div>
@@ -163,28 +84,16 @@
 </template>
 
 <script>
-import { getIndividual, getCollect, signInFind, signInCreate, newUserReward } from '@/api/modules/user'
+import { signInFind, signInCreate, newUserReward } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
 import MainTabbar from '@/components/MainTabbar'
 import NewPersonGift from '@/components/newPerson'
-import moment from 'moment'
-import { findIndexByKeyValue } from '@/utils/checkFinish'
 export default {
   data () {
     return {
-      moment: moment,
-      active: 0,
       isLogin: false,
-      noData: true,
-      noCollect: true,
       showKefu: false,
       phone: '',
-      tableList: [],
-      collectList: [],
-      moreList: [],
-      moreListName: [],
-      textOpenFlag: false, // 展开收起
-      textHeight: '', // 文本高度
       myDays: ['第一天', '第二天', '第三天', '第四天', '第五天', '第六天', '第七天'],
       signInData: [
         {
@@ -278,11 +187,8 @@ export default {
   },
   mounted () {
     this.phone = sessionStorage.getItem('phone')
-    setTimeout(() => {
-      // this.$router.push('/order-detail?batchId=4GrD2CA7oTb')
-    }, 5000)
     if (this.phone) {
-      this.getTableList()
+      this.isLogin = true
       this.getCoins()
       if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
         this.$store.dispatch('getInfo').then(res => {
@@ -292,50 +198,10 @@ export default {
           }
         })
       }
-    } else {
-      this.isLogin = false
     }
     wxShare.share()
   },
   methods: {
-    async getTableList () {
-      this.isLogin = true
-      const res = await getIndividual({ page: -1, pageSize: -1 })
-      const records = res.data.records
-      if (records) {
-        this.noData = false
-        this.tableList = records
-        this.tableList.forEach(v => {
-          const arr = []
-          v.evalRecords.forEach(el => {
-            arr.push(el.table.tableName)
-          })
-          this.moreListName.push(arr)
-        })
-        this.tableList.forEach((ele, index) => {
-          if (ele.evalRecords.length > 1) {
-            this.$set(
-              this.tableList,
-              index,
-              Object.assign({}, ele, { textOpenFlag: null })
-            )
-          }
-        })
-        this.$nextTick(() => {
-          if (this.tableList.length > 0) {
-            this.showTextAll()
-          }
-          // const contentHeight = document.querySelector('.content').clientHeight
-          // const tableHeight = contentHeight - 172
-          // const tableHeight = 186
-          // const tableDom = this.$refs.tableHeight
-          // tableDom.style.height = tableHeight + 'px'
-        })
-        // console.log(this.tableList, this.moreListName)
-      } else {
-        this.noData = true
-      }
-    },
     // 签到
     async getCoins () {
       const res = await signInFind()
@@ -380,53 +246,11 @@ export default {
         }
       }
     },
-    async getCollection () {
-      const res = await getCollect()
-      const tables = res.data
-      if (tables && tables.length > 0) {
-        this.noCollect = false
-        this.collectList = tables
-        this.$nextTick(() => {
-          const contentHeight = document.querySelector('.content').clientHeight
-          const tableHeight = contentHeight - 172
-          const tableDom = this.$refs.tableHeight
-          tableDom.style.height = tableHeight + 'px'
-        })
+    jump (path) {
+      if (this.isLogin) {
+        this.$router.push(path)
       } else {
-        this.noCollect = true
-      }
-    },
-    showTextAll () {
-      // 这是默认两行数据的高度，一行的高度可以自定义 可以*3 *4达到三行或者四行显示展示和收起的效果
-      const twoHeight = 20 * 2
-      this.textHeight = `${twoHeight}px`
-      const txtDom = this.$refs.textContainer
-      for (let i = 0; i < txtDom.length; i++) {
-        const curHeight = txtDom[i].offsetHeight
-        if (curHeight > twoHeight) {
-          this.$set(
-            this.tableList,
-            i,
-            Object.assign({}, this.tableList[i], { textOpenFlag: true })
-          )
-        } else {
-          this.$set(
-            this.tableList,
-            i,
-            Object.assign({}, this.tableList[i], { textOpenFlag: null })
-          )
-        }
-      }
-    },
-    changeTab (e) {
-      if (this.phone) {
-        if (e === 0) {
-          this.getTableList()
-        } else {
-          this.getCollection()
-        }
-      } else {
-        this.isLogin = false
+        this.$router.push('/login?url=/my-index')
       }
     },
     login () {
@@ -444,40 +268,40 @@ export default {
       window.location.href = 'tel:' + phoneNum
     },
     // 单个量表开始测试 & 多个量表开始和继续测试
-    startTest (sessionId, tables, status) {
-      sessionStorage.reportDisplayEnabled = 'true'
-      if (sessionStorage.tables) {
-        sessionStorage.removeItem('tables')
-      }
-      sessionStorage.setItem('tables', JSON.stringify(tables))
-      const tablesList = JSON.parse(sessionStorage.tables) || []
-      const currentIndex = findIndexByKeyValue(tablesList, 'finishedAt', 0)
-      if (status === 1) {
-        this.$router.push({ path: '/test-do-infos', query: { sessionId, tableCode: tablesList[0].tableCode, tableType: tablesList[0].table.tableType } })
-      } else {
-        if (tablesList[currentIndex].table.tableType === 1) {
-          this.$router.replace({ path: '/test-do-self', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
-        } else {
-          this.$router.replace({ path: '/environment', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
-        }
-      }
-    },
+    // startTest (sessionId, tables, status) {
+    //   sessionStorage.reportDisplayEnabled = 'true'
+    //   if (sessionStorage.tables) {
+    //     sessionStorage.removeItem('tables')
+    //   }
+    //   sessionStorage.setItem('tables', JSON.stringify(tables))
+    //   const tablesList = JSON.parse(sessionStorage.tables) || []
+    //   const currentIndex = findIndexByKeyValue(tablesList, 'finishedAt', 0)
+    //   if (status === 1) {
+    //     this.$router.push({ path: '/test-do-infos', query: { sessionId, tableCode: tablesList[0].tableCode, tableType: tablesList[0].table.tableType } })
+    //   } else {
+    //     if (tablesList[currentIndex].table.tableType === 1) {
+    //       this.$router.replace({ path: '/test-do-self', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
+    //     } else {
+    //       this.$router.replace({ path: '/environment', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
+    //     }
+    //   }
+    // },
     // 单个量表继续测试
-    goOnTable (type, sessionId, tableCode) {
-      sessionStorage.reportDisplayEnabled = 'true'
-      if (sessionStorage.tables) {
-        sessionStorage.removeItem('tables')
-      }
-      if (type === 1) {
-        this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
-      } else {
-        this.$router.push({ path: '/environment', query: { sessionId, tableCode } })
-      }
-    },
+    // goOnTable (type, sessionId, tableCode) {
+    //   sessionStorage.reportDisplayEnabled = 'true'
+    //   if (sessionStorage.tables) {
+    //     sessionStorage.removeItem('tables')
+    //   }
+    //   if (type === 1) {
+    //     this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
+    //   } else {
+    //     this.$router.push({ path: '/environment', query: { sessionId, tableCode } })
+    //   }
+    // },
     // 查看报告
-    readReport (sessionId, tableType) {
-      this.$router.push({ path: '/test-report', query: { sessionId, tableType } })
-    },
+    // readReport (sessionId, tableType) {
+    //   this.$router.push({ path: '/test-report', query: { sessionId, tableType } })
+    // },
     // 联系客服
     skip () {
       this.$router.push('/my-contact')
@@ -492,8 +316,13 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  // height: 100vh;
+  height: 100vh;
+  background: #F6F6F7;
   overflow: hidden;
+  background: #F6F6F7;
+  background-image:url('../../../assets/img/bg.png');
+  background-repeat:no-repeat;
+  background-size: contain;
   .header{
     height: 2.053333rem;
     display: flex;
@@ -519,7 +348,8 @@ export default {
       .center{
         border-radius: .3784rem;
         display: inline-block;
-        background: rgba(52,183,185,0.15);
+        // background: rgba(52,183,185,0.15);
+        background: #FFFFFF;
         height: .7568rem;
         padding: .1081rem .3243rem;
         box-sizing: border-box;
@@ -573,7 +403,6 @@ export default {
     }
   }
   .content{
-    background-color: #F6F6F7;
     padding: .48rem .533333rem;
     height: inherit;
     overflow: hidden;
@@ -583,7 +412,7 @@ export default {
       padding: .4324rem .2703rem;
       border-radius: .3243rem;
       background: #7ECECE;
-      margin-bottom: .4324rem;
+      margin-bottom: .2667rem;
       box-sizing: border-box;
       .top{
         font-size: 14px;
@@ -664,6 +493,40 @@ export default {
         }
       }
     }
+    .to-test{
+      height: 1.8933rem;
+      background: #FFFFFF;
+      border-radius: .2667rem;
+      margin-bottom: .2667rem;
+      padding: .4267rem .5333rem;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      .to-test-left{
+        img{
+          width: 1.04rem;
+          height: 1.04rem;
+        }
+      }
+      .to-test-center{
+        padding-left: .32rem;
+        flex: 1;
+        .top{
+          color: #333333;
+          font-size: .3733rem;
+        }
+        .under{
+          color: #666666;
+          font-size: .32rem;
+        }
+      }
+      .to-test-right{
+        img{
+          width: .8rem;
+          height: .8rem;
+        }
+      }
+    }
     .cardList{
       height: 2.213333rem;
       background: #FFFFFF;
@@ -680,84 +543,8 @@ export default {
           height: .8rem;
         }
         .tip{
-          font-size: .373333rem;
+          font-size: .32rem;
           color: #333333;
-        }
-      }
-    }
-    .ceping{
-      .noLogin{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 4.266667rem !important;
-        img{
-          width: 3.733333rem;
-          height: 3.733333rem;
-        }
-        span{
-          font-size: .48rem;
-          color: #999999;
-          margin-top: -.533333rem;
-        }
-      }
-      .tableList{
-        overflow-y: auto;
-        // height: 5.027rem;
-        // height: 500px;
-      }
-      .tableCard{
-        .cardBox{
-          // width: 8.4rem;
-          height: 1.813333rem;
-          padding: .266667rem;
-          background: #FFFFFF;
-          border-radius: .266667rem;
-          display: flex;
-          align-items: center;
-          margin-bottom: .266667rem;
-          justify-content: space-between;
-          img{
-            width: 1.813333rem;
-            height: 1.813333rem;
-          }
-          .msg{
-            // width: 4.4rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            margin-left: .266667rem;
-            height: 100%;
-            .name{
-              font-size: .373333rem;;
-              color: #333333;
-            }
-            .clollectName{
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
-            .intros{
-              font-size: 12rem / @w;
-              color: #666;
-            }
-          }
-          .van-button{
-            width: 1.866667rem;
-            height: .746667rem;
-            font-size: .32rem;
-            padding: 0;
-            line-height: .746667rem;
-            text-align: center;
-          }
-        }
-      }
-      .cllect{
-        justify-content: flex-start;
-        .msg{
-          flex: 1;
         }
       }
     }
