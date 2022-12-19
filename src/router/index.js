@@ -100,10 +100,22 @@ const routes = [
     component: resolve => require(['../views/my/my-infos/index.vue'], resolve)
   },
   {
+    path: '/my-star',
+    name: '我的-我的收藏',
+    meta: { needLogin: true, title: '云愈心理' },
+    component: resolve => require(['../views/my/my-star/index.vue'], resolve)
+  },
+  {
     path: '/my-bind',
     name: '我的-机构绑定',
     meta: { needLogin: true, title: '云愈心理' },
     component: resolve => require(['../views/my/my-bind/index.vue'], resolve)
+  },
+  {
+    path: '/my-record',
+    name: '我的-测试记录',
+    meta: { needLogin: true, title: '云愈心理' },
+    component: resolve => require(['../views/my/record/index.vue'], resolve)
   },
   // {
   //   path: '/tests',

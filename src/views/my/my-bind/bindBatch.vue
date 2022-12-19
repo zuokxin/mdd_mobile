@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="orgBox">
-      <h3>机构绑定</h3>
+      <h3><img src="../../../assets/img/my/titlepng.png" alt="" />机构绑定</h3>
       <van-form @submit="onSubmit" class="formBox">
         <van-cell-group inset>
           <van-field
@@ -125,47 +125,45 @@ export default {
 <style lang="less" scoped>
 @w: 37.5;
 h3{
-    height: 20rem / @w;
-    display: flex;
-    align-items: center;
-    font-size: 14rem / @w;
-    font-weight: 500;
-    color: #333333;
-    margin: 0;
-    margin-bottom: 14rem/@w;
-    &:before{
-      content: "";
-      display: inline-block;
-      width: 3px;
-      height: 14rem / @w;
-      background: #34B7B9;
-      border-radius: 0px 11rem / @w 11rem / @w 0px;
-      margin-right: 5rem / @w;
-    }
+  height: 20rem / @w;
+  display: flex;
+  align-items: center;
+  font-size: 14rem / @w;
+  font-weight: 500;
+  color: #333333;
+  margin: 0;
+  margin-bottom: 14rem/@w;
+  img{
+    position: relative;
+    top: -3rem /@w;
+    width: 3rem /@w;
+    height: 14rem /@w;
+    margin-right: 5rem/@w;
+  }
 }
 .orgBox{
-    padding: 14rem/@w 20rem/@w  18rem/@w;
-    .formBox{
-      background: #FFFFFF;
-      border-radius: 10px 10px 10px 10px;
-      padding: 24rem/@w;
-      padding-top: 0;
-      .van-cell-group--inset{
-        margin: 0;
-      }
-      .van-cell{
-        padding: 24rem/@w 0 16rem/@w;
-      }
-      .van-field__label{
-        width: 80rem/@w;
-        margin-right: 0;
-        color: #666;
-      }
-      .van-button--disabled{
-        background: #DEDEDE;
-        border: 0;
-        color: #FFFFFF;
-      }
+  padding: 14rem/@w 20rem/@w  18rem/@w;
+  .formBox{
+    background: #FFFFFF;
+    border-radius: 10px 10px 10px 10px;
+    padding: 24rem/@w;
+    padding-top: 0;
+    .van-cell-group--inset{
+      margin: 0;
     }
+    .van-cell{
+      padding: 24rem/@w 0 16rem/@w;
+    }
+    .van-field__label{
+      width: 80rem/@w;
+      margin-right: 0;
+      color: #666;
+    }
+    .van-button--disabled{
+      background: #DEDEDE;
+      border: 0;
+      color: #FFFFFF;
+    }
+  }
 }
 </style>

@@ -7,7 +7,7 @@
     />
     <BindBatch :id="batchId" :number="userNumber" @bindSuccess="bindSuccess"></BindBatch>
     <div class="myBind">
-      <h3>我的绑定</h3>
+      <h3> <img src="@/assets/img/my/titlepng.png" alt=""> 我的绑定</h3>
       <van-tabs type="card" v-model="active" @click="changeTab">
         <van-tab title="量表">
           <van-loading color="#1989fa" v-if="loading"/>
@@ -17,88 +17,60 @@
               <span>暂无绑定</span>
             </div>
             <div v-else>
-              <div class="cardItem" v-for="item in bindList" :key="item.index">
-                  <div class="name">
-                    机构名称：{{item.organization.orgName}}
+              <div class="list"  :key="new Date().getTime()">
+                <div class="card" v-for="(item,index) in bindList" :key="index">
+                  <div class="test-id"><div class="left">{{item.batchName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
+                  <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="ind">
+                    <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
+                    <div class="introduction" v-if="item.evalRecords[ind].table.introduction"><span >{{item.evalRecords[ind].table.introduction}}</span></div>
                   </div>
-                  <div class="itemBox">
-                    <span class="label">批次号：</span>
-                    <span>{{item.batchId}}</span>
+                  <div class="more-list" v-if="(item.evalRecords.length > 3)">
+                    <div class="add" v-if="(item.step < item.evalRecords.length)" @click="select = 'close',item.step = item.evalRecords.length">查看更多<van-icon name="arrow-down" color="#4D4D4D"/></div>
+                    <div class="reduce" v-if="(item.step === item.evalRecords.length)" @click="select = 'close',item.step = 3">收起<van-icon name="arrow-up" color="#4D4D4D"/></div>
                   </div>
-                  <div class="itemBox">
-                    <span class="label">用户编号：</span>
-                    <span>{{item.userNumber}}</span>
+                  <div class="buy-infos">
+                    <div class="left"><span>批次号: {{item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...': item.batchId}}</span></div>
+                    <div class="right" v-if="item.payee === 'user'">¥ {{item.price.toFixed(2)}}</div>
                   </div>
-                  <div class="itemBox">
-                    <span class="label">测试编号：</span>
-                    <span>{{item.sessionId}}</span>
+                  <div class="buy-infos">
+                    <div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div>
                   </div>
-                  <div class="itemBox">
-                    <span class="label">测试内容：</span>
-                    <span>
-                      <span v-for="(el, i) in item.evalRecords" :key="el.index">
-                        {{el.table.tableName}}{{i === (item.evalRecords.length - 1) ? '' : '、'}}
-                      </span>
-                    </span>
+                  <div class="buy-infos" v-if="item.finishedAt > 0">
+                    <div class="left"><span>完成时间: {{DateFormat({date: item.finishedAt * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
                   </div>
-                  <div v-if="item.evalRecords.length === 1 && !isCanDo(item.evalRecords)" class="btnBox">
-                    <van-button v-if="item.status === 0" round type="info"
-                      @click="pay(item)"
-                    >支付</van-button>
-                    <van-button v-if="item.status === 1" round type="info"
-                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)"
-                    >开始测试</van-button>
-                    <van-button v-else-if="item.status === 2" round  type="info"
-                      @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode, item.reportDisplayEnabled)"
-                    >继续测试</van-button>
-                    <van-button v-else-if="item.status === 9 && item.reportDisplayEnabled" round plain type="info"
-                    @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)"
-                    >查看报告</van-button>
+                  <div class="function-btns">
+                    <div class="psqi" v-if="isCanDo(item.evalRecords)">
+                      仅支持在APP中测试
+                    </div>
+                    <div class="normal-function" v-else>
+                      <van-button v-if="(item.status === 0)" round plain type="info" @click="pay(item)">支付</van-button>
+                      <van-button v-if="(item.status === 1)" round plain type="info" @click="startTest(item.sessionId, item.evalRecords, item.status)">开始测试</van-button>
+                      <!-- <van-button v-else-if="item.status === 2" round plain type="info" @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)">继续测试</van-button> -->
+                      <van-button v-if="item.status === 2" round plain type="info" @click="goOnTable(item.evalRecords, item.sessionId)">继续测试</van-button>
+                      <van-button v-if="item.status === 9" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
+                      <van-button v-if="item.status === 2 && item.evalRecords[0].finishedAt > 0" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
+                    </div>
                   </div>
-                  <div v-if="!isCanDo(item.evalRecords) && item.evalRecords.length > 1" class="btnBox">
-                    <van-button v-if="item.status === 0" round type="info"
-                      @click="pay(item)"
-                    >支付</van-button>
-                    <van-button v-if="item.status === 1" round type="info"
-                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)"
-                    >开始测试</van-button>
-                    <van-button v-if="item.status === 2" round  type="info"
-                      @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)"
-                    >继续测试</van-button>
-                    <van-button v-if="(item.status === 9 || hasFinish(item.evalRecords)) && item.reportDisplayEnabled" round plain type="info"
-                    @click="readReport(item.sessionId, second(item.evalRecords) ? 2 : 1)"
-                    style="margin-left: 10px">查看报告</van-button>
-                  </div>
-                  <div v-if="isCanDo(item.evalRecords)" class="btnBox app">仅支持在APP中测试</div>
+                </div>
               </div>
             </div>
           </div>
         </van-tab>
-        <van-tab title="CBT疏导">
+        <van-tab title="心理疏导">
           <van-loading color="#1989fa" v-if="loading"/>
-          <div class="bindist" v-else>
+          <div class="bindist bindist-cbt" v-else>
             <div class="noLogin" v-if="cbtList.length === 0">
               <img src="@/assets/img/my/nodata.png" alt="login">
               <span>暂无绑定</span>
             </div>
             <div v-else>
-              <div class="cardItem" v-for="item in cbtList" :key="item.index">
-                  <div class="name">
-                    机构名称：{{item.orgName}}
-                  </div>
-                  <div class="itemBox">
-                    <span class="label">批次号：</span>
-                    <span>{{item.batchId}}</span>
-                  </div>
-                  <div class="itemBox">
-                    <span class="label">用户编号：</span>
-                    <span>{{item.userNumber}}</span>
-                  </div>
-                  <div class="itemBox">
-                    <span class="label">测试内容：</span>
-                    <span>{{item.courseName}}</span>
-                  </div>
-                  <div class="btnBox app">仅支持在APP中测试</div>
+              <div class="card" v-for="(item,index) in cbtList" :key="index">
+                  <div class="test-id"><div class="left">{{item.batchName.length > 15 ? item.batchName.substring(0, 15) + '...': item.batchName}}</div><div class="right">共1件</div></div>
+                  <div class="blocks"><div class="name">{{item.courseName}}</div>
+                  <div class="buy-infos"><div class="left"><span>批次号: {{item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...': item.batchId}}</span></div></div>
+                  <div class="buy-infos"><div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div></div>
+                  <div class="function-btns"><div class="psqi">仅支持在APP中测试</div></div>
+              </div>
               </div>
             </div>
           </div>
@@ -109,6 +81,8 @@
 </template>
 
 <script>
+import { DateFormat } from '@/utils/date'
+
 import { organization, cbtCourse } from '@/api/modules/user'
 import BindBatch from './bindBatch.vue'
 import { findIndexByKeyValue } from '@/utils/checkFinish'
@@ -129,6 +103,7 @@ export default {
   },
   data () {
     return {
+      DateFormat: DateFormat,
       batchId: '',
       userNumber: '',
       bindList: [],
@@ -184,9 +159,20 @@ export default {
       this.$router.back()
     },
     // 获取机构测试记录
-    async organization () {
-      const { data } = await organization({ page: -1, pageSize: -1 })
-      this.bindList = data.records || []
+    organization () {
+      organization({ page: -1, pageSize: -1 }).then(res => {
+        if (res.code === 0) {
+          this.bindList = []
+          if (res.data.records) {
+            this.bindList = res.data.records.map(e => {
+              return {
+                ...e,
+                step: e.evalRecords.length >= 3 ? 3 : e.evalRecords.length
+              }
+            })
+          }
+        }
+      })
       this.loading = false
     },
     // 获取CBT测试记录
@@ -194,6 +180,13 @@ export default {
       const { data } = await cbtCourse({ page: -1, pageSize: -1 })
       this.cbtList = data.courseList || []
       this.loading = false
+    },
+    turnArray (target) {
+      const arr = []
+      for (let i = 0; i < target; i++) {
+        arr.push(i)
+      }
+      return arr
     },
     // 绑定机构成功
     bindSuccess (type) {
@@ -251,7 +244,8 @@ export default {
     // 支付去
     pay (item) {
       // console.log(item)
-      this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      this.$router.push(`/order-detail?batchId=${item.batchId}`)
+      // this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
       // 跳转去订单详情
     }
   }
@@ -273,14 +267,12 @@ export default {
     color: #333333;
     margin: 0;
     margin-bottom: 14rem/@w;
-    &:before{
-      content: "";
-      display: inline-block;
-      width: 3px;
-      height: 14rem / @w;
-      background: #34B7B9;
-      border-radius: 0px 11rem / @w 11rem / @w 0px;
-      margin-right: 5rem / @w;
+    img{
+      position: relative;
+      top: -3rem /@w;
+      width: 3rem /@w;
+      height: 14rem /@w;
+      margin-right: 5rem/@w;
     }
   }
   .myBind{
@@ -303,73 +295,135 @@ export default {
       }
   }
 }
-.cardItem{
-  width: 311rem/@w;
-  // height: 153rem/@w;
+.card{
+  padding: .48rem .5333rem;
   background: #FFFFFF;
-  border-radius: 10rem/@w;
-  padding: 15rem/@w 12rem/@w;
-  margin-bottom:  10rem/@w;
-  .name{
-    width: 298rem/@w;
-    height: 20rem/@w;
-    line-height: 20rem/@w;
-    font-size: 16rem/@w;
-    color: #333333;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-bottom: 10rem/@w;
-    border-bottom: 1px solid #F1F1F1;
-    margin-bottom: 8rem/@w;
+  border-radius: .2667rem;
+  margin-bottom: 10px;
+  .test-id{
+    color: #666666;
+    font-size: .32rem;
+    height: .4533rem;
+    line-height: .4533rem;
+    padding-bottom: .16rem;
+    display: flex;
+    border-bottom: 1px solid #F6F6F6;
+    margin-bottom: .2667rem;
+    .left{
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      padding-right: 2em;
+      span{
+        color: #333333;
+      }
+    }
+    .right{
+      white-space: nowrap;
+    }
   }
-  .itemBox{
+  .line{
+    padding-bottom: .2667rem;
+    border-bottom: 1px solid #F6F6F6 ;
+  }
+  .blocks{
+    margin-bottom: .2667rem;
+    .name{
+      color: #333333;
+      font-size: .3733rem;
+      line-height: .5333rem;
+      font-weight: 700;
+      height: .5333rem;
+      margin-bottom: .0533rem;
+    }
+    .introduction{
+      height: .4533rem;
+      line-height: .4533rem;
+      font-size: .32rem;
+      span{
+        color: #666666;
+      }
+    }
+  }
+  .more-list{
+    padding-top: .2667rem;
+    border-top: 1px solid #F6F6F6 ;
+    color: #666666;
+    text-align: center;
+    i{
+      padding-left: .16rem;
+    }
+    .add{
+      margin-bottom: .2133rem;
+      font-size: .32rem;
+      height: 17px;
+      line-height: .4533rem;
+    }
+    .reduce{
+      margin-bottom: .2133rem;
+      font-size: .32rem;
+      height: 17px;
+      line-height: .4533rem;
+    }
+  }
+  .buy-infos{
     display: flex;
     justify-content: space-between;
-    // align-items: center;
-    min-height: 16rem/@w;
-    font-size: 12rem/@w;
-    color: #999999;
-    margin-bottom: 5rem/@w;
-    .label{
-      white-space: nowrap;
-      text-align: justify;
-      text-align-last: justify;
-      width: 60rem/@w;
-    }
-    span:last-child{
-      text-align: right;
-      word-break: break-all;
-    }
-  }
-  .btnBox{
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: 10rem/@w;
-    .van-button--info{
-      width: 72rem/@w;
-      height: 28rem/@w;
-      border-radius: 15rem/@w;
-      font-size: 12rem/@w;
-      padding: 0;
-    }
-  }
-  .app{
-    color: #34B7B9;
+    color: #666666;
+    height: .4533rem;
     font-size: .32rem;
+    line-height: .4533rem;
+    margin-bottom: .32rem;
+    .left{
+      color: #333333;
+    }
+  }
+  .function-btns{
+    .psqi{
+      text-align: right;
+      color: #34B7B8;
+    }
+    .normal-function{
+      text-align: right;
+      .van-button{
+        width: 2.1867rem;
+        height: .7733rem;
+        border: 1px solid #34B7B9;
+        margin-left: .16rem;
+      }
+      .van-button-dark{
+        color: #333333;
+        border: 1px solid #D5D5D5;
+      }
+    }
   }
 }
-  .van-loading {
-    position: relative;
-    color: #D5D5D5;
-    width: 100%;
-    height: 200rem/@w;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0,0,0,0);
+.bindist-cbt{
+  .blocks{
+    .name{
+      padding-bottom: .2667rem;
+      margin-bottom: .2667rem;
+      border-bottom: 1px solid #F6F6F6;
+    }
   }
+}
+.list{
+  padding: .2667rem .0rem  4.2667rem;
+  overflow-y: auto;
+  box-sizing: border-box;
+  height: 100%;
+}
+.van-loading {
+  position: relative;
+  color: #D5D5D5;
+  width: 100%;
+  height: 200rem/@w;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0);
+}
 /deep/.van-tabs__wrap{
   height: 28px;
   margin: 10px  0;
