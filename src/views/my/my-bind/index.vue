@@ -22,7 +22,7 @@
                   <div class="test-id"><div class="left">{{item.batchName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
                   <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="ind">
                     <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
-                    <div class="introduction" v-if="item.evalRecords[ind].table.introduction"><span >{{item.evalRecords[ind].table.introduction}}</span></div>
+                    <div class="introduction" v-if="item.evalRecords[ind].table.tableIntroduction"><span >{{item.evalRecords[ind].table.tableIntroduction}}</span></div>
                   </div>
                   <div class="more-list" v-if="(item.evalRecords.length > 3)">
                     <div class="add" v-if="(item.step < item.evalRecords.length)" @click="select = 'close',item.step = item.evalRecords.length">查看更多<van-icon name="arrow-down" color="#4D4D4D"/></div>
@@ -226,11 +226,21 @@ export default {
       }
     },
     // 单个量表继续测试
-    goOnTable (type, sessionId, tableCode, reportDisplayEnabled) {
-      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
-      if (sessionStorage.tables) {
-        sessionStorage.removeItem('tables')
-      }
+    goOnTable (tables, sessionId) {
+      const item = tables.find(e => {
+        return e.finishedAt === 0
+      })
+      const userSelect = []
+      tables.forEach(e => {
+        if (e.finishedAt === 0) {
+          userSelect.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode })
+        }
+      })
+      sessionStorage.setItem('tables', JSON.stringify(userSelect))
+      // console.log(userSelect)
+      const tableCode = item.table.tableCode
+      const type = item.table.tableType
+      sessionStorage.reportDisplayEnabled = 'true'
       if (type === 1) {
         this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
       } else {

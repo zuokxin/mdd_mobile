@@ -16,7 +16,7 @@
         <div class="test-id" v-if="type === 2"><div class="left">{{item.batchName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
         <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="item.evalRecords[ind].table.tableName">
           <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
-          <div class="introduction"  v-if="item.evalRecords[ind].table.introduction"><span>{{item.evalRecords[ind].table.introduction}}</span></div>
+          <div class="introduction"  v-if="item.evalRecords[ind].table.tableIntroduction"><span>{{item.evalRecords[ind].table.tableIntroduction}}</span></div>
         </div>
         <div class="more-list" v-if="(item.evalRecords.length > 3)">
           <div class="add" v-if="(item.step < item.evalRecords.length)" @click="item.step = item.evalRecords.length">查看更多<van-icon name="arrow-down" color="#4D4D4D"/></div>
@@ -370,6 +370,10 @@ export default {
             height: .7733rem;
             border: 1px solid #34B7B9;
             margin-left: .16rem;
+          }
+          .van-button__content{
+            font-size: .3733rem;
+            white-space:nowrap;
           }
           .van-button-dark{
             color: #333333;
