@@ -194,7 +194,8 @@ export default {
       this.$router.push({ path: '/test-report', query: { sessionId, tableType } })
     },
     pay (item) {
-      this.$router.push(`/order-detail?batchId=${item.batchId}`)
+      // this.$router.push(`/order-detail?batchId=${item.batchId}`)
+      this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
     }
   }
 }
