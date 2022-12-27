@@ -2,7 +2,7 @@
   <div class="record">
     <div class="type">
       <van-icon name="arrow-left" @click="$router.push('/my-index')"/>
-      <div class="toggleType"> <span :class="{active: type === 1}" @click="toggleType(1)">个人测试</span> <span @click="toggleType(2)" :class="{active: type === 2}">机构测试</span> </div>
+      <div class="toggleType"> <span :class="{active: type === 2}" @click="toggleType(1)">个人测试</span> <span @click="toggleType(2)" :class="{active: type === 1}">机构测试</span> </div>
     </div>
     <div class="statusList">
       <div class="box" @click="selectStatus('1,2,9')" v-if="type === 1" :class="{actived: status === '1,2,9'}"> <div class="text">全部</div> <div class="line"></div> </div>
@@ -13,7 +13,7 @@
     <div class="list" v-if="(records.length > 0)" :key="time">
       <div class="card" v-for="(item,index) in records" :key="index">
         <div class="test-id" v-if="type === 1"><div class="left"><span>测试编号:</span>{{item.sessionId}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
-        <div class="test-id" v-if="type === 2"><div class="left">{{item.batchName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
+        <div class="test-id" v-if="type === 2"><div class="left">{{item.organization.orgName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
         <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="item.evalRecords[ind].table.tableName">
           <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
           <div class="introduction"  v-if="item.evalRecords[ind].table.tableIntroduction"><span>{{item.evalRecords[ind].table.tableIntroduction}}</span></div>
@@ -224,17 +224,18 @@ export default {
       height: .64rem;
       border-radius: .32rem;
       border: 1px solid #34B7B9;
+      background: #34B7B9;
       display: flex;
       overflow: hidden;
       span{
         flex: 1;
         line-height: .64rem;
         text-align: center;
-        color: #34B7B9;
+        color: #FFFFFF;
       }
       .active{
-        background: #34B7B9;
-        color: #FFFFFF;
+        color: #34B7B9;
+        background: #FFFFFF;
       }
     }
   }

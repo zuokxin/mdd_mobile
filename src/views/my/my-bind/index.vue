@@ -19,7 +19,7 @@
             <div v-else>
               <div class="list"  :key="new Date().getTime()">
                 <div class="card" v-for="(item,index) in bindList" :key="index">
-                  <div class="test-id"><div class="left">{{item.batchName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
+                  <div class="test-id"><div class="left">{{item.organization.orgName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
                   <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="ind">
                     <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
                     <div class="introduction" v-if="item.evalRecords[ind].table.tableIntroduction"><span >{{item.evalRecords[ind].table.tableIntroduction}}</span></div>
@@ -254,8 +254,8 @@ export default {
     // 支付去
     pay (item) {
       // console.log(item)
-      this.$router.push(`/order-detail?batchId=${item.batchId}`)
-      // this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      // this.$router.push(`/order-detail?batchId=${item.batchId}`)
+      this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
       // 跳转去订单详情
     }
   }
