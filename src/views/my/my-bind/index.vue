@@ -65,7 +65,7 @@
             </div>
             <div v-else>
               <div class="card" v-for="(item,index) in cbtList" :key="index">
-                  <div class="test-id"><div class="left">{{item.batchName.length > 15 ? item.batchName.substring(0, 15) + '...': item.batchName}}</div><div class="right">共1件</div></div>
+                  <div class="test-id"><div class="left">{{item.orgName.length > 15 ? item.orgName.substring(0, 15) + '...': item.orgName}}</div><div class="right">共1件</div></div>
                   <div class="blocks"><div class="name">{{item.courseName}}</div>
                   <div class="buy-infos"><div class="left"><span>批次号: {{item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...': item.batchId}}</span></div></div>
                   <div class="buy-infos"><div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div></div>
@@ -401,6 +401,10 @@ export default {
         height: .7733rem;
         border: 1px solid #34B7B9;
         margin-left: .16rem;
+      }
+      .van-button__content{
+        font-size: .3733rem;
+        white-space: nowrap;
       }
       .van-button-dark{
         color: #333333;
