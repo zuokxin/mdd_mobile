@@ -7,7 +7,7 @@
           <img v-if="item.tableLogo" :src="item.tableLogo" alt="">
         </div>
         <div class="right">
-          <div class="tableName">{{item.tableEnName}}{{item.tableCnName}}文字文字文字文字文字文字文字文字文字</div>
+          <div class="tableName">{{item.tableEnName}}{{item.tableCnName}}</div>
           <div class="tip">{{item.tableIntroduction}}</div>
           <div class="price">￥{{item.price}}</div>
         </div>
