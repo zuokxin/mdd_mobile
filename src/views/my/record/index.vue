@@ -13,8 +13,8 @@
     <div class="list" v-if="(records.length > 0)" :key="time">
       <div class="card" v-for="(item,index) in records" :key="index">
         <div class="test-id" v-if="type === 1"><div class="left"><span>测试编号:</span>{{item.sessionId}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
-        <div class="test-id" v-if="type === 2"><div class="left">{{item.organization.orgName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
-        <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="item.evalRecords[ind].table.tableName">
+        <div class="test-id" v-if="type === 2"><div class="left">{{item.organization && item.organization.orgName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
+        <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="item.evalRecords[ind].table.tableName" :class="{'block-under-line':(item.evalRecords.length <= 3 && ind + 1 === item.step)}">
           <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
           <div class="introduction"  v-if="item.evalRecords[ind].table.tableIntroduction"><span>{{item.evalRecords[ind].table.tableIntroduction}}</span></div>
         </div>
@@ -314,6 +314,9 @@ export default {
           color: #333333;
           font-size: .3733rem;
           line-height: .5333rem;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
           font-weight: 700;
           height: .5333rem;
           margin-bottom: .0533rem;
@@ -326,6 +329,10 @@ export default {
             color: #666666;
           }
         }
+      }
+      .block-under-line{
+        border-bottom: 1px solid #F6F6F6 ;
+        padding-bottom: 0.2133rem;
       }
       .more-list{
         padding-top: .2667rem;
