@@ -346,11 +346,17 @@ export default {
       font-weight: 700;
       height: .5333rem;
       margin-bottom: .0533rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
     .introduction{
       height: .4533rem;
       line-height: .4533rem;
       font-size: .32rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
       span{
         color: #666666;
       }
