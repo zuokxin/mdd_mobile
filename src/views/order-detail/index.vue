@@ -251,7 +251,7 @@ export default {
         if (response.code === 0) {
           const userSelect = []
           this.tables = []
-          this.continue = response.data.evalRecords.some(e => e.finishedAt > 0)
+          this.continue = response.data.status === 2
           response.data.evalRecords.forEach(e => {
             this.tableName += e.table.tableName + '、'
             if (e.finishedAt === 0) {
