@@ -16,7 +16,7 @@
     <van-goods-action :safe-area-inset-bottom="true">
       <van-goods-action-icon to="/my-bind" text="我的测评"/>
       <van-goods-action-button
-        v-if="!go"
+        v-if="status === 0"
         type="primary"
         :text="btnInfo"
         @click="onClickButton"
@@ -74,7 +74,6 @@ export default {
       discountAmount: 0, // 折扣价格
       showPay: false, // 付款弹窗
       code: '', // 微信code
-      go: false, // 是否去测试
       sessionId: '', // 当前测试的sessionid
       tableCode: '',
       hasOtherTable: false, // 是否包含他评量表
@@ -84,6 +83,7 @@ export default {
       popoutFlag: false,
       contactServiceFlag: false,
       errCode: 0,
+      status: 0,
       continue: false,
       customImage: '',
       organ: '',
@@ -195,9 +195,9 @@ export default {
           } else {
             this.sessionId = res.data.sessionId
             this.getNeedTests()
-            if (res.data.payStatus === 'success') {
-              this.go = true
-            }
+            // if (res.data.payStatus === 'success') {
+            //   this.go = true
+            // }
           }
           // 支付状态 下一步操作可以做
         }
@@ -251,6 +251,9 @@ export default {
         if (response.code === 0) {
           const userSelect = []
           this.tables = []
+          if (response.data.status !== 0) {
+            this.status = response.data.status
+          }
           this.continue = response.data.status === 2
           response.data.evalRecords.forEach(e => {
             this.tableName += e.table.tableName + '、'
@@ -335,9 +338,10 @@ export default {
         res => {
           if (res.data.orderStatus === 'success') {
             this.thisDialog('您已完成支付').then(() => {
-              this.go = true
+              // this.go = true
               this.sessionId = res.data.sessionId
               this.refresh(1)
+              this.getNeedTests()
             })
           } else if (res.data.orderStatus === 'fail') {
             this.thisDialog('支付失败').then(() => {
