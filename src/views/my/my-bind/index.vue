@@ -244,8 +244,8 @@ export default {
     // 支付去
     pay (item) {
       // console.log(item)
-      this.$router.push(`/order-detail?batchId=${item.batchId}`)
       // this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
       // 跳转去订单详情
     }
   }

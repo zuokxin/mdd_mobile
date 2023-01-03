@@ -163,9 +163,9 @@ export default {
               }
               this.discountAmount = this.table.price
               // 更新路由
-              const { discountCode, ...query } = this.$route.query
-              console.log(query)
-              this.$router.replace({ query })
+              // const { discountCode, ...query } = this.$route.query
+              // console.log(query)
+              // this.$router.replace({ query })
             }
           })
         }
