@@ -10,7 +10,6 @@
         <!-- {{end}}{{allData.id}} -->
         <div class="question">{{allData.id + 1}}.{{allData.title}}</div>
         <div v-for="(it,index) in options" :key="index">
-          <span v-if="it.commentHint" class="commentHint">{{it.commentHint}}:</span>
           <div class="each-choice" @click="dispose(index)">
             <span class="left-title">{{it.name}}</span>
             <span class="right-choice">
@@ -18,7 +17,8 @@
               <img class="check" v-else src="@/assets/checked.png">
             </span>
           </div>
-          <van-field class="each-comment" maxlength="100" @input="theInput(it.requiredComment)" type="textarea" v-if="it.requiredComment && it.checked" v-model="it.comment" placeholder="请输入具体原因"/>
+          <span v-if="it.commentHint && it.requiredComment && it.checked" class="commentHint">{{it.commentHint}}:</span>
+          <van-field class="each-comment" maxlength="100" @input="theInput(it.requiredComment)" type="textarea" v-if="it.requiredComment && it.checked" v-model="it.comment"/>
         </div>
       </div>
     </div>
