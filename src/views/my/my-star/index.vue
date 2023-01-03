@@ -2,7 +2,7 @@
   <div class="star">
     <van-nav-bar title="我的收藏" left-arrow @click-left="$router.back()"/>
     <div class="list" v-if="(list.length > 0)">
-      <div class="blocks" v-for="(item, index) in list" :key="index">
+      <div class="blocks" v-for="(item, index) in list" :key="index" @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
         <div class="left">
           <img v-if="item.tableLogo" :src="item.tableLogo" alt="">
         </div>
