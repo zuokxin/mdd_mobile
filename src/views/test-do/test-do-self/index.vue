@@ -9,7 +9,8 @@
       <div class="question-box">
         <!-- {{end}}{{allData.id}} -->
         <div class="question">{{allData.id + 1}}.{{allData.title}}</div>
-        <div  v-for="(it,index) in options" :key="index">
+        <div v-for="(it,index) in options" :key="index">
+          <span v-if="it.commentHint" class="commentHint">{{it.commentHint}}:</span>
           <div class="each-choice" @click="dispose(index)">
             <span class="left-title">{{it.name}}</span>
             <span class="right-choice">
@@ -283,6 +284,17 @@ export default {
         color: #000000;
         font-weight: 600;
         text-align: left;
+      }
+      .commentHint {
+        display: block;
+        width: 6.066667rem;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 2;
+        color: #999999;
       }
       .each-choice{
         width: 7.066667rem;
