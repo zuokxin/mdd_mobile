@@ -9,7 +9,7 @@
       <div class="question-box">
         <!-- {{end}}{{allData.id}} -->
         <div class="question">{{allData.id + 1}}.{{allData.title}}</div>
-        <div  v-for="(it,index) in options" :key="index">
+        <div v-for="(it,index) in options" :key="index">
           <div class="each-choice" @click="dispose(index)">
             <span class="left-title">{{it.name}}</span>
             <span class="right-choice">
@@ -17,7 +17,8 @@
               <img class="check" v-else src="@/assets/checked.png">
             </span>
           </div>
-          <van-field class="each-comment" maxlength="100" @input="theInput(it.requiredComment)" type="textarea" v-if="it.requiredComment && it.checked" v-model="it.comment" placeholder="请输入具体原因"/>
+          <span v-if="it.commentHint && it.requiredComment && it.checked" class="commentHint">{{it.commentHint}}:</span>
+          <van-field class="each-comment" maxlength="100" @input="theInput(it.requiredComment)" type="textarea" v-if="it.requiredComment && it.checked" v-model="it.comment"/>
         </div>
       </div>
     </div>
@@ -283,6 +284,17 @@ export default {
         color: #000000;
         font-weight: 600;
         text-align: left;
+      }
+      .commentHint {
+        display: block;
+        width: 6.066667rem;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 2;
+        color: #999999;
       }
       .each-choice{
         width: 7.066667rem;

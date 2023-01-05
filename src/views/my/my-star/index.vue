@@ -2,12 +2,12 @@
   <div class="star">
     <van-nav-bar title="我的收藏" left-arrow @click-left="$router.back()"/>
     <div class="list" v-if="(list.length > 0)">
-      <div class="blocks" v-for="(item, index) in list" :key="index" @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
+      <div class="blocks" v-for="(item, index) in list" :key="index">
         <div class="left">
           <img v-if="item.tableLogo" :src="item.tableLogo" alt="">
         </div>
         <div class="right">
-          <div class="tableName">{{item.tableEnName}}{{item.tableCnName}}文字文字文字文字文字文字文字文字文字</div>
+          <div class="tableName">{{item.tableCnName}}({{item.tableEnName}})</div>
           <div class="tip">{{item.tableIntroduction}}</div>
           <div class="price">￥{{item.price}}</div>
         </div>

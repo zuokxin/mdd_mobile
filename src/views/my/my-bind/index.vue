@@ -19,10 +19,10 @@
             <div v-else>
               <div class="list"  :key="new Date().getTime()">
                 <div class="card" v-for="(item,index) in bindList" :key="index">
-                  <div class="test-id"><div class="left">{{item.batchName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
-                  <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="ind">
+                  <div class="test-id"><div class="left">{{item.organization.orgName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
+                  <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="ind" :class="{'block-under-line':(item.evalRecords.length <= 3 && ind + 1 === item.step)}">
                     <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
-                    <div class="introduction" v-if="item.evalRecords[ind].table.introduction"><span >{{item.evalRecords[ind].table.introduction}}</span></div>
+                    <div class="introduction" v-if="item.evalRecords[ind].table.tableIntroduction"><span >{{item.evalRecords[ind].table.tableIntroduction}}</span></div>
                   </div>
                   <div class="more-list" v-if="(item.evalRecords.length > 3)">
                     <div class="add" v-if="(item.step < item.evalRecords.length)" @click="select = 'close',item.step = item.evalRecords.length">查看更多<van-icon name="arrow-down" color="#4D4D4D"/></div>
@@ -65,7 +65,7 @@
             </div>
             <div v-else>
               <div class="card" v-for="(item,index) in cbtList" :key="index">
-                  <div class="test-id"><div class="left">{{item.batchName.length > 15 ? item.batchName.substring(0, 15) + '...': item.batchName}}</div><div class="right">共1件</div></div>
+                  <div class="test-id"><div class="left">{{item.orgName.length > 15 ? item.orgName.substring(0, 15) + '...': item.orgName}}</div><div class="right">共1件</div></div>
                   <div class="blocks"><div class="name">{{item.courseName}}</div>
                   <div class="buy-infos"><div class="left"><span>批次号: {{item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...': item.batchId}}</span></div></div>
                   <div class="buy-infos"><div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div></div>
@@ -226,11 +226,21 @@ export default {
       }
     },
     // 单个量表继续测试
-    goOnTable (type, sessionId, tableCode, reportDisplayEnabled) {
-      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
-      if (sessionStorage.tables) {
-        sessionStorage.removeItem('tables')
-      }
+    goOnTable (tables, sessionId) {
+      const item = tables.find(e => {
+        return e.finishedAt === 0
+      })
+      const userSelect = []
+      tables.forEach(e => {
+        if (e.finishedAt === 0) {
+          userSelect.push({ table: e.table, tableType: e.table.tableType, tableCode: e.table.tableCode })
+        }
+      })
+      sessionStorage.setItem('tables', JSON.stringify(userSelect))
+      // console.log(userSelect)
+      const tableCode = item.table.tableCode
+      const type = item.table.tableType
+      sessionStorage.reportDisplayEnabled = 'true'
       if (type === 1) {
         this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
       } else {
@@ -244,7 +254,7 @@ export default {
     // 支付去
     pay (item) {
       // console.log(item)
-      // this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      // this.$router.push(`/order-detail?batchId=${item.batchId}`)
       this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
       // 跳转去订单详情
     }
@@ -336,15 +346,25 @@ export default {
       font-weight: 700;
       height: .5333rem;
       margin-bottom: .0533rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
     .introduction{
       height: .4533rem;
       line-height: .4533rem;
       font-size: .32rem;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
       span{
         color: #666666;
       }
     }
+  }
+  .block-under-line{
+    border-bottom: 1px solid #F6F6F6 ;
+    padding-bottom: 0.2133rem;
   }
   .more-list{
     padding-top: .2667rem;
@@ -391,6 +411,10 @@ export default {
         height: .7733rem;
         border: 1px solid #34B7B9;
         margin-left: .16rem;
+      }
+      .van-button__content{
+        font-size: .3733rem;
+        white-space: nowrap;
       }
       .van-button-dark{
         color: #333333;
