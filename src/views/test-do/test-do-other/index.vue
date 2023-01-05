@@ -756,6 +756,7 @@ export default {
     .progress-bar{
       height: 1.6757rem;
       padding: .4324rem .3243rem 0;
+      box-sizing: border-box;
       .title{
         text-align: center;
         font-size: 12px;
@@ -773,7 +774,7 @@ export default {
     border-radius: 10px;
     background: #FFFFFF;
     .question-text{
-      font-size: 16px;
+      font-size: .4267rem;
       padding: .4324rem .3243rem;
       color: #333333;
       font-weight: 500;
@@ -786,7 +787,7 @@ export default {
       line-height: 28px;
     }
     .question-topic{
-      font-size: 16px;
+      font-size: .3467rem;
       padding: .4324rem .3243rem 0rem;
       color: #333333;
       font-weight: 500;
