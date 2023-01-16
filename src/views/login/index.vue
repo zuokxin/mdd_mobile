@@ -1,40 +1,90 @@
 <template>
-  <div class="container" ref="container">
-    <div class="img"><img src="@/assets/login.png" alt="yunyu"></div>
-    <h5>登录/注册</h5>
-    <van-field v-model="username" type="number" placeholder="请输入手机号码（新手机号自动注册）" @blur="checkUsername" />
-    <van-field class="line" v-model="smsCode" type="number" maxlength="6"  placeholder="请输入验证码">
-      <template #button>
-        <van-button class="timeBtn" size="small"  @click="getMsgCode" round type="primary" :disabled="msgFlag || timeFlag">{{getmsg}}</van-button>
-      </template>
-    </van-field>
-    <div class="login">
-      <van-button round block type="primary" @click="login" :disabled="allCompleteFlag">登录</van-button>
+  <div class="login-box">
+    <div class="container" ref="container" v-show="!find">
+      <div class="img"><img src="@/assets/login.png" alt="yunyu"></div>
+      <h5>登录/注册</h5>
+      <div class="complex-line">
+        <div class="left" @click="choiceArea"><van-field :value="`+${countryCode}`" readonly right-icon="play" /></div>
+        <van-field v-model="username" type="number" placeholder="请输入手机号（新号自动注册）" @blur="checkUsername" />
+      </div>
+      <van-field class="line" v-model="smsCode" type="number" maxlength="6"  placeholder="请输入验证码">
+        <template #button>
+          <van-button class="timeBtn" size="small"  @click="getMsgCode" round type="primary" :disabled="msgFlag || timeFlag">{{getmsg}}</van-button>
+        </template>
+      </van-field>
+      <div class="login">
+        <van-button round block type="primary" @click="login" :disabled="allCompleteFlag">登录</van-button>
+      </div>
+      <p>登录注册即代表同意 <span @click="skip('agreements')">《服务协议》</span > 及 <span @click="skip('policy')">《隐私政策》</span> </p>
     </div>
-    <p>登录注册即代表同意 <span @click="skip('agreements')">《服务协议》</span > 及 <span @click="skip('policy')">《隐私政策》</span> </p>
+    <div class="area" v-show="find">
+      <div class="area-top" ref="areatop">
+        <van-nav-bar title="选择国家和地区" :border="false" left-arrow @click-left="find = false, searchFinished = false"/>
+        <div class="search-line">
+          <img src="@/assets/img/my/dark-search.png" alt="" class="left">
+          <div class="center">
+            <form action="javascript:void 0">
+              <input @keyup.13="search(keyWord)" @blur="show = false" @focus="show = true, searchFinished = false" ref="myInput" type="search" v-model="keyWord" placeholder="搜索" />
+            </form>
+          </div>
+          <img src="@/assets/img/my/clear.png" @click="clear()" v-show="keyWord !== ''" alt="" class="right">
+        </div>
+      </div>
+      <!-- ----- -->
+      <div class="area-list" :key="new Date().getTime()">
+        <van-overlay :show="show"></van-overlay>
+        <!-- panel -->
+        <van-index-bar v-if="!searchFinished && searchList.length === 0 " :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top">
+          <div v-for="item in areas" :key="item.type">
+            <van-index-anchor :index="item.type" />
+            <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="it in item.list" :key="it.chinese_name" @click="backLogin(it.phone_code)">
+              <div class="number">+{{it.phone_code}}</div>
+            </van-cell>
+          </div>
+        </van-index-bar>
+        <!-- -------------------- -->
+        <div class="noneData" v-if="searchFinished && searchList.length === 0">
+          <div class="none-list" ><img src="../../assets/img/my/none-list.png" alt=""> <div class="text">无内容</div></div>
+        </div>
+        <!-- -------------------- -->
+        <van-index-bar v-if="searchFinished || searchList.length > 0" :index-list="[]" :sticky-offset-top="top" :key="new Date().getTime()">
+            <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="(it,index) in searchList" :key="index + index" @click="backLogin(it.phone_code)" >
+              <div class="number">+{{it.phone_code}}</div>
+            </van-cell>
+        </van-index-bar>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import { areas } from './area'
 import { getCode, postUserLogin } from '@/api/modules/login'
 export default {
   name: 'login',
   data () {
     return {
+      areas: areas,
       username: '',
       smsCode: '',
+      countryCode: '86',
+      top: 0,
       timeFlag: false,
-      getmsg: '获取验证码'
+      find: false,
+      getmsg: '获取验证码',
+      keyWord: '',
+      show: false,
+      searchList: [],
+      searchFinished: false
     }
   },
   mounted () {
     this.$refs.container.style.height = window.innerHeight + 'px'
     // const flag = this.$store.getters.isLogin(sessionStorage.getItem('phone'))
-    // console.log(this.$route)
   },
   computed: {
     msgFlag () {
-      const reg = /[0-9]{11}$/
+      const reg = /[0-9]$/
       if (this.username !== '' && reg.test(this.username)) {
         return false
       } else {
@@ -61,12 +111,17 @@ export default {
       }
     },
     // 获取验证码
-    async getMsgCode () {
-      const { code } = await getCode(this.username)
-      if (code === 0) {
-        this.timeFlag = true
-        this.countDown(60)
-      }
+    getMsgCode () {
+      getCode({ phone: this.username, countryCode: this.countryCode }).then(res => {
+        if (res.code === 0) {
+          this.timeFlag = true
+          this.countDown(60)
+        }
+      }).catch(err => {
+        if (err.code) {
+          this.$toast(err.message)
+        }
+      })
     },
     // 计时器
     countDown (time) {
@@ -84,7 +139,8 @@ export default {
     login () {
       const data = {
         username: this.username,
-        smsCode: this.smsCode
+        smsCode: this.smsCode,
+        countryCode: this.countryCode
       }
       postUserLogin(data).then(res => {
         if (res.code === 0) {
@@ -103,8 +159,8 @@ export default {
           sessionStorage.userId = res.data.userId
           res.data.openid && (sessionStorage.openid = res.data.openid) // 微信内授权状态
         }
-      }).catch(err => {
-        console.log(err)
+      }).catch(() => {
+        // console.log(err)
         // this.$toast(err.message)
       })
     },
@@ -116,14 +172,68 @@ export default {
         window.location.href = window.location.origin + '/agreements/#/user'
         // window.location.href = 'https://depression.fubianmed.com/agreements/#/user'
       }
+    },
+    choiceArea () {
+      this.find = true
+      this.keyWord = ''
+      // this.$nextTick(() => {
+      // this.top = this.$refs.areatop.clientHeight
+      // })
+    },
+    clear () {
+      this.keyWord = ''
+      this.searchFinished = false
+      this.searchList = []
+    },
+    search (keyWord) {
+      // 中文、拼音、国家英文（不区分大小写) 区号
+      // 一言难尽  拼音居然也不分大小写
+      // chinese_name chinese_pinyin？english_name phone_code
+      if (this.keyWord === '') {
+        this.$refs.myInput.blur()
+        this.show = false
+      } else {
+        this.searchList = []
+        const cloneData = JSON.parse(JSON.stringify(this.areas))
+        cloneData.forEach(e => {
+          e.list.forEach(item => {
+            if (item.chinese_name.includes(this.keyWord)) {
+              this.searchList.push(item)
+            }
+            if (this.disponseSpace(item.chinese_pinyin).includes(this.disponseSpace(this.keyWord))) {
+              this.searchList.push(item)
+            }
+            if (this.disponseSpace(item.english_name).includes(this.disponseSpace(this.keyWord))) {
+              this.searchList.push(item)
+            }
+            if (item.phone_code.includes(this.keyWord)) {
+              this.searchList.push(item)
+            }
+          })
+        })
+        // console.log(this.searchList)
+        this.$refs.myInput.blur()
+        this.show = false
+        this.searchFinished = true
+      }
+    },
+    backLogin (code) {
+      this.countryCode = code
+      this.find = false
+      this.searchFinished = false
+    },
+    disponseSpace (s) {
+      const str = s.replace(/\s*/g, '')
+      return str.toLocaleLowerCase()
     }
   }
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less" vars="{top}" scoped>
 @import '../../assets/style/reset-vant.less';
-.container{
+.login-box{
+  .container{
   padding-left: 1.28rem;
   position: absolute;
   width: 100%;
@@ -149,6 +259,29 @@ export default {
     height: .746667rem;
     line-height: .746667rem;
     margin-bottom: 1.066667rem;
+  }
+  .complex-line{
+    display: flex;
+    flex-wrap: nowrap;
+    .left{
+      width: 2rem;
+      margin-right: 0.2667rem;
+      display: flex;
+      /deep/.van-field__right-icon{
+        padding: 0;
+        margin-right: 0px;
+        color: #000000;
+        transform: rotate(90deg);
+      }
+    }
+    /deep/.van-field__control{
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    /deep/.van-field__control{
+      color: #000000;
+    }
   }
   .login{
     margin-top: 1.066667rem;
@@ -188,5 +321,108 @@ export default {
       color: @green;
     }
   }
+  }
+  .area{
+    .area-top{
+      width: 100%;
+      z-index: 3000;
+      position: fixed;
+      background: #FFFFFF;
+      height: 2.6667rem;
+      .search-line{
+        padding: 0 ;
+        height: .88rem;
+        margin: 0.2667rem .4267rem .4267rem;
+        padding: 0 .4267rem;
+        border-radius: 0.4533rem;
+        background: #F6F6F6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        img{
+          width: .4267rem;
+          height: .4267rem;
+        }
+        .center{
+          flex: 1;
+          form{
+            padding: 0 0.5em;
+            input{
+              width: 100%;
+              border: none;
+              background-color: #F6F6F6;
+             -webkit-appearance: none;
+            }
+            input[type=search]::-webkit-search-cancel-button{
+             -webkit-appearance: none;
+            }
+          }
+        }
+      }
+    }
+    .area-list::-webkit-scrollbar {
+      display: none;
+    }
+    .area-list{
+      z-index: 2999;
+      width: 100%;
+      top: 2.6667rem;
+      height: calc( 100vh - 2.6667rem);
+      position: fixed;
+      overflow-y: scroll;
+      .van-cell{
+        padding-top: 11px;
+      }
+      .van-cell__value{
+        min-width: 1.3333rem;
+        max-width: 1.3333rem;
+        padding: 0 0.5em;
+        color: #999999;
+        float: right;
+      }
+      .van-cell__title{
+        color: #333333;
+      }
+      /deep/.van-index-anchor{
+        background-color:  #F6F6F6;
+        color: #333333;
+      }
+      /deep/.van-index-bar__index{
+        padding: 0;
+      }
+      // /deep/.van-index-anchor--sticky{
+      //   background-color: pink !important;
+      // }
+      /deep/.van-cell__title{
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      /deep/.van-index-bar__index--active{
+        color: #FFFFFF;
+        width: .32rem;
+        height: .32rem;
+        border-radius: 50%;
+        background-color: #34B7B9;
+      }
+      .van-overlay{
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .noneData{
+        text-align: center;
+        padding-top: 5.4133rem;
+        img{
+          width: 3.7333rem;
+          height: 3.7333rem;
+        }
+        .text{
+          color: #999999 ;
+          font-size: 0.48rem;
+        }
+      }
+    }
+  }
 }
+
 </style>

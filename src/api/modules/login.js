@@ -1,12 +1,10 @@
 import fetch from '../http.js'
 
-export const getCode = phone => fetch({
+export const getCode = params => fetch({
   url: '/api/user/getCode',
   method: 'get',
-  params: {
-    phone
-  }
-})
+  params
+}, false)
 
 export const postUserLogin = (data) => fetch({
   url: '/api/user/login',
