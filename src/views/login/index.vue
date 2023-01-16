@@ -199,14 +199,11 @@ export default {
           e.list.forEach(item => {
             if (item.chinese_name.includes(this.keyWord)) {
               this.searchList.push(item)
-            }
-            if (this.disponseSpace(item.chinese_pinyin).includes(this.disponseSpace(this.keyWord))) {
+            } else if (this.disponseSpace(item.chinese_pinyin).includes(this.disponseSpace(this.keyWord))) {
               this.searchList.push(item)
-            }
-            if (this.disponseSpace(item.english_name).includes(this.disponseSpace(this.keyWord))) {
+            } else if (this.disponseSpace(item.english_name).includes(this.disponseSpace(this.keyWord))) {
               this.searchList.push(item)
-            }
-            if (item.phone_code.includes(this.keyWord)) {
+            } else if (item.phone_code.includes(this.keyWord)) {
               this.searchList.push(item)
             }
           })
