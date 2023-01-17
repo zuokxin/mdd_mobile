@@ -111,7 +111,7 @@ export default {
       return min === max ? min : `${min}~${max}`
     },
     btnInfo () {
-      return `确认支付（${this.amount}）`
+      return `确认支付（¥${this.amount}）`
     },
     // 去测试按钮文案
     btnGoInfo () {
