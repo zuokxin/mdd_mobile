@@ -24,7 +24,7 @@
           <img src="@/assets/img/my/dark-search.png" alt="" class="left">
           <div class="center">
             <form action="javascript:void 0">
-              <input @keyup.13="search(keyWord)" @blur="show = false" @focus="show = true, searchFinished = false" ref="myInput" type="search" v-model="keyWord" placeholder="搜索" />
+              <input @keyup.13="search()" @blur="show = false" @focus="show = true, searchFinished = false" ref="myInput" type="search" v-model="keyWord" placeholder="搜索" />
             </form>
           </div>
           <img src="@/assets/img/my/clear.png" @click="clear()" v-show="keyWord !== ''" alt="" class="right">
@@ -34,7 +34,7 @@
       <div class="area-list" :key="new Date().getTime()">
         <van-overlay :show="show"></van-overlay>
         <!-- panel -->
-        <van-index-bar v-if="!searchFinished && searchList.length === 0 " :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top">
+        <van-index-bar ref="bar" v-if="!searchFinished && searchList.length === 0 " :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top">
           <div v-for="item in areas" :key="item.type">
             <van-index-anchor :index="item.type" />
             <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="it in item.list" :key="it.chinese_name" @click="backLogin(it.phone_code)">
@@ -75,7 +75,8 @@ export default {
       keyWord: '',
       show: false,
       searchList: [],
-      searchFinished: false
+      searchFinished: false,
+      defaultF: true
     }
   },
   mounted () {
@@ -102,12 +103,8 @@ export default {
   methods: {
     // 检查名字
     checkUsername () {
-      // const reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/
-      const reg = /[0-9]{11}$/
       if (this.username === '') {
         this.$toast('请输入手机号')
-      } else if (!reg.test(this.username)) {
-        this.$toast('请输入正确的手机号')
       }
     },
     // 获取验证码
@@ -176,16 +173,21 @@ export default {
     choiceArea () {
       this.find = true
       this.keyWord = ''
-      // this.$nextTick(() => {
-      // this.top = this.$refs.areatop.clientHeight
-      // })
+      this.searchList = []
+      this.defaultF = true
+      this.$nextTick(() => {
+        // this.top = this.$refs.areatop.clientHeight
+        this.$refs.bar.scrollTo('B')
+        this.$refs.bar.scrollTo('A')
+      })
     },
     clear () {
       this.keyWord = ''
       this.searchFinished = false
       this.searchList = []
+      this.defaultF = true
     },
-    search (keyWord) {
+    search () {
       // 中文、拼音、国家英文（不区分大小写) 区号
       // 一言难尽  拼音居然也不分大小写
       // chinese_name chinese_pinyin？english_name phone_code
@@ -394,6 +396,17 @@ export default {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+      }
+      /deep/.myred{
+        .van-index-bar__sidebar{
+          :first-child{
+            color: #FFFFFF;
+            width: .32rem;
+            height: .32rem;
+            border-radius: 50%;
+            background-color: #34B7B9;
+          }
+        }
       }
       /deep/.van-index-bar__index--active{
         color: #FFFFFF;
