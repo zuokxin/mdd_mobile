@@ -20,14 +20,17 @@
     <div class="area" v-show="find">
       <div class="area-top" ref="areatop">
         <van-nav-bar title="选择国家和地区" :border="false" left-arrow @click-left="find = false, searchFinished = false"/>
-        <div class="search-line">
-          <img src="@/assets/img/my/dark-search.png" alt="" class="left">
-          <div class="center">
-            <form action="javascript:void 0">
-              <input @keyup.13="search()" @blur="show = false" @focus="show = true, searchFinished = false" ref="myInput" type="search" v-model="keyWord" placeholder="搜索" />
-            </form>
+        <div class="cover-box">
+          <div class="search-line">
+            <img src="@/assets/img/my/dark-search.png" alt="" class="left">
+            <div class="center">
+              <form action="javascript:void 0">
+                <input @keyup.13="search()" @blur="show = false" @focus="show = true, searchFinished = false" ref="myInput" type="search" v-model="keyWord" placeholder="搜索" />
+              </form>
+            </div>
+            <img src="@/assets/img/my/clear.png" @click="clear()" v-show="keyWord !== ''" alt="" class="right">
           </div>
-          <img src="@/assets/img/my/clear.png" @click="clear()" v-show="keyWord !== ''" alt="" class="right">
+          <div class="cancel" v-if="keyWord || show" @click="cancel()">取消</div>
         </div>
       </div>
       <!-- ----- -->
@@ -183,9 +186,10 @@ export default {
     },
     clear () {
       this.keyWord = ''
-      this.searchFinished = false
-      this.searchList = []
-      this.defaultF = true
+      this.$refs.myInput.focus()
+      // this.searchFinished = false
+      // this.searchList = []
+      // this.defaultF = true
     },
     search () {
       // 中文、拼音、国家英文（不区分大小写) 区号
@@ -224,6 +228,11 @@ export default {
     disponseSpace (s) {
       const str = s.replace(/\s*/g, '')
       return str.toLocaleLowerCase()
+    },
+    cancel () {
+      this.keyWord = ''
+      this.searchList = []
+      this.searchFinished = false
     }
   }
 }
@@ -328,11 +337,22 @@ export default {
       position: fixed;
       background: #FFFFFF;
       height: 2.6667rem;
+      .cover-box{
+        display: flex;
+        .cancel{
+          font-size: 0.3733rem;
+          color: #333333;
+          width: 1.2267rem;
+          display: flex;
+          align-items: center;
+          margin: 0.2667rem 0rem .4267rem;
+        }
+      }
       .search-line{
-        padding: 0 ;
+        flex: 1;
+        padding: 0 .4267rem;
         height: .88rem;
         margin: 0.2667rem .4267rem .4267rem;
-        padding: 0 .4267rem;
         border-radius: 0.4533rem;
         background: #F6F6F6;
         display: flex;
