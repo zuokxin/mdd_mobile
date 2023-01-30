@@ -42,11 +42,11 @@
           </div>
           <div class="normal-function" v-else>
             <van-button v-if="(item.status === 0)" round plain type="info" @click="pay(item)">支付</van-button>
-            <van-button v-if="(item.status === 1)" round plain type="info" @click="startTest(item.sessionId, item.evalRecords, item.status)">开始测试</van-button>
+            <van-button v-if="(item.status === 1) && !isCanDo(item.evalRecords)" round plain type="info" @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)">开始测试</van-button>
             <!-- <van-button v-else-if="item.status === 2" round plain type="info" @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)">继续测试</van-button> -->
-            <van-button v-if="item.status === 2" round plain type="info" @click="goOnTable(item.evalRecords, item.sessionId)">继续测试</van-button>
-            <van-button v-if="item.status === 9" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
-            <van-button v-if="item.status === 2 && item.evalRecords[0].finishedAt > 0" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
+            <van-button v-if="item.status === 2 && !isCanDo(item.evalRecords)" round plain type="info" @click="goOnTable(item.evalRecords, item.sessionId, item.reportDisplayEnabled)">继续测试</van-button>
+            <van-button v-if="item.status === 9 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
+            <van-button v-if="item.status === 2 && item.evalRecords[0].finishedAt > 0 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
           </div>
         </div>
       </div>
@@ -74,6 +74,17 @@ export default {
       time: '',
       status: '1,2,9', // 1未完成 2全部 9已完成
       records: []
+    }
+  },
+  computed: {
+    // 判断能否在H5做量表
+    isCanDo () {
+      return (arr) => {
+        const flag = arr.some(v => {
+          return v.tableCode === 'psqi'
+        })
+        return flag
+      }
     }
   },
   mounted () {
@@ -149,8 +160,8 @@ export default {
       return arr
     },
     // 开始测试
-    startTest (sessionId, tables, status) {
-      sessionStorage.reportDisplayEnabled = 'true'
+    startTest (sessionId, tables, status, reportDisplayEnabled) {
+      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }
@@ -168,7 +179,8 @@ export default {
       }
     },
     // 继续测试
-    goOnTable (tables, sessionId) {
+    goOnTable (tables, sessionId, reportDisplayEnabled) {
+      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
       const item = tables.find(e => {
         return e.finishedAt === 0
       })
@@ -195,7 +207,8 @@ export default {
     },
     pay (item) {
       // this.$router.push(`/order-detail?batchId=${item.batchId}`)
-      this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      // this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
     }
   }
 }
