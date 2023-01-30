@@ -19,13 +19,13 @@
     </div>
     <div class="area" v-show="find">
       <div class="area-top" ref="areatop">
-        <van-nav-bar title="选择国家和地区" :border="false" left-arrow @click-left="find = false, searchFinished = false"/>
+        <van-nav-bar title="选择国家和地区" :border="false" left-arrow @click-left="find = false"/>
         <div class="cover-box">
           <div class="search-line">
             <img src="@/assets/img/my/dark-search.png" alt="" class="left">
             <div class="center">
               <form action="javascript:void 0">
-                <input @keyup.13="search()" @blur="show = false" @focus="show = true, searchFinished = false" ref="myInput" type="search" v-model="keyWord" placeholder="搜索" />
+                <input @input="search()" @blur="searchFinished = false, show = false " @focus="show = true" ref="myInput" type="search" v-model="keyWord" placeholder="搜索" />
               </form>
             </div>
             <img src="@/assets/img/my/clear.png" @click="clear()" v-show="keyWord !== ''" alt="" class="right">
@@ -34,10 +34,11 @@
         </div>
       </div>
       <!-- ----- -->
-      <div class="area-list" :key="new Date().getTime()">
-        <van-overlay :show="show"></van-overlay>
+      <div class="area-list">
+        <van-overlay :show="show && keyWord === ''"></van-overlay>
         <!-- panel -->
-        <van-index-bar ref="bar" v-if="!searchFinished && searchList.length === 0 " :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top">
+        <!-- <van-index-bar ref="bar" v-show="!searchFinished && searchList.length === 0 " :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top"> -->
+        <van-index-bar ref="bar" v-show="keyWord === ''" :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top">
           <div v-for="item in areas" :key="item.type">
             <van-index-anchor :index="item.type" />
             <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="it in item.list" :key="it.chinese_name" @click="backLogin(it.phone_code)">
@@ -46,11 +47,11 @@
           </div>
         </van-index-bar>
         <!-- -------------------- -->
-        <div class="noneData" v-if="searchFinished && searchList.length === 0">
+        <div class="noneData" v-if="searchList.length === 0">
           <div class="none-list" ><img src="../../assets/img/my/none-list.png" alt=""> <div class="text">无内容</div></div>
         </div>
         <!-- -------------------- -->
-        <van-index-bar v-if="searchFinished || searchList.length > 0" :index-list="[]" :sticky-offset-top="top" :key="new Date().getTime()">
+        <van-index-bar v-if="searchList.length > 0" :index-list="[]" :sticky-offset-top="top" :key="new Date().getTime()">
             <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="(it,index) in searchList" :key="index + index" @click="backLogin(it.phone_code)" >
               <div class="number">+{{it.phone_code}}</div>
             </van-cell>
@@ -78,7 +79,7 @@ export default {
       keyWord: '',
       show: false,
       searchList: [],
-      searchFinished: false,
+      // searchFinished: false,
       defaultF: true
     }
   },
@@ -192,33 +193,42 @@ export default {
       // this.defaultF = true
     },
     search () {
+      /* eslint-disable */
+      this.show = false
       // 中文、拼音、国家英文（不区分大小写) 区号
       // 一言难尽  拼音居然也不分大小写
       // chinese_name chinese_pinyin？english_name phone_code
       if (this.keyWord === '') {
-        this.$refs.myInput.blur()
-        this.show = false
-      } else {
-        this.searchList = []
-        const cloneData = JSON.parse(JSON.stringify(this.areas))
-        cloneData.forEach(e => {
-          e.list.forEach(item => {
-            if (item.chinese_name.includes(this.keyWord)) {
-              this.searchList.push(item)
-            } else if (this.disponseSpace(item.chinese_pinyin).includes(this.disponseSpace(this.keyWord))) {
-              this.searchList.push(item)
-            } else if (this.disponseSpace(item.english_name).includes(this.disponseSpace(this.keyWord))) {
-              this.searchList.push(item)
-            } else if (item.phone_code.includes(this.keyWord)) {
-              this.searchList.push(item)
-            }
-          })
-        })
+        this.show = true
+      // this.$refs.myInput.blur()
+      // this.show = false
+      } else if (this.keyWord !== '' && this.keyWord != '')  {
         // console.log(this.searchList)
-        this.$refs.myInput.blur()
+        // this.$refs.myInput.blur()
         this.show = false
-        this.searchFinished = true
+        this.getList()
+        // this.searchFinished = false
+      } else {
+        this.show = false
+        this.getList()
       }
+    },
+    getList () {
+      this.searchList = []
+      const cloneData = JSON.parse(JSON.stringify(this.areas))
+      cloneData.forEach(e => {
+        e.list.forEach(item => {
+          if (item.chinese_name.includes(this.keyWord)) {
+            this.searchList.push(item)
+          } else if (this.disponseSpace(item.chinese_pinyin).includes(this.disponseSpace(this.keyWord))) {
+            this.searchList.push(item)
+          } else if (this.disponseSpace(item.english_name).includes(this.disponseSpace(this.keyWord))) {
+            this.searchList.push(item)
+          } else if (item.phone_code.includes(this.keyWord)) {
+            this.searchList.push(item)
+          }
+        })
+      })
     },
     backLogin (code) {
       this.countryCode = code
@@ -226,13 +236,14 @@ export default {
       this.searchFinished = false
     },
     disponseSpace (s) {
-      const str = s.replace(/\s*/g, '')
-      return str.toLocaleLowerCase()
+      // const str = s.replace(/\s*/g, '')
+      return s.toLocaleLowerCase()
     },
     cancel () {
       this.keyWord = ''
       this.searchList = []
-      this.searchFinished = false
+      this.show = false
+      // this.searchFinished = false
     }
   }
 }
@@ -436,7 +447,8 @@ export default {
         background-color: #34B7B9;
       }
       .van-overlay{
-        position: absolute;
+        // position: absolute;
+        z-index: 999;
         background-color: rgba(0, 0, 0, 0.4);
       }
       .noneData{

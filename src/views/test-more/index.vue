@@ -119,7 +119,8 @@ export default {
     geth5ActivitylList () {
       h5ActivitylList({ status: 2 }).then(res => {
         if (res.code === 0) {
-          this.swipList = res.data.activityBasicInfo.filter(e => e.imageLink)
+          const activityBasicInfo = res.data.activityBasicInfo || []
+          this.swipList = activityBasicInfo.filter(e => e.imageLink)
         }
         // console.log(this.swipList)
       })
