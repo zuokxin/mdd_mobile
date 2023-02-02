@@ -4,7 +4,7 @@
       <div class="img"><img src="@/assets/login.png" alt="yunyu"></div>
       <h5>登录/注册</h5>
       <div class="complex-line">
-        <div class="left" @click="choiceArea"><van-field :value="`+${countryCode}`" readonly right-icon="play" /></div>
+        <div class="left" @click="choiceArea"><van-field class="dis-van-field" :value="`+${countryCode}`" readonly right-icon="play" /></div>
         <van-field v-model="username" type="number" placeholder="请输入手机号（新号自动注册）" @blur="checkUsername" />
       </div>
       <van-field class="line" v-model="smsCode" type="number" maxlength="6"  placeholder="请输入验证码">
@@ -38,7 +38,7 @@
         <van-overlay :show="show && keyWord === ''"></van-overlay>
         <!-- panel -->
         <!-- <van-index-bar ref="bar" v-show="!searchFinished && searchList.length === 0 " :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top"> -->
-        <van-index-bar ref="bar" v-show="keyWord === ''" :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top">
+        <van-index-bar ref="bar" class="van-index-bar-empty" v-show="keyWord === ''" :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top">
           <div v-for="item in areas" :key="item.type">
             <van-index-anchor :index="item.type" />
             <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="it in item.list" :key="it.chinese_name" @click="backLogin(it.phone_code)">
@@ -293,10 +293,14 @@ export default {
         transform: rotate(90deg);
       }
     }
+    /deep/.dis-van-field{
+      .van-field__control{
+        text-align: center;
+      }
+    }
     /deep/.van-field__control{
       overflow: hidden;
       white-space: nowrap;
-      text-align: center;
       text-overflow: ellipsis;
     }
     /deep/.van-field__control{
@@ -403,6 +407,9 @@ export default {
       overflow-y: scroll;
       .van-cell{
         padding-top: 11px;
+      }
+      .van-index-bar-empty{
+        padding-bottom: 2rem;
       }
       .van-cell__value{
         min-width: 1.3333rem;
