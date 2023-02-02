@@ -47,15 +47,15 @@
           </div>
         </van-index-bar>
         <!-- -------------------- -->
-        <div class="noneData" v-if="searchList.length === 0">
-          <div class="none-list" ><img src="../../assets/img/my/none-list.png" alt=""> <div class="text">无内容</div></div>
-        </div>
-        <!-- -------------------- -->
         <van-index-bar v-if="searchList.length > 0" :index-list="[]" :sticky-offset-top="top" :key="new Date().getTime()">
             <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="(it,index) in searchList" :key="index + index" @click="backLogin(it.phone_code)" >
               <div class="number">+{{it.phone_code}}</div>
             </van-cell>
         </van-index-bar>
+        <!-- -------------------- -->
+        <div class="noneData" v-if="searchList.length === 0 && keyWord !== ''">
+          <div class="none-list" ><img src="../../assets/img/my/none-list.png" alt=""> <div class="text">无内容</div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -283,7 +283,7 @@ export default {
     display: flex;
     flex-wrap: nowrap;
     .left{
-      width: 2rem;
+      width: 2.5rem;
       margin-right: 0.2667rem;
       display: flex;
       /deep/.van-field__right-icon{
@@ -296,6 +296,7 @@ export default {
     /deep/.van-field__control{
       overflow: hidden;
       white-space: nowrap;
+      text-align: center;
       text-overflow: ellipsis;
     }
     /deep/.van-field__control{
