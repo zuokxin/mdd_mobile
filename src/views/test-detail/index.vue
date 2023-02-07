@@ -125,7 +125,7 @@ export default {
     },
     // 支付按钮文案
     btnInfo () {
-      return `确认支付（${this.discountAmountInfo}）`
+      return `确认支付（¥${this.discountAmountInfo}）`
     },
     // 去测试按钮文案
     btnGoInfo () {
