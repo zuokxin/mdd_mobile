@@ -60,7 +60,16 @@ export default {
   },
   methods: {
     onClickLeft () {
-      this.$router.go(-1)
+      const mark = sessionStorage.getItem('setMark')
+      if (mark === 'gerenpay') {
+        sessionStorage.removeItem('setMark')
+        this.$router.replace('/my-record?type=1')
+      } else if (mark === 'jigoupay') {
+        sessionStorage.removeItem('setMark')
+        this.$router.replace('/my-record?type=2')
+      } else {
+        this.$router.go(-1)
+      }
     },
     onClickRight () {
       window.location.reload()

@@ -230,6 +230,7 @@ export default {
     // 开始测试
     goTest () {
       sessionStorage.reportDisplayEnabled = 'true'
+      sessionStorage.setMark = 'gerenpay'
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }
