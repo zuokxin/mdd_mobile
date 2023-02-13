@@ -1,7 +1,7 @@
 <template>
   <div class="record">
     <div class="type">
-      <van-icon name="arrow-left" @click="$router.go(-1)"/>
+      <van-icon name="arrow-left" @click="$router.push('/my-index')"/>
       <div class="toggleType"> <span :class="{active: type === 2}" @click="toggleType(1)">个人测试</span> <span @click="toggleType(2)" :class="{active: type === 1}">机构测试</span> </div>
     </div>
     <div class="statusList">
