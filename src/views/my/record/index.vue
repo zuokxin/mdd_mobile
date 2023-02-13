@@ -70,9 +70,9 @@ export default {
   data () {
     return {
       DateFormat: DateFormat,
-      type: 1,
+      type: 0,
       time: '',
-      status: '1,2,9', // 1未完成 2全部 9已完成
+      status: '', // 1未完成 2全部 9已完成
       records: []
     }
   },
@@ -88,9 +88,20 @@ export default {
     }
   },
   mounted () {
-    this.getList()
+    this.type = Number(this.$route.query.type) || 1
+    this.disponseUrl()
   },
   methods: {
+    disponseUrl () {
+      this.$router.replace(`/my-record?type=${this.type}`).catch(err => console.log(err))
+      if (this.type === 1) {
+        this.status = '1,2,9'
+        this.getList()
+      } else if (this.type === 2) {
+        this.status = '0,1,2,9'
+        this.getBatchList()
+      }
+    },
     getList () {
       getIndividual({ page: -1, pageSize: -1, status: this.status }).then(res => {
         if (res.code === 0) {
@@ -126,6 +137,7 @@ export default {
     toggleType (type) {
       if (type === this.type) return
       this.type = type
+      this.disponseUrl()
       if (this.type === 1) {
         if (this.status !== '1,2' && this.status !== '9') {
           this.status = '1,2,9'
@@ -161,7 +173,13 @@ export default {
     },
     // 开始测试
     startTest (sessionId, tables, status, reportDisplayEnabled) {
+      // sessionStorage.reportDisplayEnabled = 'true'
       sessionStorage.reportDisplayEnabled = reportDisplayEnabled
+      if (this.type === 2) {
+        sessionStorage.setMark = 'jigoupay'
+      } else {
+        sessionStorage.setMark = 'gerenpay'
+      }
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }
@@ -180,7 +198,13 @@ export default {
     },
     // 继续测试
     goOnTable (tables, sessionId, reportDisplayEnabled) {
+      // sessionStorage.reportDisplayEnabled = 'true'
       sessionStorage.reportDisplayEnabled = reportDisplayEnabled
+      if (this.type === 2) {
+        sessionStorage.setMark = 'jigoupay'
+      } else {
+        sessionStorage.setMark = 'gerenpay'
+      }
       const item = tables.find(e => {
         return e.finishedAt === 0
       })
@@ -194,7 +218,6 @@ export default {
       // console.log(userSelect)
       const tableCode = item.table.tableCode
       const type = item.table.tableType
-      sessionStorage.reportDisplayEnabled = 'true'
       if (type === 1) {
         this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
       } else {
@@ -207,8 +230,8 @@ export default {
     },
     pay (item) {
       // this.$router.push(`/order-detail?batchId=${item.batchId}`)
-      // this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
-      this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      // this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
     }
   }
 }

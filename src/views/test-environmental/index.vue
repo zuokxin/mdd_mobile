@@ -294,7 +294,14 @@ export default {
         cancelButtonText: '下载App',
         cancelButtonColor: '#34B7B9'
       }).then(() => {
-        this.$router.replace('/my-index')
+        const mark = sessionStorage.getItem('setMark')
+        if (mark === 'jigoupay') {
+          sessionStorage.removeItem('setMark')
+          this.$router.replace('/my-record?type=2')
+        } else {
+          sessionStorage.removeItem('setMark')
+          this.$router.replace('/my-record?type=1')
+        }
       }).catch(() => {
         this.$router.replace('/my-contact')
       })

@@ -29,7 +29,7 @@
         <div class="to-test-left">
           <img src="@/assets/img/my/list.png" alt="info">
         </div>
-        <div class="to-test-center" @click="jump('/my-record')">
+        <div class="to-test-center" @click="jump('/my-record?type=1')">
           <div class="top">量表测试记录</div>
           <div class="under">专业测试 客观评估</div>
         </div>

@@ -278,6 +278,7 @@ export default {
     goTest () {
       // console.log(this.tables)
       // console.log(this.userSelect[0])
+      sessionStorage.setMark = 'jigoupay'
       if (this.tables.length > this.userSelect.length) {
         if (this.userSelect[0].tableType === 1) {
           this.$router.push(`/test-do-self?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
