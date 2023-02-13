@@ -172,8 +172,9 @@ export default {
       return arr
     },
     // 开始测试
-    startTest (sessionId, tables, status) {
-      sessionStorage.reportDisplayEnabled = 'true'
+    startTest (sessionId, tables, status, reportDisplayEnabled) {
+      // sessionStorage.reportDisplayEnabled = 'true'
+      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
       if (this.type === 2) {
         sessionStorage.setMark = 'jigoupay'
       } else {
@@ -196,7 +197,9 @@ export default {
       }
     },
     // 继续测试
-    goOnTable (tables, sessionId) {
+    goOnTable (tables, sessionId, reportDisplayEnabled) {
+      // sessionStorage.reportDisplayEnabled = 'true'
+      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
       if (this.type === 2) {
         sessionStorage.setMark = 'jigoupay'
       } else {
@@ -215,7 +218,6 @@ export default {
       // console.log(userSelect)
       const tableCode = item.table.tableCode
       const type = item.table.tableType
-      sessionStorage.reportDisplayEnabled = 'true'
       if (type === 1) {
         this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
       } else {
