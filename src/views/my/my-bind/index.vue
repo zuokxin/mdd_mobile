@@ -209,6 +209,7 @@ export default {
     // 单个量表开始测试 & 多个量表开始和继续测试
     startTest (sessionId, tables, status, reportDisplayEnabled) {
       sessionStorage.reportDisplayEnabled = reportDisplayEnabled
+      sessionStorage.setItem('backPath', 'bind')
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }
@@ -228,6 +229,7 @@ export default {
     // 单个量表继续测试
     goOnTable (tables, sessionId, reportDisplayEnabled) {
       sessionStorage.reportDisplayEnabled = reportDisplayEnabled
+      sessionStorage.setItem('backPath', 'bind')
       const item = tables.find(e => {
         return e.finishedAt === 0
       })
@@ -241,7 +243,7 @@ export default {
       // console.log(userSelect)
       const tableCode = item.table.tableCode
       const type = item.table.tableType
-      sessionStorage.reportDisplayEnabled = 'true'
+      // sessionStorage.reportDisplayEnabled = 'true'
       if (type === 1) {
         this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
       } else {
@@ -255,6 +257,7 @@ export default {
     // 支付去
     pay (item) {
       // console.log(item)
+      sessionStorage.setItem('backPath', 'bind')
       // this.$router.push(`/order-detail?batchId=${item.batchId}`)
       // this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
       this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
