@@ -172,7 +172,6 @@ export default {
       return arr
     },
     // 开始测试
-<<<<<<< HEAD
     startTest (sessionId, tables, status) {
       sessionStorage.reportDisplayEnabled = 'true'
       if (this.type === 2) {
@@ -180,10 +179,6 @@ export default {
       } else {
         sessionStorage.setMark = 'gerenpay'
       }
-=======
-    startTest (sessionId, tables, status, reportDisplayEnabled) {
-      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
->>>>>>> dev
       if (sessionStorage.tables) {
         sessionStorage.removeItem('tables')
       }
@@ -201,17 +196,12 @@ export default {
       }
     },
     // 继续测试
-<<<<<<< HEAD
     goOnTable (tables, sessionId) {
       if (this.type === 2) {
         sessionStorage.setMark = 'jigoupay'
       } else {
         sessionStorage.setMark = 'gerenpay'
       }
-=======
-    goOnTable (tables, sessionId, reportDisplayEnabled) {
-      sessionStorage.reportDisplayEnabled = reportDisplayEnabled
->>>>>>> dev
       const item = tables.find(e => {
         return e.finishedAt === 0
       })
