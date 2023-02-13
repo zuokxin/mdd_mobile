@@ -228,8 +228,8 @@ export default {
     },
     pay (item) {
       // this.$router.push(`/order-detail?batchId=${item.batchId}`)
-      // this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
-      this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      // this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
     }
   }
 }

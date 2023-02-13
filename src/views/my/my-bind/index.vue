@@ -256,8 +256,8 @@ export default {
     pay (item) {
       // console.log(item)
       // this.$router.push(`/order-detail?batchId=${item.batchId}`)
-      this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
-      // this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      // this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
+      this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
       // 跳转去订单详情
     }
   }
