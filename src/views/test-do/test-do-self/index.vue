@@ -65,7 +65,7 @@ export default {
     routerPath () {
       // 测试表未完成
       // console.log(this.thisTable, 'this.$route.query.tableCode')
-      const next = this.nextTable(this.thisTable, '1111')
+      const next = this.nextTable(this.thisTable)
       // console.log(next, '自评')
       if (next) {
         if (next.table.tableType === 1) {
@@ -186,6 +186,8 @@ export default {
     // 完成
     async finished () {
       const next = this.nextTable(this.thisTable)
+      // console.log(next)
+      // console.log(this.thisTable)
       if (this.needSend) {
         this.allData.form.formItems[0].options = this.options
         const data = {
