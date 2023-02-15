@@ -11,7 +11,7 @@ export default {
       // const curTables = getters.curTables
       return (curTableCode) => {
         // console.log(sessionStorage.tables)
-        const curTables = JSON.parse(sessionStorage.tables) || []
+        const curTables = sessionStorage.tables ? JSON.parse(sessionStorage.tables) : []
         // console.log(curTables)
         // console.log(curTables)
         const index = curTables.findIndex(v => {
