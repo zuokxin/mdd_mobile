@@ -8,7 +8,7 @@
       </div>
       <div class="question-box">
         <!-- {{end}}{{allData.id}} -->
-        <div class="question">{{allData.id + 1}}.{{allData.title}}</div>
+        <div class="question">{{(allData.id + 1)? (allData.id + 1): ''}}.{{allData.title}}</div>
         <div v-for="(it,index) in options" :key="index">
           <div class="each-choice" @click="dispose(index)">
             <span class="left-title">{{it.name}}</span>
