@@ -294,13 +294,19 @@ export default {
         cancelButtonText: '下载App',
         cancelButtonColor: '#34B7B9'
       }).then(() => {
-        const mark = sessionStorage.getItem('setMark')
-        if (mark === 'jigoupay') {
-          sessionStorage.removeItem('setMark')
-          this.$router.replace('/my-record?type=2')
+        const backPath = sessionStorage.getItem('backPath')
+        if (backPath === 'bind') {
+          sessionStorage.removeItem('backPath')
+          this.$router.replace('/my-bind')
         } else {
-          sessionStorage.removeItem('setMark')
-          this.$router.replace('/my-record?type=1')
+          const mark = sessionStorage.getItem('setMark')
+          if (mark === 'jigoupay') {
+            sessionStorage.removeItem('setMark')
+            this.$router.replace('/my-record?type=2')
+          } else {
+            sessionStorage.removeItem('setMark')
+            this.$router.replace('/my-record?type=1')
+          }
         }
       }).catch(() => {
         this.$router.replace('/my-contact')

@@ -60,15 +60,21 @@ export default {
   },
   methods: {
     onClickLeft () {
-      const mark = sessionStorage.getItem('setMark')
-      if (mark === 'gerenpay') {
-        sessionStorage.removeItem('setMark')
-        this.$router.replace('/my-record?type=1')
-      } else if (mark === 'jigoupay') {
-        sessionStorage.removeItem('setMark')
-        this.$router.replace('/my-record?type=2')
+      const backPath = sessionStorage.getItem('backPath')
+      if (backPath === 'bind') {
+        sessionStorage.removeItem('backPath')
+        this.$router.replace('/my-bind')
       } else {
-        this.$router.go(-1)
+        const mark = sessionStorage.getItem('setMark')
+        if (mark === 'gerenpay') {
+          sessionStorage.removeItem('setMark')
+          this.$router.replace('/my-record?type=1')
+        } else if (mark === 'jigoupay') {
+          sessionStorage.removeItem('setMark')
+          this.$router.replace('/my-record?type=2')
+        } else {
+          this.$router.go(-1)
+        }
       }
     },
     onClickRight () {

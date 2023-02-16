@@ -1,14 +1,18 @@
+/* eslint-disable */
 export default {
   state: {
     tables: []
   },
   getters: {
-    curTables () {
+    curTables() {
       return sessionStorage.tables ? JSON.parse(sessionStorage.tables) : []
     },
-    nextTable (state, getters) {
-      const curTables = getters.curTables
+    nextTable(state, getters) {
+      // const curTables = getters.curTables
       return (curTableCode) => {
+        // console.log(sessionStorage.tables)
+        const curTables = sessionStorage.tables ? JSON.parse(sessionStorage.tables) : []
+        // console.log(curTables)
         // console.log(curTables)
         const index = curTables.findIndex(v => {
           return v.tableCode === curTableCode
@@ -21,7 +25,7 @@ export default {
     }
   },
   mutations: {
-    SET_TABLES_TITLE (state, tables) {
+    SET_TABLES_TITLE(state, tables) {
       sessionStorage.tables = JSON.stringify(tables)
       state.tables = tables
     }
