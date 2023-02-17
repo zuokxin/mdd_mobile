@@ -26,3 +26,9 @@ export const searchTable = params => fetch({
   method: 'get',
   params
 })
+
+// 量表推荐位
+export const recommendSeat = () => fetch({
+  url: '/api/app/recommend/seat',
+  method: 'get'
+})

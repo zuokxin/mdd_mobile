@@ -63,7 +63,6 @@
 <script>
 import { DateFormat } from '@/utils/date'
 import { getIndividual, getOrganization } from '@/api/modules/user'
-import { findIndexByKeyValue } from '@/utils/checkFinish'
 
 export default {
   name: 'record',
@@ -185,15 +184,10 @@ export default {
       }
       sessionStorage.setItem('tables', JSON.stringify(tables))
       const tablesList = JSON.parse(sessionStorage.tables) || []
-      const currentIndex = findIndexByKeyValue(tablesList, 'finishedAt', 0)
       if (status === 1) {
         this.$router.push({ path: '/test-do-infos', query: { sessionId, tableCode: tablesList[0].tableCode, tableType: tablesList[0].table.tableType } })
       } else {
-        if (tablesList[currentIndex].table.tableType === 1) {
-          this.$router.push({ path: '/test-do-self', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
-        } else {
-          this.$router.push({ path: '/environment', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
-        }
+        this.$router.push({ path: '/test-do-start', query: { sessionId, tableCode: tablesList[0].tableCode, tableType: tablesList[0].table.tableType } })
       }
     },
     // 继续测试
@@ -218,20 +212,14 @@ export default {
       // console.log(userSelect)
       const tableCode = item.table.tableCode
       const type = item.table.tableType
-      if (type === 1) {
-        this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
-      } else {
-        this.$router.push({ path: '/environment', query: { sessionId, tableCode } })
-      }
+      this.$router.push({ path: '/test-do-start', query: { sessionId, tableCode, tableType: type } })
     },
     // 查看报告
     readReport (sessionId, tableType) {
       this.$router.push({ path: '/test-report', query: { sessionId, tableType } })
     },
     pay (item) {
-      // this.$router.push(`/order-detail?batchId=${item.batchId}`)
       this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
-      // this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
     }
   }
 }

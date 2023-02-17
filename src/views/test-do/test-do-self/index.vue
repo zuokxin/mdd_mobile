@@ -81,7 +81,7 @@ export default {
   mounted () {
     this.sessionId = this.$route.query.sessionId
     this.tableCode = this.$route.query.tableCode
-    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+    if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
       this.getQues()
     } else {
       this.$router.replace('/login')

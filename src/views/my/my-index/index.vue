@@ -59,6 +59,28 @@
           <div class="tip">下载APP</div>
         </div>
       </div>
+      <van-button class="login-out" :class="{'invisible ': !isLogin}" @click="loginOut">退出登录</van-button>
+      <div class="footer">
+        <div class="title">专业的心理服务平台</div>
+        <van-row class="con">
+          <van-col span="12">
+            <icon-font name="#h5-a-zu4974" :width="19" :height="19" color="999"> </icon-font>
+            量表测试
+          </van-col>
+          <van-col span="12">
+            <icon-font name="#h5-a-zu4979" :width="20" :height="20" color="999"> </icon-font>
+            心理疏导
+          </van-col>
+          <van-col span="12">
+            <icon-font name="#h5-a-zu4977" :width="20" :height="20" color="999"> </icon-font>
+            心情记录
+          </van-col>
+          <van-col span="12">
+            <icon-font name="#h5-a-zu4975" :width="17" :height="17" color="999" style="margin-right: 3px;"> </icon-font>
+            解压游戏
+          </van-col>
+        </van-row>
+      </div>
     </div>
     <div style="height:50px"><MainTabbar></MainTabbar></div>
     <van-dialog v-model="showKefu" :showConfirmButton="false">
@@ -85,9 +107,11 @@
 
 <script>
 import { signInFind, signInCreate, newUserReward } from '@/api/modules/user'
+import { postLogout } from '@/api/modules/login'
 import wxShare from '@/utils/wxShare'
 import MainTabbar from '@/components/MainTabbar'
 import NewPersonGift from '@/components/newPerson'
+import { Dialog } from 'vant'
 export default {
   data () {
     return {
@@ -186,11 +210,11 @@ export default {
     }
   },
   mounted () {
-    this.phone = sessionStorage.getItem('phone')
+    this.phone = localStorage.getItem('phone')
     if (this.phone) {
       this.isLogin = true
       this.getCoins()
-      if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+      if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
         this.$store.dispatch('getInfo').then(res => {
           this.yunyu_coins = res.data.yunyu_coins
           if (res.data.isNewUser && !res.data.isRxNUReward) {
@@ -267,44 +291,28 @@ export default {
     phoneClick (phoneNum) {
       window.location.href = 'tel:' + phoneNum
     },
-    // 单个量表开始测试 & 多个量表开始和继续测试
-    // startTest (sessionId, tables, status) {
-    //   sessionStorage.reportDisplayEnabled = 'true'
-    //   if (sessionStorage.tables) {
-    //     sessionStorage.removeItem('tables')
-    //   }
-    //   sessionStorage.setItem('tables', JSON.stringify(tables))
-    //   const tablesList = JSON.parse(sessionStorage.tables) || []
-    //   const currentIndex = findIndexByKeyValue(tablesList, 'finishedAt', 0)
-    //   if (status === 1) {
-    //     this.$router.push({ path: '/test-do-infos', query: { sessionId, tableCode: tablesList[0].tableCode, tableType: tablesList[0].table.tableType } })
-    //   } else {
-    //     if (tablesList[currentIndex].table.tableType === 1) {
-    //       this.$router.replace({ path: '/test-do-self', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
-    //     } else {
-    //       this.$router.replace({ path: '/environment', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
-    //     }
-    //   }
-    // },
-    // 单个量表继续测试
-    // goOnTable (type, sessionId, tableCode) {
-    //   sessionStorage.reportDisplayEnabled = 'true'
-    //   if (sessionStorage.tables) {
-    //     sessionStorage.removeItem('tables')
-    //   }
-    //   if (type === 1) {
-    //     this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
-    //   } else {
-    //     this.$router.push({ path: '/environment', query: { sessionId, tableCode } })
-    //   }
-    // },
-    // 查看报告
-    // readReport (sessionId, tableType) {
-    //   this.$router.push({ path: '/test-report', query: { sessionId, tableType } })
-    // },
     // 联系客服
     skip () {
       this.$router.push('/my-contact')
+    },
+    // 退出登录
+    loginOut () {
+      // 按钮位置调换
+      Dialog.confirm({
+        message: '是否要退出登录？',
+        theme: 'round-button',
+        className: 'dialog-confirm',
+        confirmButtonText: '取消',
+        confirmButtonColor: '#fff',
+        cancelButtonText: '确定',
+        cancelButtonColor: '#34B7B9'
+      }).then(() => {
+        console.log('取消')
+      }).catch(async () => {
+        await postLogout()
+        localStorage.removeItem('phone')
+        this.$router.push('/login?url=/my-index')
+      })
     }
   }
 }
@@ -701,6 +709,38 @@ export default {
           color: #FFFFFF;
         }
       }
+    }
+  }
+}
+.login-out {
+  width: 100%;
+  height: 1.3514rem;
+  margin-top: .2667rem;
+  margin-bottom: .2667rem;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #F31313;
+}
+.invisible {
+  visibility: hidden;
+}
+.footer {
+  text-align: center;
+  color: #999999;
+  font-size: .32rem;
+  font-weight: 400;
+  .title {
+    margin-bottom: .32rem;
+    font-size: .3733rem;
+    font-weight: 600;
+  }
+  .con {
+    padding: 0 .8rem;
+    .van-col {
+      line-height: 2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
 }

@@ -22,3 +22,21 @@ video {
 .detail-dialog .van-dialog__footer {
   padding: 0.21333333rem 2.8rem 1.06666667rem;
 }
+.dialog-confirm .van-dialog__message {
+  font-size: 0.4266667rem;
+  font-weight: 700;
+  color: #000000;
+}
+.dialog-confirm .van-dialog__confirm {
+  color: #34b7b9 !important;
+  border-radius: 999px;
+  border: 1px solid #34b7b9 !important;
+}
+.dialog-confirm .van-dialog__cancel {
+  border-radius: 999px;
+  margin-left: 20px;
+}
+.dialog-confirm .van-dialog__footer {
+  padding: 8px 50px 40px;
+  flex-direction: row-reverse;
+}
