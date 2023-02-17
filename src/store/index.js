@@ -30,8 +30,8 @@ export default new Vuex.Store({
               phone,
               openid
             } = data
-            sessionStorage.phone = phone
-            sessionStorage.openid = openid
+            localStorage.phone = phone
+            localStorage.openid = openid
             resolve(data)
           }
         ).catch(
@@ -39,8 +39,8 @@ export default new Vuex.Store({
             reject(err)
             // 登录状态已过期状态下清空
             if (err.code === 605) {
-              sessionStorage.removeItem('phone')
-              sessionStorage.removeItem('openid')
+              localStorage.removeItem('phone')
+              localStorage.removeItem('openid')
             }
           }
         )

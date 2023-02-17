@@ -11,22 +11,10 @@ export const postUserLogin = (data) => fetch({
   method: 'post',
   data
 })
-
-export const postAdminLogin = (data) => fetch({
-  url: '/api/admin/login',
-  method: 'post',
-  data
-})
-
+// 退出登录
 export const postLogout = () => fetch({
   url: '/api/admin/logout',
   method: 'post'
-})
-// 医院内部系统医生登录
-export const login = (data) => fetch({
-  url: '/api/admin/login',
-  method: 'post',
-  data
 })
 
 // 新用户奖励

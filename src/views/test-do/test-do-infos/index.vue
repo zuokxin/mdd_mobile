@@ -118,7 +118,7 @@ export default {
   mounted () {
     this.sessionId = this.$route.query.sessionId
     this.tableCode = this.$route.query.tableCode
-    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+    if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
       this.init()
     } else {
       this.$router.replace('/login')
@@ -220,15 +220,19 @@ export default {
       } else {
         userCreate({ sessionId: this.sessionId, info: this.info }).then(res => {
           if (res.code === 0) {
+            this.$router.replace({
+              path: '/test-do-start',
+              query: this.$route.query
+            })
             // this.$router.replace({ path: `/test-do-${this.$route.query.type}`, query: { sessionId: this.sessionId, tableCode: this.tableCode } })
             // 1 自评
-            if (this.$route.query.tableType === '1') {
-              this.$router.replace({ path: '/test-do-self', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
-            }
-            // 2 他评
-            if (this.$route.query.tableType === '2') {
-              this.$router.replace({ path: '/environment', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
-            }
+            // if (this.$route.query.tableType === '1') {
+            //   this.$router.replace({ path: '/test-do-self', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
+            // }
+            // // 2 他评
+            // if (this.$route.query.tableType === '2') {
+            //   this.$router.replace({ path: '/environment', query: { sessionId: this.sessionId, tableCode: this.tableCode } })
+            // }
           } else {
             this.$toast(res.message)
           }

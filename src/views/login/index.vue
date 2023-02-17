@@ -85,7 +85,7 @@ export default {
   },
   mounted () {
     this.$refs.container.style.height = window.innerHeight + 'px'
-    // const flag = this.$store.getters.isLogin(sessionStorage.getItem('phone'))
+    // const flag = this.$store.getters.isLogin(localStorage.getItem('phone'))
   },
   computed: {
     msgFlag () {
@@ -149,16 +149,16 @@ export default {
           //   newUserReward().then(resp => {
           //   })
           // }
+          localStorage.phone = res.data.phone
+          localStorage.isNewUser = res.data.isNewUser
+          localStorage.userId = res.data.userId
+          res.data.openid && (localStorage.openid = res.data.openid) // 微信内授权状态
           if (this.$route.query.url) {
             const { url, ...otherQuery } = this.$route.query
             this.$router.push({ path: url, query: otherQuery })
           } else {
             this.$router.push({ path: '/test-more' })
           }
-          sessionStorage.phone = res.data.phone
-          sessionStorage.isNewUser = res.data.isNewUser
-          sessionStorage.userId = res.data.userId
-          res.data.openid && (sessionStorage.openid = res.data.openid) // 微信内授权状态
         }
       }).catch(() => {
         // console.log(err)

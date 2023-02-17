@@ -41,7 +41,7 @@ export default {
   mounted () {
     let getWait = 0
     // console.log(this.second, this.configTables)
-    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+    if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
       if (!this.second) this.num = 5
       this.timer = setInterval(async () => {
         if (this.num > 0) {

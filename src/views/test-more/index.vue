@@ -6,6 +6,16 @@
         <img src="@/assets/img/test/search.png" alt="search">
         <span>请输入您要找的量表名</span>
       </div>
+      <van-row class="recommend-box" gutter="8">
+        <van-col span="8" v-for="item in recommendList" :key="item.tableCode">
+          <img
+            :src="item.tableLogo"
+            alt="推荐位"
+            style="width: 100%"
+            @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
+          <p class="recommend-title">{{ item.tableName }}</p>
+        </van-col>
+      </van-row>
       <!-- 轮播图 -->
       <van-swipe :autoplay="5000">
         <van-swipe-item>
@@ -62,6 +72,7 @@
 
 <script>
 import { tableTypeList, getAllTable, h5ActivitylList } from '@/api/modules/user'
+import { recommendSeat } from '@/api/modules/table'
 import MainTabbar from '@/components/MainTabbar'
 import NewPersonGift from '@/components/newPerson'
 
@@ -79,13 +90,31 @@ export default {
       tableList: [],
       tableAll: [],
       swipList: [],
-      newPersonFlag: false
+      newPersonFlag: false,
+      recommendList: [
+        {
+          img: require('@/assets/img/test/game.png'),
+          title: '实用性人格解析',
+          tableCode: 'sds'
+        },
+        {
+          img: require('@/assets/img/test/game.png'),
+          title: '实用性人格解析',
+          tableCode: 'ass'
+        },
+        {
+          img: require('@/assets/img/test/game.png'),
+          title: '实用性人格解析',
+          tableCode: 'sss'
+        }
+      ]
     }
   },
   mounted () {
     this.getTypeList()
     this.geth5ActivitylList()
-    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+    this.getRecommend()
+    if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           this.newPersonFlag = true
@@ -95,6 +124,13 @@ export default {
     }
   },
   methods: {
+    getRecommend () {
+      recommendSeat().then(
+        res => {
+          this.recommendList = res.data
+        }
+      )
+    },
     async getTypeList () {
       this.loading = true
       const res = await tableTypeList({ page: -1, pageSize: 10 })
@@ -136,7 +172,7 @@ export default {
       this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
     },
     playGame () {
-      const userId = sessionStorage.getItem('userId')
+      const userId = localStorage.getItem('userId')
       window.location.href = `https://depression.fubianmed.com/game/xcwm${userId ? '?userId=' + userId : ''}`
     }
   }
@@ -309,5 +345,16 @@ export default {
     justify-content: center;
     align-items: center;
     background: rgba(0,0,0,0);
+}
+.recommend-box {
+  margin-top: .3rem;
+}
+.recommend-title {
+  margin: .1rem 0 0 0;
+  font-size: 12px;
+  color: #666666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
