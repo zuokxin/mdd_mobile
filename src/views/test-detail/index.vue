@@ -231,7 +231,7 @@ export default {
     goTest () {
       sessionStorage.reportDisplayEnabled = 'true'
       sessionStorage.setMark = 'gerenpay'
-      sessionStorage.tables = [this.table]
+      sessionStorage.tables = [{ table: this.table }]
       this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.tableCode}&tableType=${this.table.tableType}`)
     },
     // 他评窗口
