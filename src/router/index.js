@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import store from '../store'
+// import store from '../store'
 
 Vue.use(VueRouter)
 
@@ -151,26 +151,27 @@ const router = new VueRouter({
   routes
 })
 
-let init = false
+// let init = false
 router.beforeEach(async (to, from, next) => {
   document.title = to.meta.title || '云愈心理'
-  if (!init) {
-    try {
-      await store.dispatch('getToken')
-      init = true
-      next()
-    } catch (err) {
-      // 登录过期
-      if (err.code === 605) {
-        // init = false
-        next()
-      } else {
-        next()
-      }
-    }
-  } else {
-    next()
-  }
+  // if (!init) {
+  //   try {
+  //     await store.dispatch('getToken')
+  //     init = true
+  //     next()
+  //   } catch (err) {
+  //     // 登录过期
+  //     if (err.code === 605) {
+  //       // init = false
+  //       next()
+  //     } else {
+  //       next()
+  //     }
+  //   }
+  // } else {
+  //   next()
+  // }
+  next()
 })
 
 export default router

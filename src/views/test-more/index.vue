@@ -8,12 +8,14 @@
       </div>
       <van-row class="recommend-box" gutter="8">
         <van-col span="8" v-for="item in recommendList" :key="item.tableCode">
-          <img
-            :src="item.tableLogo"
-            alt="推荐位"
-            style="width: 100%"
-            @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
-          <p class="recommend-title">{{ item.tableName }}</p>
+          <div class="recommend-box-content" :title="item.tableType">
+            <img
+              :src="item.tableLogo"
+              alt="推荐位"
+              style="width: 100%"
+              @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
+            <p class="recommend-title">{{ item.tableName }}</p>
+          </div>
         </van-col>
       </van-row>
       <!-- 轮播图 -->
@@ -91,23 +93,7 @@ export default {
       tableAll: [],
       swipList: [],
       newPersonFlag: false,
-      recommendList: [
-        {
-          img: require('@/assets/img/test/game.png'),
-          title: '实用性人格解析',
-          tableCode: 'sds'
-        },
-        {
-          img: require('@/assets/img/test/game.png'),
-          title: '实用性人格解析',
-          tableCode: 'ass'
-        },
-        {
-          img: require('@/assets/img/test/game.png'),
-          title: '实用性人格解析',
-          tableCode: 'sss'
-        }
-      ]
+      recommendList: []
     }
   },
   mounted () {
@@ -346,8 +332,28 @@ export default {
     align-items: center;
     background: rgba(0,0,0,0);
 }
+// 推荐位
 .recommend-box {
   margin-top: .3rem;
+  .recommend-box-content {
+    position: relative;
+    // 推荐位分类标签
+    &::after {
+      content: attr(title);
+      position: absolute;
+      left: -3px;
+      top: -2px;
+      padding: 0 7px;
+      min-width: 34px;
+      height: 19px;
+      line-height: 19px;
+      text-align: center;
+      color: #fff;
+      border-radius: 5px 0px 5px 0px;
+      transform: scale(.84);
+      background: rgba(0,0,0,.6);
+    }
+  }
 }
 .recommend-title {
   margin: .1rem 0 0 0;
