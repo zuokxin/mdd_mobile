@@ -85,10 +85,9 @@ import { DateFormat } from '@/utils/date'
 
 import { organization, cbtCourse } from '@/api/modules/user'
 import BindBatch from './bindBatch.vue'
-import { findIndexByKeyValue } from '@/utils/checkFinish'
 export default {
   beforeRouteEnter (to, from, next) {
-    if (sessionStorage.getItem('phone')) {
+    if (localStorage.getItem('phone')) {
       next()
     } else {
       next(vm => {
@@ -148,7 +147,7 @@ export default {
   },
   mounted () {
     // 路由重定向后不再执行下去
-    if (!sessionStorage.getItem('phone')) return
+    if (!localStorage.getItem('phone')) return
     this.organization()
   },
   methods: {
@@ -215,15 +214,10 @@ export default {
       }
       sessionStorage.setItem('tables', JSON.stringify(tables))
       const tablesList = JSON.parse(sessionStorage.tables) || []
-      const currentIndex = findIndexByKeyValue(tablesList, 'finishedAt', 0)
       if (status === 1) {
         this.$router.push({ path: '/test-do-infos', query: { sessionId, tableCode: tablesList[0].tableCode, tableType: tablesList[0].table.tableType } })
       } else {
-        if (tablesList[currentIndex].table.tableType === 1) {
-          this.$router.replace({ path: '/test-do-self', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
-        } else {
-          this.$router.replace({ path: '/environment', query: { sessionId: sessionId, tableCode: tablesList[currentIndex].tableCode } })
-        }
+        this.$router.push({ path: '/test-do-start', query: { sessionId, tableCode: tablesList[0].tableCode, tableType: tablesList[0].table.tableType } })
       }
     },
     // 单个量表继续测试
@@ -243,12 +237,7 @@ export default {
       // console.log(userSelect)
       const tableCode = item.table.tableCode
       const type = item.table.tableType
-      // sessionStorage.reportDisplayEnabled = 'true'
-      if (type === 1) {
-        this.$router.push({ path: '/test-do-self', query: { sessionId, tableCode } })
-      } else {
-        this.$router.push({ path: '/environment', query: { sessionId, tableCode } })
-      }
+      this.$router.push({ path: '/test-do-start', query: { sessionId, tableCode, tableType: type } })
     },
     // 查看报告
     readReport (sessionId, tableType) {
@@ -256,12 +245,8 @@ export default {
     },
     // 支付去
     pay (item) {
-      // console.log(item)
       sessionStorage.setItem('backPath', 'bind')
-      // this.$router.push(`/order-detail?batchId=${item.batchId}`)
-      // this.$router.replace(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
       this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
-      // 跳转去订单详情
     }
   }
 }
