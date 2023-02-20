@@ -124,7 +124,7 @@ export default {
     this.batchId = this.$route.query.batchId
     this.organ = this.$route.query.organ
     this.getBatch()
-    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+    if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           newUserReward()
@@ -134,9 +134,9 @@ export default {
     this.$nextTick(async () => {
       // 微信授权
       this.code = params.get('code') || ''
-      if (!sessionStorage.openid && this.code) {
+      if (!localStorage.openid && this.code) {
         await postUserCode(this.code).then(res => {
-          sessionStorage.openid = res.data.openid
+          localStorage.openid = res.data.openid
         })
       }
       // 支付页面回调
@@ -222,7 +222,7 @@ export default {
     },
     onClickButton () {
       // 未登录
-      if (!sessionStorage.phone) {
+      if (!localStorage.phone) {
         this.$router.push({
           path: '/login',
           query: {
@@ -236,7 +236,7 @@ export default {
       if (this.errText) {
         this.errPopout = true
       } else {
-        if (browser().weixin && !sessionStorage.openid) {
+        if (browser().weixin && !localStorage.openid) {
           const appid = 'wxb073a9d513bbcd43'
           const redirect = encodeURIComponent(window.location.href)
           window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`
@@ -280,12 +280,7 @@ export default {
       // console.log(this.userSelect[0])
       sessionStorage.setMark = 'jigoupay'
       if (this.tables.length > this.userSelect.length) {
-        if (this.userSelect[0].tableType === 1) {
-          this.$router.push(`/test-do-self?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
-        }
-        if (this.userSelect[0].tableType === 2) {
-          this.$router.push(`/environment?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}`)
-        }
+        this.$router.push(`/test-do-start?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
       } else {
         this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
       }

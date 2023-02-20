@@ -138,7 +138,7 @@ export default {
     // if (this.continue) this.go = true
     // 量表信息
     this.tableCode = this.$route.query.tableCode
-    if (this.$store.getters.isLogin(sessionStorage.getItem('phone'))) {
+    if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           this.newPersonFlag = true
@@ -175,9 +175,9 @@ export default {
     this.$nextTick(async () => {
       // 微信授权
       this.code = params.get('code') || ''
-      if (!sessionStorage.openid && this.code) {
+      if (!localStorage.openid && this.code) {
         await postUserCode(this.code).then(res => {
-          sessionStorage.openid = res.data.openid
+          localStorage.openid = res.data.openid
         })
       }
       // 支付页面回调
@@ -203,7 +203,7 @@ export default {
   methods: {
     onClickButton () {
       // 未登录
-      if (!sessionStorage.phone) {
+      if (!localStorage.phone) {
         this.$router.push({
           path: '/login',
           query: {
@@ -214,7 +214,7 @@ export default {
         return
       }
       // 微信内未授权
-      if (browser().weixin && !sessionStorage.openid) {
+      if (browser().weixin && !localStorage.openid) {
         const appid = 'wxb073a9d513bbcd43'
         const redirect = encodeURIComponent(window.location.href)
         window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`
@@ -231,9 +231,7 @@ export default {
     goTest () {
       sessionStorage.reportDisplayEnabled = 'true'
       sessionStorage.setMark = 'gerenpay'
-      if (sessionStorage.tables) {
-        sessionStorage.removeItem('tables')
-      }
+      sessionStorage.tables = JSON.stringify([{ table: this.table }])
       this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.tableCode}&tableType=${this.table.tableType}`)
     },
     // 他评窗口

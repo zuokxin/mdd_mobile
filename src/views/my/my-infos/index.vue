@@ -43,7 +43,7 @@ import { getUserInfo, updateInfo } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
 export default {
   beforeRouteEnter (to, from, next) {
-    if (sessionStorage.getItem('phone')) {
+    if (localStorage.getItem('phone')) {
       next()
     } else {
       next(vm => {

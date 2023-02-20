@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import IconFont from '@/components/IconFont'
 
 import Vant from 'vant'
 // import {
@@ -21,6 +22,7 @@ import '@/assets/css/index.css'
 Vue.config.productionTip = false
 
 Vue.use(Vant)
+Vue.use(IconFont)
 // Vue.use(Button).use(Col).use(Row).use(Cell).use(Icon).use(Form).use(Field)
 
 new Vue({
