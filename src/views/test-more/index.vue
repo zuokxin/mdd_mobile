@@ -341,8 +341,8 @@ export default {
     &::after {
       content: attr(title);
       position: absolute;
-      left: -3px;
-      top: -2px;
+      left: 0;
+      top: 0;
       padding: 0 7px;
       min-width: 34px;
       height: 19px;
@@ -350,8 +350,11 @@ export default {
       text-align: center;
       color: #fff;
       border-radius: 5px 0px 5px 0px;
-      transform: scale(.84);
+      transform: scale(.84) translate(-10%, -10%);
       background: rgba(0,0,0,.6);
+    }
+    img {
+      border-radius: 4px;
     }
   }
 }
