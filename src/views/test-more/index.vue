@@ -14,7 +14,7 @@
               alt="推荐位"
               style="width: 100%"
               @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
-            <p class="recommend-title">{{ item.tableName }}</p>
+            <p class="recommend-title">{{ item.introduction }}</p>
           </div>
         </van-col>
       </van-row>
