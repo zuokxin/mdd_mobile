@@ -265,7 +265,7 @@ export default {
           })
           this.hasOtherTable = userSelect.some(e => e.table.tableType === 2)
           this.userSelect = userSelect
-          sessionStorage.setItem('tables', JSON.stringify(this.tables))
+          sessionStorage.setItem('tables', JSON.stringify(userSelect))
           // console.log(this.continue)
           // console.log(this.tableName)
           // console.log(this.tables, '用户选择的简单表')
