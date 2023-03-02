@@ -1,6 +1,6 @@
 <template>
   <div class="detail">
-    <img class="detail-banner" src="@/assets/img/detail-bannner.png"/>
+    <img class="detail-banner" :src="table.pageHeaderImage || require('@/assets/img/detail-bannner.png')"/>
     <!-- 头部盒子 -->
     <detail-header
       :tableName="table.tableName"
