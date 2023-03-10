@@ -64,19 +64,19 @@
         <div class="title">专业的心理服务平台</div>
         <van-row class="con">
           <van-col span="12">
-            <icon-font name="#h5-a-zu4974" :width="19" :height="19" color="999"> </icon-font>
+            <icon-font name="#h5-a-zu4974" :width="19" :height="19" color="999"></icon-font>
             量表测试
           </van-col>
           <van-col span="12">
-            <icon-font name="#h5-a-zu4979" :width="20" :height="20" color="999"> </icon-font>
+            <icon-font name="#h5-a-zu4975" :width="17" :height="17" color="999"></icon-font>
             心理疏导
           </van-col>
           <van-col span="12">
-            <icon-font name="#h5-a-zu4977" :width="20" :height="20" color="999"> </icon-font>
+            <icon-font name="#h5-a-zu4977" :width="20" :height="20" color="999"></icon-font>
             心情记录
           </van-col>
           <van-col span="12">
-            <icon-font name="#h5-a-zu4975" :width="17" :height="17" color="999" style="margin-right: 3px;"> </icon-font>
+            <icon-font name="#h5-a-zu4979" :width="19" :height="19" color="999"></icon-font>
             解压游戏
           </van-col>
         </van-row>
@@ -733,6 +733,9 @@ export default {
     margin-bottom: .32rem;
     font-size: .3733rem;
     font-weight: 600;
+  }
+  .iconfont {
+    margin-right: 5px;
   }
   .con {
     padding: 0 .8rem;
