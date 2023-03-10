@@ -37,13 +37,12 @@
           <div class="left"><span>完成时间: {{DateFormat({date: item.finishedAt * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
         </div>
         <div class="function-btns">
-          <div class="psqi" v-if="type === 1 && item.evalSelection && item.evalSelection.includes('psqi')">
+          <div class="psqi" v-if="(item.status === 1 || item.status === 2) && item.evalSelection && item.evalSelection.includes('psqi')">
             仅支持在APP中测试
           </div>
           <div class="normal-function" v-else>
             <van-button v-if="(item.status === 0)" round plain type="info" @click="pay(item)">支付</van-button>
             <van-button v-if="(item.status === 1) && !isCanDo(item.evalRecords)" round plain type="info" @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)">开始测试</van-button>
-            <!-- <van-button v-else-if="item.status === 2" round plain type="info" @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)">继续测试</van-button> -->
             <van-button v-if="item.status === 2 && !isCanDo(item.evalRecords)" round plain type="info" @click="goOnTable(item.evalRecords, item.sessionId, item.reportDisplayEnabled)">继续测试</van-button>
             <van-button v-if="item.status === 9 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
             <van-button v-if="item.status === 2 && item.evalRecords[0].finishedAt > 0 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
