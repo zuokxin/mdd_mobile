@@ -100,7 +100,7 @@ export default {
     this.getTypeList()
     this.geth5ActivitylList()
     this.getRecommend()
-    if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
+    if (localStorage.getItem('phone')) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           this.newPersonFlag = true
