@@ -38,7 +38,7 @@
         </div>
       </div>
       <div class="cardList">
-        <div class="card" @click="$router.push('/my-bind').catch(() => {})">
+        <div class="card" @click="jump('/my-bind')">
           <img src="@/assets/img/my/bind.png" alt="bind">
           <div class="tip">机构绑定</div>
         </div>
@@ -46,7 +46,7 @@
           <img src="@/assets/img/my/star.png" alt="bind">
           <div class="tip">我的收藏</div>
         </div>
-        <div class="card" @click="$router.push('/my-infos').catch(() => {})">
+        <div class="card" @click="jump('/my-infos')">
           <img src="@/assets/img/my/info.png" alt="info">
           <div class="tip">个人信息</div>
         </div>
@@ -210,18 +210,17 @@ export default {
     }
   },
   mounted () {
-    this.phone = localStorage.getItem('phone')
-    if (this.phone) {
+    const phone = localStorage.getItem('phone')
+    if (phone) {
+      this.phone = phone
       this.isLogin = true
       this.getCoins()
-      if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
-        this.$store.dispatch('getInfo').then(res => {
-          this.yunyu_coins = res.data.yunyu_coins
-          if (res.data.isNewUser && !res.data.isRxNUReward) {
-            this.newPersonFlag = true
-          }
-        })
-      }
+      this.$store.dispatch('getInfo').then(res => {
+        this.yunyu_coins = res.data.yunyu_coins
+        if (res.data.isNewUser && !res.data.isRxNUReward) {
+          this.newPersonFlag = true
+        }
+      })
     }
     wxShare.share()
   },

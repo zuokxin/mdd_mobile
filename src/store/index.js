@@ -10,10 +10,11 @@ export default new Vuex.Store({
   state: {
   },
   getters: {
-    isLogin: () => (phone) => {
-      // const reg = /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/
-      return String(phone).length === 11
-    }
+    // 校验手机号码长度，因为有外国用户废弃
+    // isLogin: () => (phone) => {
+    //   // const reg = /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/
+    //   return String(phone).length === 11
+    // }
   },
   mutations: {
     INIT () {
