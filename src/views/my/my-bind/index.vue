@@ -39,7 +39,7 @@
                     <div class="left"><span>完成时间: {{DateFormat({date: item.finishedAt * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
                   </div>
                   <div class="function-btns">
-                    <div class="psqi" v-if="isCanDo(item.evalRecords)">
+                    <div class="psqi" v-if="item.status === 1 && isCanDo(item.evalRecords)">
                       仅支持在APP中测试
                     </div>
                     <div class="normal-function" v-else>
