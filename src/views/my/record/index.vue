@@ -37,7 +37,10 @@
           <div class="left"><span>完成时间: {{DateFormat({date: item.finishedAt * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
         </div>
         <div class="function-btns">
-          <div class="psqi" v-if="(item.status === 1 || item.status === 2) && item.evalSelection && item.evalSelection.includes('psqi')">
+          <div class="psqi" v-if="item.status === 1 && item.evalRecords.map(v => v.tableCode).includes('psqi')">
+            仅支持在APP中测试
+          </div>
+          <div class="psqi" v-else-if="item.status === 2 && item.evalRecords.length === 1 && item.evalRecords.map(v => v.tableCode).includes('psqi')">
             仅支持在APP中测试
           </div>
           <div class="normal-function" v-else>
