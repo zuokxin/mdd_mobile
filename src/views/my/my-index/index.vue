@@ -2,14 +2,12 @@
   <div class="main">
     <div class="header">
       <img src="@/assets/img/my/touxiang.png" alt="touxiang">
-      <!-- <div class="name" @click="login">
-        <span v-if="!isLogin">点击登录</span>
-        <span v-else>{{phone}}</span>
-      </div> -->
       <div class="name">
         <div class="top"><span v-if="!isLogin" @click="login">点击登录</span><span v-else>{{phone}}</span> </div>
-        <div class="center"><img src="../../../assets/img/yunyuicon.png" alt=""><span>云愈币 {{isLogin ?  yunyu_coins : '***'}}</span></div>
-        <!-- scale -->
+        <div class="center">
+          <div class="center-left"><img src="../../../assets/img/yunyuicon.png" alt=""><span>云愈币 {{isLogin ?  yunyu_coins : '***'}}</span></div>
+          <div class="center-right" v-if="userId"><span>ID：{{ userId }}</span><img @click="copy(userId)" src="@/assets/img/my/copy.png" alt=""></div>
+        </div>
         <div class="under"><span class="round"><span>i</span> </span><span class="last"> <span>云愈币仅可在云愈心理APP中消费，暂不支持网页消费</span> </span></div>
       </div>
     </div>
@@ -23,7 +21,7 @@
             <div class="block-under"> <span :class="{'ed': item.isSignIn}">+{{item.coin}}</span> </div>
           </div>
         </div>
-        <div class="under"><van-button round type="success" :class="{'van-ed': todayIsSignIn}" @click="signCoins">{{todayIsSignIn ? '今天已签到，明天继续' : '签到领云愈币'}}</van-button></div>
+        <div class="under"><van-button round type="success" :class="{'van-ed': todayIsSignIn}" @click="signCoins">{{todayIsSignIn ? '今天已签到，记得明天来啊' : '签到领云愈币'}}</van-button></div>
       </div>
       <div class="to-test">
         <div class="to-test-left">
@@ -162,6 +160,7 @@ export default {
       showCoins: false,
       reward: '',
       yunyu_coins: '',
+      userId: '',
       newPersonFlag: false
     }
   },
@@ -170,15 +169,6 @@ export default {
     NewPersonGift
   },
   computed: {
-    // 判断能否在H5做量表
-    isCanDo () {
-      return (arr) => {
-        const flag = arr.some(v => {
-          return v.tableCode === 'psqi'
-        })
-        return flag
-      }
-    },
     // 判断多个量表中是否有已经完成的量表
     hasFinish () {
       return (arr) => {
@@ -197,16 +187,6 @@ export default {
         // console.log(flag, this.configTables)
         return flag
       }
-    },
-    // 判断显示样式
-    showStyle () {
-      return (arr) => {
-        if (arr.length === 1 && arr[0].tableCode !== 'psqi') {
-          return true
-        } else {
-          return false
-        }
-      }
     }
   },
   mounted () {
@@ -216,6 +196,8 @@ export default {
       this.getCoins()
       if (this.$store.getters.isLogin(localStorage.getItem('phone'))) {
         this.$store.dispatch('getInfo').then(res => {
+          // console.log(res)
+          this.userId = res.data.userId
           this.yunyu_coins = res.data.yunyu_coins
           if (res.data.isNewUser && !res.data.isRxNUReward) {
             this.newPersonFlag = true
@@ -313,6 +295,16 @@ export default {
         localStorage.removeItem('phone')
         this.$router.push('/login?url=/my-index')
       })
+    },
+    copy (v) {
+      const inputEle = document.createElement('input')
+      inputEle.setAttribute('readonly', 'readonly')
+      document.body.appendChild(inputEle)
+      inputEle.value = v
+      inputEle.select()
+      document.execCommand('Copy')
+      this.$toast('复制成功')
+      document.body.removeChild(inputEle)
     }
   }
 }
@@ -323,8 +315,8 @@ export default {
 .main{
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 100vh;
+  width: 100vw;
+  min-height: 100vh;
   background: #F6F6F7;
   overflow: hidden;
   background: #F6F6F7;
@@ -335,6 +327,9 @@ export default {
     height: 2.053333rem;
     display: flex;
     padding: .266667rem  .533333rem;
+    padding-right: 0px;
+    margin-right: .533333rem;
+    box-sizing: border-box;
     img{
       width: 1.6rem;
       height: 1.6rem;
@@ -342,11 +337,15 @@ export default {
     .name{
       margin-left: .4rem;
       height: 1.6rem;
+      flex: 1;
       font-size: .426667rem;
       font-weight: 600;
       color: #333333;
+      margin-bottom: .16rem;
       .top{
-        height: .5946rem;
+        height: .5867rem;
+        line-height: 22px;
+        font-size: 16px;
         margin-bottom: .0541rem;
         span{
           color: #333333;
@@ -354,23 +353,47 @@ export default {
         }
       }
       .center{
-        border-radius: .3784rem;
-        display: inline-block;
-        // background: rgba(52,183,185,0.15);
-        background: #FFFFFF;
-        height: .7568rem;
-        padding: .1081rem .3243rem;
-        box-sizing: border-box;
-        img{
-          width: .5135rem;
-          height: .5135rem;
+        height: .4267rem;
+        display: flex;
+        justify-content: space-between;
+        overflow: hidden;
+        margin-bottom: .16rem;
+        .center-left{
+          border-radius: .3784rem;
+          display: inline-block;
+          background: #FFFFFF;
+          padding: 1px 4px 1px 2px;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          img{
+            width: .32rem;
+            height: .32rem;
+          }
+          span{
+            font-size: 12px;
+            display: inline-block;
+            height: .32rem;
+            line-height: .32rem;
+            scale: 0.83;
+            color: #666666;
+            font-weight: 500;
+            padding-left: .1622rem;
+          }
         }
-        span{
-          font-size: 14px;
-          color: #333333;
-          font-weight: 500;
-          vertical-align: top;
-          padding-left: .1622rem;
+        .center-right{
+          display: flex;
+          align-items: center;
+          span{
+            color: #666666;
+            margin-right: .1067rem;
+            font-size: 12px;
+            scale: 0.83;
+          }
+          img{
+            width: .32rem;
+            height: .32rem;
+          }
         }
       }
       .under{
@@ -397,9 +420,14 @@ export default {
         }
         .last{
           padding-left: 2px;
+          position: relative;
+          flex: 1;
           span{
-            width: 10rem;
             display: block;
+            position: absolute;
+            top: -1px;
+            left: 0;
+            width: 300px;
             font-size: 12px;
             color: #333333;
             transform: scale(0.83);
