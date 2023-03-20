@@ -19,12 +19,15 @@
         </div>
         <div  v-if="options.style === 'radio-column-1'">
           <div v-for="(it,index) in options.formItems[0].options" :key="index">
-            <div class="each-choice" @click="psqiDispose(index)">
+            <div class="each-choice" :class="{'each-choice-active':it.checked}" @click="psqiDispose(index)">
               <span class="left-title">{{it.name}}</span>
               <span class="right-choice">
                 <img class="uncheck" v-if="!it.checked"  src="@/assets/uncheck.png">
                 <img class="check" v-else src="@/assets/checked.png">
               </span>
+            </div>
+            <div class="isCommentIsNecessary" v-if="it.checked && it.commentIsNecessary">
+              <van-field v-model.trim="it.comment" @input="psqiDisposeComment(index)" rows="2" autosize  label="" type="textarea" :placeholder="it.commentHint" show-word-limit/>
             </div>
           </div>
         </div>
@@ -46,10 +49,15 @@
       </div>
     </div>
     <!-- ---------- -->
-    <div class="bnts" v-if="allData.title">
+    <div class="bnts" v-if="allData.title && tableCode !== 'psqi'">
       <van-button round block type="primary" :disabled="allData.id === 0" @click="prev">上一题</van-button>
       <van-button round block type="primary" v-if="(allData.id + 1) !== allData.questionTotal" :disabled="!end" @click="next">下一题</van-button>
       <van-button round block type="primary" v-else @click="finished" :disabled="!end">完成</van-button>
+    </div>
+    <div class="bnts" v-else>
+      <van-button round block type="primary" :disabled="allData.id === 0" @click="prev">上一题</van-button>
+      <van-button round block type="primary" v-if="psqiFinish" :disabled="!end" @click="finished">完成</van-button>
+      <van-button round block type="primary" v-else :disabled="!end"  @click="next">下一题</van-button>
     </div>
   </div>
 </template>
@@ -72,7 +80,8 @@ export default {
       needSend: false,
       tempValue: false,
       sheetOptions: [],
-      sheetindex: ''
+      sheetindex: '',
+      psqiFinish: false
     }
   },
   computed: {
@@ -127,14 +136,21 @@ export default {
       }
       const res = await getTableQues(data)
       if (res.code === 0) {
-        this.needSend = false
-        this.end = false
-        this.allData = res.data
         if (this.tableCode === 'psqi') {
-          this.options = res.data.form
-          console.log(this.options)
-          this.checkpsqi()
+          if (res.data.id !== -1) {
+            this.needSend = false
+            this.end = false
+            this.allData = res.data
+            this.options = res.data.form
+            console.log(this.options)
+            this.checkpsqi()
+          } else {
+            this.psqiFinish = true
+          }
         } else {
+          this.needSend = false
+          this.end = false
+          this.allData = res.data
           this.options = res.data.form.formItems[0].options
           this.currentCheck()
         }
@@ -178,11 +194,23 @@ export default {
           e.checked = true
         } else {
           e.checked = false
+          e.comment = ''
         }
       })
-      const end = this.options.formItems[0].options.some(e => e.checked)
-      if (end) {
+      const item = this.options.formItems[0].options.find(e => e.checked)
+      console.log(item)
+      if (item.checked && item.commentIsNecessary) {
+        this.end = false
+      } else if (item.checked && !item.commentIsNecessary) {
         this.next()
+      }
+    },
+    psqiDisposeComment (index) {
+      const item = this.options.formItems[0].options[index]
+      if (item.checked && item.commentIsNecessary && item.comment !== '') {
+        this.end = true
+      } else {
+        this.end = false
       }
     },
     getChecked (item) {
@@ -402,6 +430,31 @@ export default {
         font-weight: 700;
         line-height: 2;
         color: #999999;
+      }
+      .each-choice-active{
+        border: 1px solid #34B7B9 !important;
+      }
+      .isCommentIsNecessary{
+        width: 7.066667rem;
+        height: 1.6rem;
+        background-color: pink;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+        margin-bottom: .426667rem;
+        border-radius: 0.426667rem;
+        border: 1px solid #F6F6F6;
+        overflow: hidden;
+        .van-cell{
+          padding: 0;
+          height: 100%;
+          background-color: #F6F6F6;
+          /deep/.van-field__body{
+            height: 100%;
+            padding-left: 1em;
+            padding-right: 1em;
+          }
+        }
       }
       .each-choice{
         width: 7.066667rem;
