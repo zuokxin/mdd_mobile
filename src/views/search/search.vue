@@ -71,7 +71,7 @@ export default {
       historyList: [],
       popout: false,
       searched: false,
-      filterArr: ['psqi', 'FADI']
+      filterArr: ['FADI']
     }
   },
   mounted () {

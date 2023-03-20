@@ -6,7 +6,30 @@
         <div class="text" v-if="allData.showProgress">测试进度: {{allData.id + 1}} / {{allData.questionTotal}}</div>
         <van-progress :percentage="process" stroke-width="5px" color="#34B7B9" v-if="allData.showProgress" :show-pivot="false" />
       </div>
-      <div class="question-box">
+      <div class="question-box" v-if="tableCode === 'psqi'">
+        <!-- {{end}}{{allData.id}} -->
+        <div class="question">{{(allData.id + 1)? (allData.id + 1): ''}}.{{allData.title}}</div>
+        <div class="psqi" v-if="options.style === 'psqi-1'">
+          <div class="items" v-for="(item,myindex) in options.formItems" :key="myindex">
+            <div class="plaintext" v-if="item.type === 'plaintext'">{{ item.plaintext}}</div>
+            <div class="select" v-if="item.type === 'select'" @click="popoutTrue(myindex, item.options)">{{ getChecked(item) }}</div>
+            <div class="suffix" v-if="item.type === 'select'">{{ item.suffix }}</div>
+            <van-action-sheet v-model="tempValue" close-on-click-action cancel-text="取消" :actions="sheetOptions" @select="onSelect" />
+          </div>
+        </div>
+        <div  v-if="options.style === 'radio-column-1'">
+          <div v-for="(it,index) in options.formItems[0].options" :key="index">
+            <div class="each-choice" @click="psqiDispose(index)">
+              <span class="left-title">{{it.name}}</span>
+              <span class="right-choice">
+                <img class="uncheck" v-if="!it.checked"  src="@/assets/uncheck.png">
+                <img class="check" v-else src="@/assets/checked.png">
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="question-box" v-else>
         <!-- {{end}}{{allData.id}} -->
         <div class="question">{{(allData.id + 1)? (allData.id + 1): ''}}.{{allData.title}}</div>
         <div v-for="(it,index) in options" :key="index">
@@ -46,7 +69,10 @@ export default {
       tableCode: '',
       options: [],
       end: false,
-      needSend: false
+      needSend: false,
+      tempValue: false,
+      sheetOptions: [],
+      sheetindex: ''
     }
   },
   computed: {
@@ -104,8 +130,14 @@ export default {
         this.needSend = false
         this.end = false
         this.allData = res.data
-        this.options = res.data.form.formItems[0].options
-        this.currentCheck()
+        if (this.tableCode === 'psqi') {
+          this.options = res.data.form
+          console.log(this.options)
+          this.checkpsqi()
+        } else {
+          this.options = res.data.form.formItems[0].options
+          this.currentCheck()
+        }
       }
     },
     // 检查是否可以下一题了
@@ -140,6 +172,65 @@ export default {
         this.needSend = true
       }
     },
+    psqiDispose (index) {
+      this.options.formItems[0].options.forEach((e, ind) => {
+        if (ind === index) {
+          e.checked = true
+        } else {
+          e.checked = false
+        }
+      })
+      const end = this.options.formItems[0].options.some(e => e.checked)
+      if (end) {
+        this.next()
+      }
+    },
+    getChecked (item) {
+      const e = item.options.find(e => e.checked === true)
+      return (e && e.name) || ''
+    },
+    popoutTrue (index, list) {
+      this.sheetindex = index
+      this.tempValue = true
+      this.sheetOptions = list
+      // console.log(index, list)
+    },
+    clearSheet () {
+      this.sheetindex = 'index'
+      this.tempValue = false
+      this.sheetOptions = []
+    },
+    onSelect (e) {
+      this.options.formItems[this.sheetindex].options.forEach(item => {
+        if (item.id === e.id) {
+          item.checked = true
+        } else {
+          item.checked = false
+        }
+      })
+      this.clearSheet()
+      this.checkpsqi()
+      // console.log(this.options)
+    },
+    checkpsqi () {
+      console.log(this.options, '检查这题有答案嘛')
+      if (this.options.style === 'psqi-1') {
+        const list = this.options.formItems.filter(e => e.type === 'select')
+        const arr = []
+        list.forEach(e => {
+          e.options.forEach(e => {
+            if (e.checked) {
+              arr.push(true)
+            }
+          })
+        })
+        if (arr.length === 2) {
+          this.end = true
+        }
+      } else if (this.options.style === 'radio-column-1') {
+        this.end = this.options.formItems[0].options.some(e => e.checked)
+      }
+    },
     // 文本内容
     theInput (text) {
       if (text) {
@@ -159,23 +250,37 @@ export default {
       if (res.code === 0) {
         this.end = false
         this.allData = res.data
-        this.options = res.data.form.formItems[0].options
-        this.currentCheck()
+        if (this.tableCode === 'psqi') {
+          this.options = res.data.form
+          this.checkpsqi()
+        } else {
+          this.options = res.data.form.formItems[0].options
+          this.currentCheck()
+        }
       } else {
         this.$toast(res.message)
       }
     },
     // 下一题
     async next () {
-      this.allData.form.formItems[0].options = this.options
+      // console.log(this.options)
       const data = {
         id: this.allData.id,
         sessionId: this.sessionId,
-        tableCode: this.tableCode,
-        form: this.allData.form
+        tableCode: this.tableCode
+        // form: this.allData.form
+      }
+      if (this.tableCode === 'psqi') {
+        data.form = JSON.parse(JSON.stringify(this.options))
+        data.title = this.allData.title
+        this.checkpsqi()
+      } else {
+        this.allData.form.formItems[0].options = JSON.parse(JSON.stringify(this.options))
+        data.form = this.allData.form
       }
       const res = await postTableQues(data)
       if (res.code === 0) {
+        console.log(res)
         if ((this.allData.id + 1) !== this.allData.questionTotal) {
           this.getQues(this.allData.id + 1)
         }
@@ -345,6 +450,28 @@ export default {
       }
       .checked{
         border: 1px solid @green;
+      }
+      .psqi{
+        display: flex;
+        padding: 0 .32rem;
+        color: #333333;
+        font-size: .5333rem;
+        flex-wrap: wrap;
+        .items{
+          display: flex;
+          .select{
+            width: .96rem;
+            height: .6933rem;
+            padding-top: 2px;
+            border: 1px solid #000000;
+            border-radius: .16rem;
+            text-align: center;
+            box-sizing: border-box;
+          }
+          /deep/.van-overlay{
+            background-color: rgba(0, 0, 0, 0.3);
+          }
+        }
       }
     }
   }

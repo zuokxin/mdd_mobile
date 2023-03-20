@@ -86,7 +86,7 @@ export default {
     getTableList () {
       getAllTable().then(res => {
         if (res.code === 0) {
-          this.tableAll = res.data.filter(v => v.tableCode !== 'psqi').filter(v => {
+          this.tableAll = res.data.filter(v => {
             if (v.tableType === 2) {
               return v.tableCode === 'hama' || v.tableCode === 'hamd'
             } else {
