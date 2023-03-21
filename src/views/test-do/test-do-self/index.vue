@@ -137,7 +137,16 @@ export default {
       const res = await getTableQues(data)
       if (res.code === 0) {
         if (this.tableCode === 'psqi') {
-          if (res.data.id !== -1) {
+          this.psqiFinish = false
+          if (res.data.id === 18) {
+            if (res.data.isEnd) {
+              this.psqiFinish = true
+            }
+            this.needSend = false
+            this.end = false
+            this.allData = res.data
+            this.options = res.data.form
+          } else if (res.data.id !== -1) {
             this.needSend = false
             this.end = false
             this.allData = res.data
@@ -146,6 +155,7 @@ export default {
             this.checkpsqi()
           } else {
             this.psqiFinish = true
+            this.end = true
           }
         } else {
           this.needSend = false
@@ -241,7 +251,6 @@ export default {
       // console.log(this.options)
     },
     checkpsqi () {
-      console.log(this.options, '检查这题有答案嘛')
       if (this.options.style === 'psqi-1') {
         const list = this.options.formItems.filter(e => e.type === 'select')
         const arr = []
@@ -256,7 +265,17 @@ export default {
           this.end = true
         }
       } else if (this.options.style === 'radio-column-1') {
-        this.end = this.options.formItems[0].options.some(e => e.checked)
+        const item = this.options.formItems[0].options.find(e => e.checked)
+        console.log(item)
+        if (item && item.checked && item.commentIsNecessary && this.allData.id === 23) {
+          this.psqiFinish = true
+          this.end = true
+        } else if (item && item.checked) {
+          this.end = true
+        } else {
+          this.psqiFinish = false
+          this.end = false
+        }
       }
     },
     // 文本内容
@@ -269,6 +288,9 @@ export default {
     },
     // 上一题
     async prev () {
+      if (this.tableCode === 'psqi') {
+        this.psqiFinish = false
+      }
       const data = {
         questionId: this.allData.id - 1,
         sessionId: this.sessionId,
@@ -308,6 +330,9 @@ export default {
       }
       const res = await postTableQues(data)
       if (res.code === 0) {
+        if (this.tableCode === 'psqi') {
+          this.getQues(this.allData.id + 1)
+        }
         console.log(res)
         if ((this.allData.id + 1) !== this.allData.questionTotal) {
           this.getQues(this.allData.id + 1)
