@@ -141,9 +141,9 @@ export default {
           if (res.data.id === 18) {
             if (res.data.isEnd) {
               this.psqiFinish = true
+              this.end = true
             }
             this.needSend = false
-            this.end = false
             this.allData = res.data
             this.options = res.data.form
           } else if (res.data.id !== -1) {
@@ -151,7 +151,7 @@ export default {
             this.end = false
             this.allData = res.data
             this.options = res.data.form
-            console.log(this.options)
+            // console.log(this.options)
             this.checkpsqi()
           } else {
             this.psqiFinish = true
@@ -208,7 +208,7 @@ export default {
         }
       })
       const item = this.options.formItems[0].options.find(e => e.checked)
-      console.log(item)
+      // console.log(item)
       if (item.checked && item.commentIsNecessary) {
         this.end = false
       } else if (item.checked && !item.commentIsNecessary) {
@@ -266,7 +266,7 @@ export default {
         }
       } else if (this.options.style === 'radio-column-1') {
         const item = this.options.formItems[0].options.find(e => e.checked)
-        console.log(item)
+        // console.log(item)
         if (item && item.checked && item.commentIsNecessary && this.allData.id === 23) {
           this.psqiFinish = true
           this.end = true
@@ -333,7 +333,7 @@ export default {
         if (this.tableCode === 'psqi') {
           this.getQues(this.allData.id + 1)
         }
-        console.log(res)
+        // console.log(res)
         if ((this.allData.id + 1) !== this.allData.questionTotal) {
           this.getQues(this.allData.id + 1)
         }
