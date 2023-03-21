@@ -146,6 +146,13 @@ export default {
             this.needSend = false
             this.allData = res.data
             this.options = res.data.form
+          } else if (res.data.id === 23) {
+            this.needSend = false
+            this.end = false
+            this.allData = res.data
+            this.options = res.data.form
+            // console.log(this.options)
+            this.checkpsqi()
           } else if (res.data.id !== -1) {
             this.needSend = false
             this.end = false
@@ -202,6 +209,7 @@ export default {
       this.options.formItems[0].options.forEach((e, ind) => {
         if (ind === index) {
           e.checked = true
+          this.psqiFinish = false
         } else {
           e.checked = false
           e.comment = ''
@@ -251,6 +259,7 @@ export default {
       // console.log(this.options)
     },
     checkpsqi () {
+      // console.log(this.options.style)
       if (this.options.style === 'psqi-1') {
         const list = this.options.formItems.filter(e => e.type === 'select')
         const arr = []
@@ -267,14 +276,28 @@ export default {
       } else if (this.options.style === 'radio-column-1') {
         const item = this.options.formItems[0].options.find(e => e.checked)
         // console.log(item)
-        if (item && item.checked && item.commentIsNecessary && this.allData.id === 23) {
-          this.psqiFinish = true
-          this.end = true
-        } else if (item && item.checked) {
-          this.end = true
+        if (this.allData.id === 23) {
+          // console.log('上')
+          // console.log(item)
+          if (item && item.checked && !item.commentIsNecessary) {
+            this.psqiFinish = true
+            this.end = true
+          } else if (item && item.checked && item.commentIsNecessary && item.comment) {
+            this.psqiFinish = true
+            this.end = true
+          }
         } else {
-          this.psqiFinish = false
-          this.end = false
+          // console.log('下')
+          // 非23题  19题简单单选 最后一题不一样
+          if (item && item.checked && item.commentIsNecessary) {
+            this.psqiFinish = false
+            this.end = true
+          } else if (item && item.checked) {
+            this.end = true
+          } else {
+            this.psqiFinish = false
+            this.end = false
+          }
         }
       }
     },
