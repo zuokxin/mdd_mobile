@@ -47,12 +47,14 @@
         <van-button class="sure-btn" type="primary" @click="errPopout = false">确定</van-button>
       </template>
     </popout>
+    <Finish v-if="reportBack" />
   </div>
 </template>
 
 <script>
 import PayAction from '@/components/PayAction.vue'
 import popout from './popout'
+import Finish from './finish.vue'
 import ContactService from './contactService'
 import { Dialog } from 'vant'
 import { getOrderState, postUserCode } from '@/api/index'
@@ -66,7 +68,8 @@ export default {
   components: {
     PayAction,
     popout,
-    ContactService
+    ContactService,
+    Finish
   },
   data () {
     return {
@@ -89,7 +92,8 @@ export default {
       organ: '',
       amount: '0.00', // 价钱
       errPopout: false,
-      errText: ''
+      errText: '',
+      reportBack: false
     }
   },
   computed: {
@@ -403,6 +407,13 @@ export default {
     //     }
     //   })
     // }
+  },
+  beforeRouteEnter (to, from, next) {
+    if (from.path === '/test-report') {
+      next(vm => { vm.reportBack = true })
+    } else {
+      next()
+    }
   }
 }
 </script>

@@ -132,7 +132,7 @@ export default {
           }
         })
         this.typeList = typeAll
-        this.tableAll = table.data.filter(v => v.tableCode !== 'psqi')
+        this.tableAll = table.data
         const id = this.typeList[0].id
         this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
         this.loading = false
