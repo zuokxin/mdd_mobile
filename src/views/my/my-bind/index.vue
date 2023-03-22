@@ -39,14 +39,11 @@
                     <div class="left"><span>完成时间: {{DateFormat({date: item.finishedAt * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
                   </div>
                   <div class="function-btns">
-                    <div class="psqi" v-if="item.status === 1 && isCanDo(item.evalRecords)">
-                      仅支持在APP中测试
-                    </div>
-                    <div class="normal-function" v-else>
+                    <div class="normal-function">
                       <van-button v-if="(item.status === 0)" round plain type="info" @click="pay(item)">支付</van-button>
-                      <van-button v-if="(item.status === 1) && !isCanDo(item.evalRecords)" round plain type="info" @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)">开始测试</van-button>
+                      <van-button v-if="item.status === 1" round plain type="info" @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)">开始测试</van-button>
                       <!-- <van-button v-else-if="item.status === 2" round plain type="info" @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)">继续测试</van-button> -->
-                      <van-button v-if="item.status === 2 && !isCanDo(item.evalRecords)" round plain type="info" @click="goOnTable(item.evalRecords, item.sessionId, item.reportDisplayEnabled)">继续测试</van-button>
+                      <van-button v-if="item.status === 2" round plain type="info" @click="goOnTable(item.evalRecords, item.sessionId, item.reportDisplayEnabled)">继续测试</van-button>
                       <van-button v-if="item.status === 9 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
                       <van-button v-if="item.status === 2 && item.evalRecords[0].finishedAt > 0 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
                     </div>
@@ -116,15 +113,6 @@ export default {
     BindBatch
   },
   computed: {
-    // 判断能否在H5做量表
-    isCanDo () {
-      return (arr) => {
-        const flag = arr.some(v => {
-          return v.tableCode === 'psqi'
-        })
-        return flag
-      }
-    },
     // 判断多个量表中是否有已经完成的量表
     hasFinish () {
       return (arr) => {

@@ -42,13 +42,14 @@
     </van-goods-action>
     <CameraDialog :show.sync="otherTestDialog" @needOpenCamera="needOpenCamera"></CameraDialog>
     <NewPersonGift :flag="newPersonFlag"/>
-
+    <Finish v-if="reportBack" />
   </div>
 </template>
 
 <script>
 import DetailHeader from './detail-header.vue'
 import DetailContent from './detail-content.vue'
+import Finish from './finish.vue'
 import PayAction from '@/components/PayAction.vue'
 import CameraDialog from '@/components/CameraDialog.vue'
 import NewPersonGift from '@/components/newPerson'
@@ -65,7 +66,8 @@ export default {
     DetailContent,
     PayAction,
     CameraDialog,
-    NewPersonGift
+    NewPersonGift,
+    Finish
   },
   data () {
     return {
@@ -97,7 +99,8 @@ export default {
       continue: false, // 是否为继续测试
       tableCode: '',
       otherTestDialog: false,
-      aiEvalCamEnabled: false
+      aiEvalCamEnabled: false,
+      reportBack: false
     }
   },
   computed: {
@@ -137,6 +140,7 @@ export default {
     // this.continue = this.$route.query.continue
     // if (this.continue) this.go = true
     // 量表信息
+    console.log('111')
     this.tableCode = this.$route.query.tableCode
     if (localStorage.getItem('phone')) {
       this.$store.dispatch('getInfo').then(res => {
@@ -379,6 +383,13 @@ export default {
           wxShare.getJSSDK(res.data, dataForm)
         }
       })
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    if (from.path === '/test-report') {
+      next(vm => { vm.reportBack = true })
+    } else {
+      next()
     }
   }
 }
