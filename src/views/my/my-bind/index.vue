@@ -234,6 +234,7 @@ export default {
     // 支付去
     pay (item) {
       sessionStorage.setItem('backPath', 'bind')
+      sessionStorage.setItem('backType', 2)
       this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
     }
   }
