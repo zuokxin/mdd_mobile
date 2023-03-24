@@ -14,7 +14,7 @@
             <div class="plaintext" v-if="item.type === 'plaintext'">{{ item.plaintext}}</div>
             <div class="select" v-if="item.type === 'select'" @click="popoutTrue(myindex, item.options)">{{ getChecked(item) }}</div>
             <div class="suffix" v-if="item.type === 'select'">{{ item.suffix }}</div>
-            <van-action-sheet v-model="tempValue" close-on-click-action cancel-text="取消" :actions="sheetOptions" @select="onSelect" />
+            <van-action-sheet v-model="tempValue" close-on-click-action cancel-text="取消" :actions="sheetOptions" @select="onSelect"/>
           </div>
         </div>
         <div  v-if="options.style === 'radio-column-1'">
