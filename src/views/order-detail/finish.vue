@@ -11,12 +11,7 @@ export default {
   name: 'popout',
   methods: {
     disponseBackPath () {
-      const type = sessionStorage.getItem('backType')
-      if (type === '2') {
-        this.$router.replace('/my-record?type=2')
-      } else {
-        this.$router.replace('/my-record')
-      }
+      this.$router.replace('/my-record?type=2')
     }
   }
 }
