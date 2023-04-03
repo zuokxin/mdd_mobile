@@ -1,11 +1,12 @@
 <template>
-  <div class="ques-counselling">
+  <div id="tableFadi" class="ques-counselling">
     <div class="ques-counselling-wrap">
       <div class="top">
-        <img src="@/assets/img/test/fadi-logo.png" alt="fadi-logo">
+        <img src="@/assets/img/test/lamp.png" alt="lamp" height="18">
+        <span>小愈是智能虚拟人物，可以辅助评估你的心理状态。</span>
       </div>
-      <div class="main">
-        <div class="main-in" ref="mainIn">
+      <div class="main" ref="mainIn">
+        <div class="main-in">
           <div v-if="historRecods.length > 0">
             <TimeShow class="mt-4 mb-2" :type="1"></TimeShow>
             <div v-for="item in historRecods" :key="item.index">
@@ -23,7 +24,7 @@
               :needAnswer="record.needAnswer"
               :url="record.url"
               :textLeft="record.text"
-              @palyAudio="e => palyAudio(e, index)"
+              @playVideo="e => playVideo(e, index)"
             ></DialogBoxLeft>
             <DialogBoxRight v-if="record.component === 'right'" :textRight="record.time"></DialogBoxRight>
           </div>
@@ -51,18 +52,20 @@
           block
           :disabled="finishBtnDisable"
           @click="submit"
+          style="width: 80%;"
         >
           完成
         </van-button>
       </div>
-      <div v-show="!recorderShow" class="bottom" style="background-color: #F4F4F4;"></div>
+      <!-- <div v-show="!recorderShow" class="bottom" style="background-color: #F4F4F4;"></div> -->
     </div>
     <!-- 人脸 -->
     <DragVideo
       v-if="aiEvalCamEnabled"
       ref="dragVideo"
       @getFace="getFace"
-      >
+      style="right: 10px; left:auto; top: 50px;"
+    >
     </DragVideo>
     <!-- 弹窗提示 -->
     <van-dialog
@@ -105,10 +108,11 @@ export default {
   },
   data () {
     return {
+      qVideoUrl: '',
       faceShow: false,
       chatRecords: [],
       historRecods: [],
-      textRight: '',
+      // textRight: '',
       volumeVal: 0,
       queLoading: false,
       midwayBackBool: true, // true代表着中途返回
@@ -329,7 +333,7 @@ export default {
       const timeJson = { timeStamp, timeType, timeShow: false }
       if (this.lastTime && timeStamp - this.lastTime < 300000) return timeJson
       this.lastTime = timeStamp
-      timeJson.timeShow = true
+      // timeJson.timeShow = true
       return timeJson
     },
     // 是否需要打开摄像头&&需要做哪些量表的信息
@@ -357,7 +361,8 @@ export default {
             id,
             title,
             topic,
-            qAudioUrl,
+            qVideoUrl,
+            // qAudioUrl,
             hintsTitle,
             isNeedAnswer,
             proDisplay,
@@ -366,6 +371,7 @@ export default {
             choice
           } = res.data
           this.isEnd = isEnd
+          // this.qVideoUrl = qVideoUrl
           this.queObj = { id, title, topic, isNeedAnswer, proDisplay, progress, showProgress, choice }
           setTimeout(() => {
             this.queLoading = false
@@ -390,23 +396,23 @@ export default {
                       component: 'left',
                       needAnswer: false,
                       text: v.title,
-                      url: v.qAudioUrl,
+                      url: v.qVideoUrl,
                       status: statusTitle,
                       ...timeJson
                     })
                   }
                 })
               }
-              if (qAudioUrl) {
+              if (qVideoUrl) {
                 record.text = title
-                record.url = qAudioUrl
+                record.url = qVideoUrl
                 const timeJson = this.setTime()
                 if (status) record.status = status
                 this.chatRecords.push(Object.assign({ ...timeJson, needAnswer: true }, record))
               }
               this.token = qiniuToken
               this.titleIndex++
-              this.quesUrl = qAudioUrl
+              this.quesUrl = qVideoUrl
             } else {
               this.recorderShow = true
               this.finishBtnDisable = false
@@ -418,7 +424,7 @@ export default {
                     component: 'left',
                     needAnswer: false,
                     text: v.title,
-                    url: v.qAudioUrl,
+                    url: v.qVideoUrl,
                     status,
                     ...timeJson
                   })
@@ -435,7 +441,7 @@ export default {
       )
     },
     // 音频播放结束
-    palyAudio (data, index) {
+    playVideo (data, index) {
       if (index + 1 !== this.chatRecords.length) {
         // 缓冲下一题
         setTimeout(() => {
@@ -453,7 +459,9 @@ export default {
         if (this.error) this.error = false
         this.recorder.start()
         if (this.aiEvalCamEnabled) this.mediaRecorder.start()
-        this.recorderShow = true
+        setTimeout(() => {
+          this.recorderShow = true
+        }, 500)
       }
     },
     // 下一题
@@ -473,6 +481,11 @@ export default {
         this.$refs.dragVideo.$children[0].pause()
         this.mediaRecorder.stop()
         this.recorder.pause()
+        // 避免提交过程中摄像头检出
+        if (this.faceTimer) {
+          clearInterval(this.faceTimer)
+          this.faceTimer = null
+        }
       } else {
         this.recorder.pause(() => {
           this.audioCreate()
@@ -523,7 +536,7 @@ export default {
           // 添加回答
           const answer = queRes.data || ''
           const timeJson = this.setTime()
-          this.chatRecords.push({ component: 'right', text: answer, time: this.textRight, ...timeJson })
+          this.chatRecords.push({ component: 'right', text: answer, time: this.audioDuration, ...timeJson })
           this.getCurQue()
           this.recorderShow = false
           // 让滚动条始终在最底部
@@ -597,7 +610,7 @@ export default {
               // 添加回答
               const answer = queRes.data || ''
               const timeJson = this.setTime()
-              this.chatRecords.push({ component: 'right', text: answer, time: this.textRight, ...timeJson })
+              this.chatRecords.push({ component: 'right', text: answer, time: this.audioDuration, ...timeJson })
               this.getCurQue()
               this.openVideo()
               this.recorderShow = false
@@ -655,11 +668,11 @@ export default {
       this.audioFiles.push(this.audioFile)
       // 时间计算
       this.audioDuration = this.recorder.getDuration()
-      if (this.audioDuration > 60) {
-        this.textRight = parseInt(this.audioDuration / 60) + " ' " + (this.audioDuration % 60) + " '' "
-      } else {
-        this.textRight = this.audioDuration + " '' "
-      }
+      // if (this.audioDuration > 60) {
+      //   this.textRight = parseInt(this.audioDuration / 60) + " ' " + (this.audioDuration % 60) + " '' "
+      // } else {
+      //   this.textRight = this.audioDuration + " '' "
+      // }
     },
     // 视频文件处理
     videoCreate () {
@@ -686,16 +699,25 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.top{
-  img{
-    width: 100%;
-  }
-}
   .ques-counselling {
     width: 100%;
     height: 100vh;
     box-sizing: border-box;
-    background-color: #F4F4F4;
+    background-color: #D1CDCD;
+    .top {
+      padding: 0 16px;
+      height: 34px;
+      line-height: 34px;
+      color: #fff;
+      background: linear-gradient(90deg, rgba(0, 203, 255, 0.21) 0%, rgba(0,203,255,0.1) 51%, rgba(0,203,255,0.01) 100%);
+      z-index: 2;
+      img{
+        width: 18px;
+        height: 18px;
+        vertical-align: text-bottom;
+        margin-right: 6px;
+      }
+    }
     .tips {
       margin-top: 5vh;
       font-size: 14px;
@@ -709,33 +731,42 @@ export default {
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      // background-color: #fff;
       .main {
+        position: fixed;
+        bottom: 15px;
         width: 100%;
-        flex: 1;
-        margin-top: 16px;
-        overflow: hidden;
+        height: 40vh;
+        // margin-top: 16px;
+        padding-bottom: 15px;
+        overflow: scroll;
+        z-index: 2;
         .main-in {
           // position: absolute;
           // width: 100%;
-          // min-height: 100%;
+          min-height: 100%;
           // left: 0;
           // bottom: 0;
-          height: 100%;
-          overflow-y: auto;
-          padding-bottom: 30px;
+          // height: 100%;
+          // overflow-y: auto;
+          // padding-bottom: 30px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
         }
       }
       .bottom {
-        height: 210px;
-        padding-top: 30px;
+        height: 150px;
+        padding-top: 16px;
         display: flex;
         justify-content: center;
         background-color: #fff;
-        // border-top: 1px solid #35D5CD;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        z-index: 3;
         &.isEnd {
           height: auto;
-          padding: 54px 44px;
+          padding: 54px 0;
           align-items: flex-end;
           background-color: #F4F4F4;
         }
@@ -747,14 +778,14 @@ export default {
         .tips-01 {
           line-height: 1;
           font-size: 14px;
-          font-weight: 500;
-          color: #555555;
+          font-weight: 600;
+          color: #000000;
           margin-bottom: 0;
         }
         .tips-02 {
           margin: 10px 0;
           font-size: 12px;
-          color: #999999;
+          color: #313131;
         }
         .submit-btn {
           display: flex;

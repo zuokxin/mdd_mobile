@@ -17,17 +17,17 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 80px;
-  height: 80px;
+  width: 45px;
+  height: 45px;
   background: #FFFFFF;
   box-shadow: 0px 4px 8px 1px rgba(0,0,0,0.16);
   border-radius: 50%;
   margin: 0 12px;
   .in {
-    width: 28px;
-    height: 28px;
+    width: 15px;
+    height: 15px;
     background: #DA6254;
-    border-radius: 8px;
+    border-radius: 5px;
   }
   &.disabled {
     .in {
