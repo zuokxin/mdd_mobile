@@ -83,6 +83,8 @@
     <div style="height:50px"><MainTabbar></MainTabbar></div>
     <van-dialog v-model="showKefu" :showConfirmButton="false">
       <div class="close" @click="showKefu = false"><img  src="@/assets/img/my/close.png" alt="close"></div>
+      <h4>关注公众号</h4>
+      <div class="wx"><img  src="@/assets/img/my/account.png" alt="account"></div>
       <h4>联系微信</h4>
       <div class="wx"><img  src="@/assets/img/my/wx.png" alt="wx"></div>
       <h4>客服电话</h4>
@@ -656,7 +658,7 @@ export default {
   }
   .van-dialog{
     width: 7.786667rem;
-    height: 6.48rem;
+    min-height: 6.48rem;
     background: #FFFFFF;
     border-radius: .533333rem;
     padding: .426667rem;
@@ -670,7 +672,7 @@ export default {
     }
     h4{
       font-size: .373333rem;
-      font-weight: 600;
+      font-weight: 500;
       color: #333333;
       margin: 0;
       margin-bottom: .266667rem;
@@ -679,7 +681,7 @@ export default {
     .wx{
       display: flex;
       justify-content:center;
-      margin-bottom: .426667rem;
+      margin-bottom: .2rem;
       img{
         width: 3.2rem;
         height: 3.2rem;
@@ -689,6 +691,7 @@ export default {
       display: flex;
       justify-content:center;
       align-items: center;
+      margin-bottom: .4rem;
       img{
         width: .293333rem;
         height: .293333rem;
