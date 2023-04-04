@@ -204,6 +204,9 @@ export default {
       this.$router.push({ path: '/test-report', query: { sessionId, tableType } })
     },
     pay (item) {
+      if (this.type === 2) {
+        sessionStorage.setItem('backType', 2)
+      }
       this.$router.push(`/order-detail?batchId=${item.batchId}&sessionId=${item.sessionId}`)
     }
   }

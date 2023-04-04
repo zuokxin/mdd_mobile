@@ -404,16 +404,17 @@ export default {
           display: inline-block;
         }
         .round{
-          width: .3243rem;
-          height: .3243rem;
+          width: 12px;
+          height: 12px;
           border-radius: 50%;
           background: #34B7B9;
           display: flex;
           justify-content: center;
           align-items: center;
+          transform: scale(0.83);
           span{
             font-size: 12px;
-            scale: 0.83;
+            transform: scale(0.83);
             color: #FFFFFF;
             text-align: center;
           }

@@ -26,7 +26,7 @@
         <span>语音测试</span>
         <img width="28" :src="curImg(!volumeWarn)" alt="check-icon">
       </p>
-      <p>进行环境语音检测</p>
+      <p>请确保周围环境噪音不高于40分贝</p>
       <p class="subtitle test-error" :class="{ 'hidden': volumeTips }">当前噪音过大</p>
       <p class="tips">
         <b :style="{ color: volumeColor }">{{ db }}</b>
@@ -73,7 +73,7 @@ export default {
       face: true,
       faceSuccess: false,
       faceTimer: null,
-      faceIndex: 0,
+      faceIndex: 3,
       aiEvalCamEnabled: false // 是否有摄像头
     }
   },
@@ -128,15 +128,15 @@ export default {
     face (n) {
       if (this.faceSuccess) return
       if (n) {
-        this.faceIndex = 1
+        this.faceIndex = 3
         this.faceTimer = setInterval(() => {
-          if (this.faceIndex === 3) {
+          if (this.faceIndex === 1) {
             this.faceSuccess = true
             this.$refs.thisVideo.pause()
             clearInterval(this.faceTimer)
-            this.faceIndex = 0
+            this.faceIndex = 1
           } else {
-            this.faceIndex++
+            this.faceIndex--
           }
         }, 1000)
       } else {

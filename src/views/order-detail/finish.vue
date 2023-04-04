@@ -2,13 +2,18 @@
   <div class="popout" >
     <div class="popout_box">
       <div class="text">您已完成测试，可前往查看记录</div>
-      <van-button class="sure-btn" type="primary" @click="$router.replace('/my-record')">确定</van-button>
+      <van-button class="sure-btn" type="primary" @click="disponseBackPath()">确定</van-button>
     </div>
   </div>
 </template>
 <script>
 export default {
-  name: 'popout'
+  name: 'popout',
+  methods: {
+    disponseBackPath () {
+      this.$router.replace('/my-record?type=2')
+    }
+  }
 }
 </script>
 
