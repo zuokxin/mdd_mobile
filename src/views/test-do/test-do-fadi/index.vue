@@ -25,6 +25,7 @@
               :url="record.url"
               :textLeft="record.text"
               @playVideo="e => playVideo(e, index)"
+              @openStartPrompt="openStartPrompt"
             ></DialogBoxLeft>
             <DialogBoxRight v-if="record.component === 'right'" :textRight="record.time"></DialogBoxRight>
           </div>
@@ -439,6 +440,15 @@ export default {
           }, 1000)
         }
       )
+    },
+    // 视频播放初始获取用户点击行为
+    openStartPrompt (e) {
+      this.thisDialog('测试即将开始', '好的').then(() => {
+        // 设置加载渲染时长
+        e.setTimer()
+        // 视频播放
+        e.play()
+      })
     },
     // 音频播放结束
     playVideo (data, index) {

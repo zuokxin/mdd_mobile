@@ -39,32 +39,56 @@ export default {
     return {
       isPlay: true, // 正在播放
       isReady: false, // 是否正在加载
-      timer: null,
+      timer: null, // 视频渲染计时器
       startTime: 0,
-      videoEle: null
+      videoEle: null, // 视频元素
+      canvas: null, // 画布元素
+      ctx: null
     }
   },
   mounted () {
     this.$nextTick(() => {
       // 历史不读
-      if (this.isHistory) return
-      // 创建视频元素，每一个语音创建一个视频保证视频衔接的流畅
+      if (this.isHistory) {
+        this.isReady = true
+        return
+      }
+      // 画布初始化
+      this.canvas = document.getElementById('canvas')
+      if (!this.canvas) {
+        this.canvas = document.createElement('canvas')
+        this.canvas.id = 'canvas'
+        this.canvas.className = 'dialog-box-left-video'
+        this.canvas.width = window.innerWidth || document.body.clientWidth
+        this.canvas.height = window.innerHeight || document.body.clientHeight
+        this.canvas.style = 'z-index: 1'
+        document.getElementById('tableFadi').appendChild(this.canvas)
+      }
+      this.ctx = this.canvas.getContext('2d')
+      // 视频初始化
       this.videoEle = document.getElementById('dialogVideo')
-      this.videoEle = document.createElement('video')
-      this.videoEle.className = 'dialog-box-left-video'
-      this.videoEle.id = 'dialogVideo'
-      this.videoEle.src = this.url
-      this.videoEle.autoplay = true
+      if (!this.videoEle) {
+        this.videoEle = document.createElement('video')
+        this.videoEle.className = 'dialog-box-left-video'
+        this.videoEle.id = 'dialogVideo'
+        this.videoEle.src = this.url
+        this.videoEle.style = 'display:none'
+        document.getElementById('tableFadi').appendChild(this.videoEle)
+        this.$emit('openStartPrompt', { setTimer: this.setTimer, play: this.play })
+      } else {
+        // 视频元素已存在
+        this.videoEle.autoplay = true
+        this.videoEle.src = this.url
+        // 渲染后开始计时
+        this.setTimer()
+      }
       // 插入fadi页面中，后退可一起销毁
-      document.getElementById('tableFadi').appendChild(this.videoEle)
       this.videoEle.addEventListener('play', this.played)
       this.videoEle.addEventListener('pause', this.paused)
       this.$once('hook:beforeDestroy', () => {
         this.videoEle.removeEventListener('play', this.played)
         this.videoEle.removeEventListener('pause', this.paused)
       })
-      // 渲染后开始计时
-      this.setTimer()
     })
   },
   beforeDestroy () {
@@ -92,6 +116,8 @@ export default {
             }).then(() => {
               // 视频重新渲染
               this.videoEle.src = this.url
+              // 如果是第一个没有自动播放，需要后续加上
+              if (!this.videoEle.autoplay) this.videoEle.autoplay = true
               this.setTimer()
               console.log('重新加载视频')
             })
@@ -103,6 +129,10 @@ export default {
         if (this.timer) clearInterval(this.timer)
       })
     },
+    // 手动播放
+    play () {
+      this.videoEle.play()
+    },
     // 开始播放
     played () {
       console.log('播放')
@@ -112,6 +142,10 @@ export default {
       }
       this.isReady = true
       this.isPlay = true
+      const i = setInterval(() => {
+        this.ctx.drawImage(this.videoEle, 0, 0, this.canvas.width, this.canvas.height)
+        if (this.videoEle.ended || this.videoEle.paused) clearInterval(i)
+      }, 40)
     },
     // 视频暂停（自动播放结束和手动暂停）
     paused () {
@@ -177,13 +211,13 @@ export default {
   border-bottom-width: 8px;
   border-bottom-color: currentColor;
   border-radius: 0 0 34px 0;
-  color: #FFFFFF;
+  color: rgba(255, 255, 255, .8);
   transform: rotateX(180deg) rotateZ(-115deg);
 }
 .laba {
   width: 22px;
   height: 22px;
-  background: #34B7B9;
+  background: rgba(52, 183, 185, .8);
   border-radius: 50%;
   margin-left: 10px;
   display: flex;
