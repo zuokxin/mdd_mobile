@@ -5,8 +5,14 @@
 </template>
 
 <script>
+// 微信控制台，需要调试的时候可以开
+// import Vconsole from 'vconsole'
 export default {
   name: 'App'
+  // mounted () {
+  //   const vConsole = new Vconsole()
+  //   console.log(vConsole)
+  // }
 }
 </script>
 

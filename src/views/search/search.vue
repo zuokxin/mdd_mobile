@@ -70,8 +70,7 @@ export default {
       list: [],
       historyList: [],
       popout: false,
-      searched: false,
-      filterArr: ['FADI']
+      searched: false
     }
   },
   mounted () {
@@ -104,7 +103,7 @@ export default {
           this.$refs.myInput.blur()
           this.searched = true
           if (res.data.tables) {
-            this.list = res.data.tables.filter(e => !this.filterArr.includes(e.tableCode)) || []
+            this.list = res.data.tables || []
           } else {
             this.list = []
           }
