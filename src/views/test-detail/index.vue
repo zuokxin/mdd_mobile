@@ -140,7 +140,6 @@ export default {
     // this.continue = this.$route.query.continue
     // if (this.continue) this.go = true
     // 量表信息
-    console.log('111')
     this.tableCode = this.$route.query.tableCode
     if (localStorage.getItem('phone')) {
       this.$store.dispatch('getInfo').then(res => {
@@ -431,7 +430,6 @@ export default {
     padding-left: 20rem / @w;
     padding-right: 20rem / @w;
     font-size: 14rem / @w;
-    font-weight: 700;
     color: #333333;
   }
   /deep/.van-button__content {
