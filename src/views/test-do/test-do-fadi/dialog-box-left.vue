@@ -150,6 +150,10 @@ export default {
     // 视频暂停（自动播放结束和手动暂停）
     paused () {
       this.isPlay = false
+      // 暂停并将视频归位
+      this.videoEle.currentTime = 0
+      // 画布重绘第一帧
+      this.ctx.drawImage(this.videoEle, 0, 0, this.canvas.width, this.canvas.height)
       this.$emit('playVideo', true)
       this.videoEle.removeEventListener('play', this.played)
       this.videoEle.removeEventListener('pause', this.paused)
@@ -157,9 +161,7 @@ export default {
     // 手动暂停
     pauseVideo () {
       if (!this.isPlay) return
-      // 暂停并将视频归位
       this.videoEle.pause()
-      this.videoEle.currentTime = 0
     }
   }
 }
