@@ -65,7 +65,7 @@
       v-if="aiEvalCamEnabled"
       ref="dragVideo"
       @getFace="getFace"
-      style="right: 10px; left:auto; top: 50px;"
+      :location="{ right: 10, top: 50 }"
     >
     </DragVideo>
     <!-- 弹窗提示 -->
