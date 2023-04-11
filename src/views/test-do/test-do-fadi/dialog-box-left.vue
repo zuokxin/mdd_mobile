@@ -43,7 +43,8 @@ export default {
       startTime: 0,
       videoEle: null, // 视频元素
       canvas: null, // 画布元素
-      ctx: null
+      ctx: null,
+      sParams: {} // 切割视频定位尺寸
     }
   },
   mounted () {
@@ -69,7 +70,6 @@ export default {
       this.videoEle = document.getElementById('dialogVideo')
       if (!this.videoEle) {
         this.videoEle = document.createElement('video')
-        this.videoEle.className = 'dialog-box-left-video'
         this.videoEle.id = 'dialogVideo'
         this.videoEle.src = this.url
         this.videoEle.style = 'display:none'
@@ -119,7 +119,6 @@ export default {
               // 如果是第一个没有自动播放，需要后续加上
               if (!this.videoEle.autoplay) this.videoEle.autoplay = true
               this.setTimer()
-              console.log('重新加载视频')
             })
           }
         }
@@ -135,15 +134,25 @@ export default {
     },
     // 开始播放
     played () {
-      console.log('播放')
       if (this.timer) {
         clearInterval(this.timer)
         this.timer = null
       }
       this.isReady = true
       this.isPlay = true
+      // 计算裁切部分
+      const { videoWidth, videoHeight } = this.videoEle
+      const scaleVideoHeight = videoWidth * (this.canvas.height / this.canvas.width)
+      const videoY = (videoHeight - scaleVideoHeight) / 2
+      this.sParams = {
+        sx: 0,
+        sy: videoY,
+        sw: videoWidth,
+        sh: scaleVideoHeight
+      }
+      // 间隔40毫秒绘制一次
       const i = setInterval(() => {
-        this.ctx.drawImage(this.videoEle, 0, 0, this.canvas.width, this.canvas.height)
+        this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
         if (this.videoEle.ended || this.videoEle.paused) clearInterval(i)
       }, 40)
     },
@@ -153,7 +162,7 @@ export default {
       // 暂停并将视频归位
       this.videoEle.currentTime = 0
       // 画布重绘第一帧
-      this.ctx.drawImage(this.videoEle, 0, 0, this.canvas.width, this.canvas.height)
+      this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
       this.$emit('playVideo', true)
       this.videoEle.removeEventListener('play', this.played)
       this.videoEle.removeEventListener('pause', this.paused)
@@ -161,6 +170,8 @@ export default {
     // 手动暂停
     pauseVideo () {
       if (!this.isPlay) return
+      // 暂停并将视频归位
+      this.videoEle.currentTime = 0
       this.videoEle.pause()
     }
   }
