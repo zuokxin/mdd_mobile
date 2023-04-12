@@ -73,6 +73,9 @@ export default {
         this.videoEle.id = 'dialogVideo'
         this.videoEle.src = this.url
         this.videoEle.style = 'display:none'
+        // 视频行内播放设置
+        this.videoEle.setAttribute('webkit-playsinline', 'webkit-playsinline')
+        this.videoEle.setAttribute('playsinline', 'playsinline')
         document.getElementById('tableFadi').appendChild(this.videoEle)
         this.$emit('openStartPrompt', { setTimer: this.setTimer, play: this.play })
       } else {
