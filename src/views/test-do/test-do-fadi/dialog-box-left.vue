@@ -72,12 +72,14 @@ export default {
         this.videoEle = document.createElement('video')
         this.videoEle.id = 'dialogVideo'
         this.videoEle.src = this.url
+        this.videoEle.crossOrigin = 'anonymous'
+        this.videoEle.preload = 'auto'
         this.videoEle.style = 'display:none'
         // 视频行内播放设置
         this.videoEle.setAttribute('webkit-playsinline', 'webkit-playsinline')
         this.videoEle.setAttribute('playsinline', 'playsinline')
         document.getElementById('tableFadi').appendChild(this.videoEle)
-        this.$emit('openStartPrompt', { setTimer: this.setTimer, play: this.play })
+        this.$emit('openStartPrompt')
       } else {
         // 视频元素已存在
         this.videoEle.autoplay = true
@@ -153,19 +155,22 @@ export default {
         sw: videoWidth,
         sh: scaleVideoHeight
       }
+      // 初始记录第一帧图片
+      this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
+      this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
       // 间隔40毫秒绘制一次
       const i = setInterval(() => {
         this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
         if (this.videoEle.ended || this.videoEle.paused) clearInterval(i)
-      }, 40)
+      }, 0)
     },
     // 视频暂停（自动播放结束和手动暂停）
     paused () {
       this.isPlay = false
       // 暂停并将视频归位
-      this.videoEle.currentTime = 0
+      // this.videoEle.currentTime = 0
       // 画布重绘第一帧
-      this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
+      this.ctx.putImageData(this.imageData, 0, 0)
       this.$emit('playVideo', true)
       this.videoEle.removeEventListener('play', this.played)
       this.videoEle.removeEventListener('pause', this.paused)
@@ -173,8 +178,6 @@ export default {
     // 手动暂停
     pauseVideo () {
       if (!this.isPlay) return
-      // 暂停并将视频归位
-      this.videoEle.currentTime = 0
       this.videoEle.pause()
     }
   }
