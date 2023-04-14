@@ -212,7 +212,7 @@ export default {
   background: rgba(255, 255, 255, .8);
   border-radius: 8px;
   // margin: 10px 0;
-  margin-left: 26px;
+  margin-left: 16px;
   font-size: 14px;
   color: #000;
 }

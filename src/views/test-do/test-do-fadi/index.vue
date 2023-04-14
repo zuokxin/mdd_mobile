@@ -773,7 +773,8 @@ export default {
         height: 40vh;
         // margin-top: 16px;
         padding-bottom: 15px;
-        overflow: scroll;
+        overflow-x: hidden;
+        overflow-y: scroll;
         z-index: 2;
         .main-in {
           // position: absolute;
