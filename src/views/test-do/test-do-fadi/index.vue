@@ -212,11 +212,20 @@ export default {
           // 未检出人脸1.5S
           if (!e) {
             if (this.faceTimer) return
+            // this.faceTimer = setInterval(() => {
+            //   this.openFacrTips()
+            //   clearInterval(this.faceTimer)
+            //   this.faceTimer = null
+            // }, 1500)
+            this.unFaceTime = (new Date()).getTime()
             this.faceTimer = setInterval(() => {
-              this.openFacrTips()
-              clearInterval(this.faceTimer)
-              this.faceTimer = null
-            }, 1500)
+              const newTime = (new Date()).getTime()
+              if (newTime - this.unFaceTime >= 1000) {
+                this.openFacrTips()
+                clearInterval(this.faceTimer)
+                this.faceTimer = null
+              }
+            }, 1)
           } else {
             if (this.faceTimer) {
               clearInterval(this.faceTimer)
@@ -491,6 +500,7 @@ export default {
         //   this.finishBtnDisable = false
         //   return
         // }
+        // this.testInfo = (new Date()).getTime()
         if (this.error) this.error = false
         this.recorder.start()
         if (this.aiEvalCamEnabled) this.mediaRecorder.start()
@@ -703,6 +713,7 @@ export default {
       this.audioFiles.push(this.audioFile)
       // 时间计算
       this.audioDuration = this.recorder.getDuration()
+      console.log(this.audioDuration)
       // if (this.audioDuration > 60) {
       //   this.textRight = parseInt(this.audioDuration / 60) + " ' " + (this.audioDuration % 60) + " '' "
       // } else {
