@@ -8,7 +8,7 @@
       <div class="main" ref="mainIn">
         <div class="main-in">
           <div v-if="historRecods.length > 0">
-            <TimeShow class="mt-4 mb-2" :type="true"></TimeShow>
+            <!-- <TimeShow class="mt-4 mb-2" :type="true"></TimeShow> -->
             <div v-for="item in historRecods" :key="item.index">
               <DialogBoxLeft
                 :textLeft="item.title"
@@ -18,7 +18,7 @@
             </div>
           </div>
           <div v-for="(record, index) in chatRecords" :key="record + index">
-            <TimeShow class="mt-4 mb-2" v-if="record.timeShow && historRecods.length === 0" :type="record.timeType"></TimeShow>
+            <!-- <TimeShow class="mt-4 mb-2" v-if="record.timeShow && historRecods.length === 0" :type="record.timeType"></TimeShow> -->
             <DialogBoxLeft
               :ref="'DialogBoxLeft' + index"
               v-if="record.component === 'left' && record.status === false"
@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import TimeShow from './time-show'
+// import TimeShow from './time-show'
 import DialogBoxLeft from './dialog-box-left'
 import DialogBoxRight from './dialog-box-right'
 import XyButton from './xy-button'
@@ -118,7 +118,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'test-do-fadi',
   components: {
-    TimeShow,
+    // TimeShow,
     DialogBoxLeft,
     DialogBoxRight,
     XyButton,
@@ -404,6 +404,7 @@ export default {
           this.queObj = { id, title, topic, isNeedAnswer, proDisplay, progress, showProgress, choice }
           setTimeout(() => {
             this.queLoading = false
+            // 判断是否已经完成所有题目
             if (!isEnd) {
               const record = {
                 component: 'left',
@@ -500,13 +501,15 @@ export default {
         //   this.finishBtnDisable = false
         //   return
         // }
-        // this.testInfo = (new Date()).getTime()
         if (this.error) this.error = false
         this.recorder.start()
         if (this.aiEvalCamEnabled) this.mediaRecorder.start()
+        // 显示录音答题，过1S可提交
+        this.canUpload = false
+        this.recorderShow = true
         setTimeout(() => {
-          this.recorderShow = true
-        }, 500)
+          this.canUpload = true
+        }, 1000)
       }
     },
     // 下一题
