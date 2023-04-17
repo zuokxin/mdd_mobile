@@ -509,7 +509,7 @@ export default {
         this.recorderShow = true
         setTimeout(() => {
           this.canUpload = true
-        }, 1000)
+        }, 1500)
       }
     },
     // 下一题
