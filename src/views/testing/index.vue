@@ -233,11 +233,13 @@ export default {
   min-height: 100vh;
   background-color: #F6F6F6;
   padding: 16px 20px;
+  box-sizing: border-box;
   .test-wrap {
     background-color: #fff;
-    min-height: 80vh;
+    min-height: calc(100vh - 3rem);
     border-radius: 10px;
     padding: 16px 12px;
+    box-sizing: border-box;
   }
   .icon {
     color: #DDD;

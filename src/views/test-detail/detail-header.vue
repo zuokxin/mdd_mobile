@@ -105,10 +105,7 @@ export default {
   padding-left: 20rem / @w;
   padding-right: 20rem / @w;
   padding-top: 16rem / @w;
-  padding-bottom: 20rem / @w;
   margin-top: -12rem / @w;
-  margin-bottom: 10rem / @w;
-  border-radius: 12px 12px 0px 0px;
   background: #fff;
   .title {
     margin-bottom: 10rem / @w;

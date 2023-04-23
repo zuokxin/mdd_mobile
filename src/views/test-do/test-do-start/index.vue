@@ -71,6 +71,7 @@ export default {
   font-size: 14rem / @w;
   font-weight: 400;
   color: #333333;
+  box-sizing: border-box;
   p {
     margin-top: 0;
     margin-bottom: 10rem / @w;
@@ -78,9 +79,10 @@ export default {
   }
   .test-wrap {
     background-color: #fff;
-    min-height: 80vh;
+    height: calc(100vh - 3rem);
     border-radius: 10px;
     padding: 16px 12px;
+    box-sizing: border-box;
   }
 }
 </style>

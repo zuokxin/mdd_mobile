@@ -23,11 +23,11 @@
         </div>
         <div class="under"><van-button round type="success" :class="{'van-ed': todayIsSignIn}" @click="signCoins">{{todayIsSignIn ? '今天已签到，记得明天来啊' : '签到领云愈币'}}</van-button></div>
       </div>
-      <div class="to-test">
+      <div class="to-test" @click="jump('/my-record?type=1')">
         <div class="to-test-left">
           <img src="@/assets/img/my/list.png" alt="info">
         </div>
-        <div class="to-test-center" @click="jump('/my-record?type=1')">
+        <div class="to-test-center">
           <div class="top">量表测试记录</div>
           <div class="under">专业测试 客观评估</div>
         </div>

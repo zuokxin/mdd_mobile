@@ -751,7 +751,7 @@ export default {
   .in-set{
     margin: 0 .5405rem;
     box-sizing: border-box;
-    height: 100%;
+    // height: calc(100% - 0.8rem);
     overflow: hidden;
     .progress-bar{
       height: 1.6757rem;
@@ -770,7 +770,7 @@ export default {
   .question-box{
     position: relative;
     overflow: hidden;
-    height: 100%;
+    height: calc(100vh - 2.5rem);
     border-radius: 10px;
     background: #FFFFFF;
     .question-text{
@@ -807,7 +807,8 @@ export default {
       width: calc(100% - 1.07rem);
       height: 4.9459rem;
       position: fixed;
-      bottom: 0;
+      bottom: 0.8rem;
+      border-radius: 10px;
       .line{
         margin:  0 .2703rem;
         height: 2px;
