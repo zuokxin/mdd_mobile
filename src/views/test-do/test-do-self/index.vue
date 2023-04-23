@@ -561,14 +561,17 @@ export default {
         flex-wrap: wrap;
         .items{
           display: flex;
+          font-weight: 600;
           .select{
             width: .96rem;
             height: .6933rem;
             padding-top: 2px;
             border: 1px solid #000000;
             border-radius: .16rem;
-            text-align: center;
             box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
           }
           /deep/.van-overlay{
             background-color: rgba(0, 0, 0, 0.3);

@@ -16,6 +16,9 @@
 import VideoBox from './VideoBox'
 export default {
   name: 'drag-video',
+  props: {
+    location: Object
+  },
   components: {
     VideoBox
   },
@@ -32,6 +35,16 @@ export default {
   },
   mounted () {
     this.videoObject = this.$refs.thisVideo
+    // 设置摄像头框初始位置
+    if (this.location) {
+      const { top = 0, left = 0, right = 0 } = this.location
+      this.moveTop = top
+      if (left) {
+        this.moveLeft = left
+      } else if (right) {
+        this.moveLeft = document.body.clientWidth - 92 - right
+      }
+    }
   },
   methods: {
     // 人脸识别

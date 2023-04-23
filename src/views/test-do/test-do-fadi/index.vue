@@ -8,7 +8,7 @@
       <div class="main" ref="mainIn">
         <div class="main-in">
           <div v-if="historRecods.length > 0">
-            <TimeShow class="mt-4 mb-2" :type="1"></TimeShow>
+            <!-- <TimeShow class="mt-4 mb-2" :type="true"></TimeShow> -->
             <div v-for="item in historRecods" :key="item.index">
               <DialogBoxLeft
                 :textLeft="item.title"
@@ -18,8 +18,9 @@
             </div>
           </div>
           <div v-for="(record, index) in chatRecords" :key="record + index">
-            <TimeShow class="mt-4 mb-2" v-if="record.timeShow && historRecods.length === 0" :type="record.timeType"></TimeShow>
+            <!-- <TimeShow class="mt-4 mb-2" v-if="record.timeShow && historRecods.length === 0" :type="record.timeType"></TimeShow> -->
             <DialogBoxLeft
+              :ref="'DialogBoxLeft' + index"
               v-if="record.component === 'left' && record.status === false"
               :needAnswer="record.needAnswer"
               :url="record.url"
@@ -65,9 +66,26 @@
       v-if="aiEvalCamEnabled"
       ref="dragVideo"
       @getFace="getFace"
-      style="right: 10px; left:auto; top: 50px;"
+      :location="{ right: 10, top: 50 }"
     >
     </DragVideo>
+    <!-- 开始提示 -->
+    <van-dialog
+      v-model="startShow"
+      theme="round-button"
+      className="detail-dialog"
+      confirmButtonText="好的"
+      confirmButtonColor="#34B7B9"
+      @close="colseStartTips"
+    >
+      <div class="fadi-start-box">
+        <p class="title">测试即将开始</p>
+        <p class="content">
+          <van-icon name="info" color="#EB5940" style="margin-left: -1.1em" />
+          部分手机自带浏览器可能无法正常播放视频画面，您可以尝试切换浏览器测评
+        </p>
+      </div>
+    </van-dialog>
     <!-- 弹窗提示 -->
     <van-dialog
       v-if="aiEvalCamEnabled"
@@ -83,7 +101,7 @@
 </template>
 
 <script>
-import TimeShow from './time-show'
+// import TimeShow from './time-show'
 import DialogBoxLeft from './dialog-box-left'
 import DialogBoxRight from './dialog-box-right'
 import XyButton from './xy-button'
@@ -100,7 +118,7 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'test-do-fadi',
   components: {
-    TimeShow,
+    // TimeShow,
     DialogBoxLeft,
     DialogBoxRight,
     XyButton,
@@ -110,6 +128,7 @@ export default {
   data () {
     return {
       qVideoUrl: '',
+      startShow: false,
       faceShow: false,
       chatRecords: [],
       historRecods: [],
@@ -193,11 +212,20 @@ export default {
           // 未检出人脸1.5S
           if (!e) {
             if (this.faceTimer) return
+            // this.faceTimer = setInterval(() => {
+            //   this.openFacrTips()
+            //   clearInterval(this.faceTimer)
+            //   this.faceTimer = null
+            // }, 1500)
+            this.unFaceTime = (new Date()).getTime()
             this.faceTimer = setInterval(() => {
-              this.openFacrTips()
-              clearInterval(this.faceTimer)
-              this.faceTimer = null
-            }, 1500)
+              const newTime = (new Date()).getTime()
+              if (newTime - this.unFaceTime >= 1000) {
+                this.openFacrTips()
+                clearInterval(this.faceTimer)
+                this.faceTimer = null
+              }
+            }, 1)
           } else {
             if (this.faceTimer) {
               clearInterval(this.faceTimer)
@@ -376,6 +404,7 @@ export default {
           this.queObj = { id, title, topic, isNeedAnswer, proDisplay, progress, showProgress, choice }
           setTimeout(() => {
             this.queLoading = false
+            // 判断是否已经完成所有题目
             if (!isEnd) {
               const record = {
                 component: 'left',
@@ -441,14 +470,16 @@ export default {
         }
       )
     },
+    // 视频播放开始提示用户
+    openStartPrompt () {
+      this.startShow = true
+    },
     // 视频播放初始获取用户点击行为
-    openStartPrompt (e) {
-      this.thisDialog('测试即将开始', '好的').then(() => {
-        // 设置加载渲染时长
-        e.setTimer()
-        // 视频播放
-        e.play()
-      })
+    colseStartTips () {
+      const { setTimer, play } = this.$refs.DialogBoxLeft0[0]
+      setTimer()
+      play()
+      this.startShow = false
     },
     // 音频播放结束
     playVideo (data, index) {
@@ -456,6 +487,10 @@ export default {
         // 缓冲下一题
         setTimeout(() => {
           this.chatRecords[index + 1].status = false
+          // 让滚动条始终在最底部
+          this.$nextTick(() => {
+            this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
+          })
         }, 500)
       } else if (!this.queObj.isNeedAnswer && !this.isEnd) {
         // 无需回答
@@ -469,9 +504,12 @@ export default {
         if (this.error) this.error = false
         this.recorder.start()
         if (this.aiEvalCamEnabled) this.mediaRecorder.start()
+        // 显示录音答题，过1S可提交
+        this.canUpload = false
+        this.recorderShow = true
         setTimeout(() => {
-          this.recorderShow = true
-        }, 500)
+          this.canUpload = true
+        }, 1500)
       }
     },
     // 下一题
@@ -678,6 +716,7 @@ export default {
       this.audioFiles.push(this.audioFile)
       // 时间计算
       this.audioDuration = this.recorder.getDuration()
+      console.log(this.audioDuration)
       // if (this.audioDuration > 60) {
       //   this.textRight = parseInt(this.audioDuration / 60) + " ' " + (this.audioDuration % 60) + " '' "
       // } else {
@@ -748,7 +787,8 @@ export default {
         height: 40vh;
         // margin-top: 16px;
         padding-bottom: 15px;
-        overflow: scroll;
+        overflow-x: hidden;
+        overflow-y: scroll;
         z-index: 2;
         .main-in {
           // position: absolute;
@@ -804,21 +844,21 @@ export default {
         }
       }
     }
-    .start-prompt {
-      margin-bottom: 3vh;
-      font-size: 28px;
-      color: #666;
-    }
-    .icon-wrong {
-      // position: fixed;
-      // left: 1vh;
-      // bottom: 1vh;
-      font-size: 1.65rem;
-      cursor: pointer;
-      &.el-icon-star-on {
-        font-size: 2.15rem;
-      }
-    }
+    // .start-prompt {
+    //   margin-bottom: 3vh;
+    //   font-size: 28px;
+    //   color: #666;
+    // }
+    // .icon-wrong {
+    //   // position: fixed;
+    //   // left: 1vh;
+    //   // bottom: 1vh;
+    //   font-size: 1.65rem;
+    //   cursor: pointer;
+    //   &.el-icon-star-on {
+    //     font-size: 2.15rem;
+    //   }
+    // }
   }
 .main-in::-webkit-scrollbar {
   /*滚动条整体样式*/
@@ -873,6 +913,22 @@ export default {
 .el-dialog.is-fullscreen.other-dialg {
   height: calc(100vh - 50px);
   margin-top: 50px;
+}
+.fadi-start-box {
+  .title {
+    margin: 1.68rem 0 0 0;
+    font-weight: 600;
+    color: #000000;
+    text-align: center;
+  }
+  .content {
+    padding: 0 1rem;
+    margin-top: 2px;
+    margin-bottom: .9rem;
+    font-size: 14px;
+    font-weight: 400;
+    color: #666666;
+  }
 }
 </style>
 <style lang="less">

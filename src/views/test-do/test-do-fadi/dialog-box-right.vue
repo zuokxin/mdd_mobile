@@ -54,7 +54,7 @@ export default {
   position: relative;
   width:100px;
   height:36px;
-  margin: 10px 45px 10px 0;
+  margin: 10px 16px 10px 0;
   padding: 5px 11px;
   font-size: 14px;
   color: #fff;
