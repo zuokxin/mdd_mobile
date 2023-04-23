@@ -446,15 +446,16 @@ export default {
     text-align: center;
     .progress{
       color: #000000;
+      height: 1.627rem;
       padding: .426667rem .32rem;
+      box-sizing: border-box;
       .text{
         margin-bottom: .266667rem;
       }
     }
     .question-box{
       background-color: #FFFFFF;
-      max-height: 70vh;
-      min-height: 70vh;
+      height: calc(100vh - 4rem);
       overflow: hidden;
       overflow-y: scroll;
       border-radius: .266667rem;
@@ -582,7 +583,7 @@ export default {
   .bnts{
     width: calc(100% - 1rem);
     position: fixed;
-    bottom: .5rem;
+    bottom: .8rem;
     display: flex;
     justify-content: center;
     .van-button{

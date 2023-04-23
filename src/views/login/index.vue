@@ -41,14 +41,14 @@
         <van-index-bar ref="bar" class="van-index-bar-empty" v-show="keyWord === ''" :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top">
           <div v-for="item in areas" :key="item.type">
             <van-index-anchor :index="item.type" />
-            <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="it in item.list" :key="it.chinese_name" @click="backLogin(it.phone_code)">
+            <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="it in item.list" :key="it.chinese_name" @click="backLogin(it.phone_code, it.chinese_name)">
               <div class="number">+{{it.phone_code}}</div>
             </van-cell>
           </div>
         </van-index-bar>
         <!-- -------------------- -->
         <van-index-bar v-if="searchList.length > 0" :index-list="[]" :sticky-offset-top="top" :key="new Date().getTime()">
-            <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="(it,index) in searchList" :key="index + index" @click="backLogin(it.phone_code)" >
+            <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="(it,index) in searchList" :key="index + index" @click="backLogin(it.phone_code, it.chinese_name)" >
               <div class="number">+{{it.phone_code}}</div>
             </van-cell>
         </van-index-bar>
@@ -75,6 +75,7 @@ export default {
       top: 0,
       timeFlag: false,
       find: false,
+      country: '中国',
       getmsg: '获取验证码',
       keyWord: '',
       show: false,
@@ -141,7 +142,8 @@ export default {
       const data = {
         username: this.username,
         smsCode: this.smsCode,
-        countryCode: this.countryCode
+        countryCode: this.countryCode,
+        country: this.country
       }
       postUserLogin(data).then(res => {
         if (res.code === 0) {
@@ -230,8 +232,9 @@ export default {
         })
       })
     },
-    backLogin (code) {
+    backLogin (code, chineseName) {
       this.countryCode = code
+      this.country = chineseName
       this.find = false
       this.searchFinished = false
     },

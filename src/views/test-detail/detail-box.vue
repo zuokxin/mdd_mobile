@@ -24,7 +24,6 @@ export default {
 .detail-box {
   .title {
     font-size: 14rem / @w;
-    font-weight: 700;
     color: #333333;
     img {
       width: 17rem / @w;
@@ -38,6 +37,7 @@ export default {
     font-size: 14rem / @w;
     color: #666666;
     white-space: pre-wrap;
+    font-weight: 400;
   }
   /deep/h3 {
     font-size: 14rem / @w;
