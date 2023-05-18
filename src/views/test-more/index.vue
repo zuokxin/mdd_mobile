@@ -368,28 +368,32 @@ export default {
     color: #242424;
   }
 
-  .recommend-box-content {
-    position: relative;
+  .van-row {
+    margin-top: .2133rem;
 
-    // 推荐位分类标签
-    &::after {
-      content: attr(title);
-      position: absolute;
-      left: 0;
-      top: 0;
-      padding: 0 7px;
-      min-width: 34px;
-      height: 19px;
-      line-height: 19px;
-      text-align: center;
-      color: #fff;
-      border-radius: 5px 0px 5px 0px;
-      transform: scale(.84) translate(-10%, -10%);
-      background: rgba(0, 0, 0, .6);
-    }
+    .recommend-box-content {
+      position: relative;
 
-    img {
-      border-radius: 4px;
+      // 推荐位分类标签
+      &::after {
+        content: attr(title);
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding: 0 7px;
+        min-width: 34px;
+        height: 19px;
+        line-height: 19px;
+        text-align: center;
+        color: #fff;
+        border-radius: 5px 0px 5px 0px;
+        transform: scale(.84) translate(-10%, -10%);
+        background: rgba(0, 0, 0, .6);
+      }
+
+      img {
+        border-radius: 4px;
+      }
     }
   }
 }
