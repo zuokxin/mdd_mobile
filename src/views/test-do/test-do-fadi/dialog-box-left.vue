@@ -63,8 +63,8 @@ export default {
         this.canvas.id = 'canvas'
         this.canvas.className = 'dialog-box-left-video'
         // 处理渲染图片不清晰问题
-        this.canvas.width = (window.innerWidth || document.body.clientWidth) * 2
-        this.canvas.height = (window.innerHeight || document.body.clientHeight) * 2
+        this.canvas.width = (window.innerWidth || document.body.clientWidth) * 4
+        this.canvas.height = (window.innerHeight || document.body.clientHeight) * 4
         // this.canvas.width = (window.innerWidth || document.body.clientWidth)
         // this.canvas.height = (window.innerHeight || document.body.clientHeight)
         this.canvas.style = 'z-index: 1'
