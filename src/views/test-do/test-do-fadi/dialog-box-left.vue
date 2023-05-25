@@ -24,6 +24,7 @@
 
 <script>
 import { Dialog } from 'vant'
+import browser from '@/utils/browser'
 export default {
   name: 'dialog-box-left',
   props: {
@@ -44,7 +45,8 @@ export default {
       videoEle: null, // 视频元素
       canvas: null, // 画布元素
       ctx: null,
-      sParams: {} // 切割视频定位尺寸
+      sParams: {}, // 切割视频定位尺寸
+      ios: browser().ios
     }
   },
   mounted () {
@@ -60,8 +62,11 @@ export default {
         this.canvas = document.createElement('canvas')
         this.canvas.id = 'canvas'
         this.canvas.className = 'dialog-box-left-video'
-        this.canvas.width = window.innerWidth || document.body.clientWidth
-        this.canvas.height = window.innerHeight || document.body.clientHeight
+        // 处理渲染图片不清晰问题
+        this.canvas.width = (window.innerWidth || document.body.clientWidth) * 4
+        this.canvas.height = (window.innerHeight || document.body.clientHeight) * 4
+        // this.canvas.width = (window.innerWidth || document.body.clientWidth)
+        // this.canvas.height = (window.innerHeight || document.body.clientHeight)
         this.canvas.style = 'z-index: 1'
         document.getElementById('tableFadi').appendChild(this.canvas)
       }
@@ -148,7 +153,8 @@ export default {
       // 计算裁切部分
       const { videoWidth, videoHeight } = this.videoEle
       const scaleVideoHeight = videoWidth * (this.canvas.height / this.canvas.width)
-      const videoY = (videoHeight - scaleVideoHeight) / 2
+      const vParam = this.ios ? 1.1 : 2 // ios需要整体上拉一些防止盖住脸
+      const videoY = (videoHeight - scaleVideoHeight) / vParam
       this.sParams = {
         sx: 0,
         sy: videoY,
@@ -186,6 +192,8 @@ export default {
 <style>
 .dialog-box-left-video {
   position: fixed;
+  width: 100vw;
+  height: 100vh;
   top: 0;
   left: 0;
   z-index: 0;

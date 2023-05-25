@@ -2,11 +2,12 @@
   <div class="container">
     <!-- ---------- -->
     <div class="test">
-      <div class="progress" >
+      <div class="psqi-padding" v-if="tableCode === 'psqi'"></div>
+      <div class="progress" v-if="tableCode !== 'psqi'">
         <div class="text" v-if="allData.showProgress">测试进度: {{allData.id + 1}} / {{allData.questionTotal}}</div>
         <van-progress :percentage="process" stroke-width="5px" color="#34B7B9" v-if="allData.showProgress" :show-pivot="false" />
       </div>
-      <div class="question-box" v-if="tableCode === 'psqi'">
+      <div class="question-box" v-if="tableCode === 'psqi'" :class="{'question-box-psqi': tableCode === 'psqi'}">
         <!-- {{end}}{{allData.id}} -->
         <div class="question">{{(allData.id + 1)? (allData.id + 1): ''}}.{{allData.title}}</div>
         <div class="psqi" v-if="options.style === 'psqi-1'">
@@ -32,7 +33,7 @@
           </div>
         </div>
       </div>
-      <div class="question-box" v-else>
+      <div class="question-box" :class="{'question-box-psqi': tableCode === 'psqi'}" v-else>
         <!-- {{end}}{{allData.id}} -->
         <div class="question">{{(allData.id + 1)? (allData.id + 1): ''}}.{{allData.title}}</div>
         <div v-for="(it,index) in options" :key="index">
@@ -444,6 +445,9 @@ export default {
   padding: 0 .533333rem;
   .test{
     text-align: center;
+    .psqi-padding{
+      height: .4267rem;
+    }
     .progress{
       color: #000000;
       height: 1.627rem;
@@ -452,6 +456,9 @@ export default {
       .text{
         margin-bottom: .266667rem;
       }
+    }
+    .question-box-psqi{
+      height: calc(100vh - 2.85rem) !important;
     }
     .question-box{
       background-color: #FFFFFF;

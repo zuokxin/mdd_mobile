@@ -90,7 +90,6 @@ export default {
 <style lang="less" scoped>
 @w: 37.5;
 .detail-wrap {
-  padding-top: 25rem / @w;
   padding-left: 20rem / @w;
   padding-right: 20rem / @w;
   padding-bottom: 50rem / @w;
@@ -101,7 +100,6 @@ export default {
   }
 }
 .detail-img{
-  padding-top: 0;
   padding-left: 0;
   padding-right: 0;
 }
