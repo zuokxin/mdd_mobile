@@ -41,7 +41,7 @@
           <p class="tips-02">{{ btnText2 }}</p>
           <div class="submit-btn">
             <VolumeIcon class="mr-3" v-show="!loading" :value="volumeVal" style="transform: rotateZ(180deg);"></VolumeIcon>
-            <XyButton :disabled="loading || !canUpload" @click.native="toNext()"></XyButton>
+            <XyButton :disabled="loading || !btnShow" @click.native="toNext()"></XyButton>
             <VolumeIcon class="ml-3" v-show="!loading" :value="volumeVal" style="margin-bottom: -5px;"></VolumeIcon>
           </div>
         </div>
@@ -54,7 +54,7 @@
           block
           :disabled="finishBtnDisable"
           @click="submit"
-          style="width: 80%;"
+          style="width: 76.8%;"
         >
           完成
         </van-button>
@@ -159,7 +159,8 @@ export default {
       videoPlayer: null, // 摄像头对象
       faceTimer: null, // 人脸识别计时器
       canUpload: true,
-      aiEvalCamEnabled: true
+      aiEvalCamEnabled: true,
+      btnShow: false
     }
   },
   computed: {
@@ -206,17 +207,12 @@ export default {
     // 监听人脸识别
     getFace (e) {
       // 上传答题环节
-      if (!this.isEnd && this.recorderShow) {
+      if (!this.isEnd) {
         // 答题录像环节
         if (!this.loading && this.canUpload) {
-          // 未检出人脸1.5S
+          // 未检出人脸1S
           if (!e) {
             if (this.faceTimer) return
-            // this.faceTimer = setInterval(() => {
-            //   this.openFacrTips()
-            //   clearInterval(this.faceTimer)
-            //   this.faceTimer = null
-            // }, 1500)
             this.unFaceTime = (new Date()).getTime()
             this.faceTimer = setInterval(() => {
               const newTime = (new Date()).getTime()
@@ -242,9 +238,10 @@ export default {
       this.toNext(() => {
         this.canUpload = false
       })
-      setTimeout(() => {
-        this.faceShow = true
-      }, 0)
+      this.faceShow = true
+      // setTimeout(() => {
+      //   this.faceShow = true
+      // }, 0)
     },
     // 关闭人脸提示
     colseFaceTips () {
@@ -255,14 +252,13 @@ export default {
     // 摄像头再启动
     openVideo () {
       if (this.aiEvalCamEnabled) {
-        this.$refs.dragVideo.$children[0].play()
-        this.$refs.dragVideo.$children[0].started()
+        this.$refs.dragVideo.restartVideo()
       }
     },
     // 弹窗逻辑处理（人脸识别和无答案）
     handleDialog () {
       // 打开摄像头
-      this.openVideo()
+      // this.openVideo()
       // 隐藏提交按钮
       this.recorderShow = false
       // 重新读题
@@ -324,9 +320,7 @@ export default {
       // 不开启摄像头
       if (!this.aiEvalCamEnabled) return
 
-      this.$refs.dragVideo.videoObject.videoBox.srcObject = stream
-      // this.videoPlayer = this.$refs.dragVideo.videoObject
-      this.$refs.dragVideo.$children[0].play()
+      this.$refs.dragVideo.setSteam(stream)
       this.mediaRecorder = new MediaRecorder(stream)
       console.log('录像初始化。。。')
       // 监听录像
@@ -503,19 +497,23 @@ export default {
         // }
         if (this.error) this.error = false
         this.recorder.start()
-        if (this.aiEvalCamEnabled) this.mediaRecorder.start()
-        // 显示录音答题，过1S可提交
-        this.canUpload = false
+        if (this.aiEvalCamEnabled) {
+          this.mediaRecorder.start()
+          this.openVideo()
+        }
+        // 显示录音答题，过1.5S可提交
+        this.btnShow = false
         this.recorderShow = true
+        this.canUpload = true
         setTimeout(() => {
-          this.canUpload = true
+          this.btnShow = true
         }, 1500)
       }
     },
     // 下一题
     toNext (cb) {
       // 禁用无法进入
-      if (this.loading || !this.canUpload) return
+      if (this.loading || !this.canUpload || !this.btnShow) return
       if (this.error) {
         Notify({ type: 'warning', message: '请检查设备后再完成题目' })
         return
@@ -526,7 +524,7 @@ export default {
       if (cb) cb()
       // 是否用摄像头
       if (this.aiEvalCamEnabled) {
-        this.$refs.dragVideo.$children[0].pause()
+        this.$refs.dragVideo.pauseVideo()
         this.mediaRecorder.stop()
         this.recorder.pause()
         // 避免提交过程中摄像头检出
@@ -660,7 +658,7 @@ export default {
               const timeJson = this.setTime()
               this.chatRecords.push({ component: 'right', text: answer, time: this.audioDuration, ...timeJson })
               this.getCurQue()
-              this.openVideo()
+              // this.openVideo()
               this.recorderShow = false
               // 让滚动条始终在最底部
               this.$nextTick(() => {
@@ -816,9 +814,9 @@ export default {
         z-index: 3;
         &.isEnd {
           height: auto;
-          padding: 54px 0;
+          padding: 10px 0;
           align-items: flex-end;
-          background-color: #F4F4F4;
+          background-color: rgba(255, 255, 255, .8);
         }
         .bot_box{
           display: flex;

@@ -1,6 +1,9 @@
 video {
   transform: scaleX(-1);
 }
+.text-center {
+  text-align: center;
+}
 .van-button--info {
   background-color: #34B7B9;
   border: 1px solid #34B7B9;

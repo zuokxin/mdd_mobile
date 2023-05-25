@@ -30,7 +30,7 @@ module.exports = {
     open: false, // 配置自动启动浏览器
     proxy: {
       '/api': httpProxy(),
-      '/static': httpProxy(),
+      '/static': httpProxy()
     }
   },
   pages: utils.pagesConfig,
@@ -48,7 +48,7 @@ module.exports = {
           // 直接覆盖变量
           // 'text-color': '#111',
           // 'border-color': '#eee'
-          hack: `true; @import "${path.join(__dirname, './src/assets/style/reset-vant.less')}";`,
+          hack: `true; @import "${path.join(__dirname, './src/assets/style/reset-vant.less')}";`
         }
       }
     }

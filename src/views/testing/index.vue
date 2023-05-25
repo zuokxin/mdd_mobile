@@ -6,13 +6,14 @@
           摄像头检测
         </p>
         <p>请将人脸放置在图像框内</p>
-        <video-box
-          ref="thisVideo"
-          size="172px"
-          :icon="true"
-          style="margin: 0 auto"
-        >
-        </video-box>
+        <div class="text-center">
+          <video-box
+            ref="thisVideo"
+            size="110px"
+            :icon="true"
+          >
+          </video-box>
+        </div>
       </div>
       <p class="title" style="margin-top: 5vh">
         语音测试
