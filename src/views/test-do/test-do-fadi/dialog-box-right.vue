@@ -61,6 +61,7 @@ export default {
   font-weight: 400;
   background: rgba(52, 183, 185, .8);
   border-radius: 8px;
+  box-sizing: border-box;
 }
 .boxRight:after {
     content: '';

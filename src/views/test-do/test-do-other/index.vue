@@ -38,8 +38,8 @@
               <span v-for="(it, index) in voice" :key="it" :class="{active: left_Voice[index]}"></span>
             </div>
             <div class="center same">
-              <img @click="postAnswer" v-if="!textFlag" src="@/assets/img/stop.png" alt="">
-              <img @click="postAnswer" v-if="textFlag" src="@/assets/img/wait.png" alt="">
+              <img @click="postAnswer" v-if="!textFlag && btnShow" src="@/assets/img/stop.png" alt="">
+              <img @click="postAnswer" v-if="textFlag || !btnShow" src="@/assets/img/wait.png" alt="">
             </div>
             <div class="right same">
               <span v-for="(it, index) in voice" :key="it" :class="{active: right_Voice[index]}"></span>
@@ -49,11 +49,13 @@
       </div>
     </div>
     <!-- 人脸 -->
-    <div class="face-box" v-show="timeOver && aiEvalCamEnabled && readOver" ref="point" :style="`width:${divWidth}px;height:${divHeight}px;left:${moveLeft}px;top:${moveTop}px;`"
-      @touchstart.prevent="(e)=>{dragStart(e)}" @touchend.prevent="(e)=>{dragEnd(e)}"  @touchmove.prevent="(e) => dragMove(e)">
-      <video ref="videoBox" webkit-playsinline="true" playsinline="true"  @loadedmetadata="start"  src="" style="width: 100%; height:100%; object-fit: cover" muted></video>
-      <!-- <video ref="videoBox"  style="width: 100%; height:100%; object-fit: cover" muted></video> -->
-    </div>
+    <DragVideo
+      v-show="timeOver && aiEvalCamEnabled && readOver"
+      ref="dragVideo"
+      @getFace="getFace"
+      :location="{ right: 10, bottom: 210 }"
+    >
+    </DragVideo>
     <!-- 一开始播报弹窗 -->
     <popout :countTime="countTime" :popoutShow="popoutShow" @close="close"></popout>
     <!-- 每一题的语音播报弹窗 -->
@@ -82,23 +84,27 @@
       </template>
     </errpopout>
     <!-- 无人脸 -->
-     <errpopout class="errpopout" :errPopout="noFace">
-      <template slot="text">
-        <div class="text">未识别到全部人脸，请重做本题</div>
-      </template>
-      <template slot="btn">
-        <van-button class="sure-btn" type="primary" @click="getFace">确定</van-button>
-      </template>
-    </errpopout>
+    <!-- 弹窗提示 -->
+    <van-dialog
+      v-if="aiEvalCamEnabled"
+      v-model="noFace"
+      message="未识别到全部人脸，请重做本题"
+      theme="round-button"
+      className="detail-dialog"
+      confirmButtonText="确定"
+      confirmButtonColor="#34B7B9"
+      @close="colseFaceTips"
+    ></van-dialog>
   </div>
 </template>
 
 <script>
 import Recorder from '@/utils/media/recorder'
-import * as faceapi from 'face-api.js'
+// import * as faceapi from 'face-api.js'
 // import Recorder from 'js-audio-recorder'
 import { uploader } from '@/utils/uploader'
 import miniBox from '@/components/miniChoice.vue'
+import DragVideo from '@/components/DragVideo'
 import { getTableQues, batchInfo, posTableQues, postTableRes } from '@/api/modules/user'
 import popout from './popout'
 import errpopout from './errpopout'
@@ -120,14 +126,11 @@ export default {
     popout,
     errpopout,
     voice,
-    miniBox
+    miniBox,
+    DragVideo
   },
   data () {
     return {
-      moveLeft: 0, // 左边界&drop
-      moveTop: 0, // 上边界&drop
-      divWidth: 92,
-      divHeight: 92,
       voice: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // dom元素
       left_Voice: [],
       right_Voice: [],
@@ -163,7 +166,7 @@ export default {
       miniNextFlag: true,
       miniType: ['check', 'select', 'radio', 'selectRange', 'radioGroup', 'dateRange'],
       yesNoMiniDialogFlag: false, // mini 回答是否的错误弹窗
-      getFaceFlag: true
+      btnShow: false
     }
   },
   computed: {
@@ -224,67 +227,35 @@ export default {
       const res = await getTableQues(data)
       const next = this.nextTable(this.thisTable)
       // console.log(res)
-      if (res.code === 0) {
-        if (res.data.isEnd) {
-          // 获取不到题目了就去等待页
-          postTableRes({
-            sessionId: this.sessionId,
-            tableCode: this.tableCode
-          }).then(res => {
-            if (res.code === 0) {
-              if (next) {
-                this.thisDialog('您将进入下一个量表进行测试').then(() => {
-                  this.$router.replace(this.routerPath)
-                })
-              } else {
+      if (res.data.isEnd) {
+        // 获取不到题目了就去等待页
+        postTableRes({
+          sessionId: this.sessionId,
+          tableCode: this.tableCode
+        }).then(res => {
+          if (res.code === 0) {
+            if (next) {
+              this.thisDialog('您将进入下一个量表进行测试').then(() => {
                 this.$router.replace(this.routerPath)
-              }
-              // this.$router.replace({ path: '/test-do-wait', query: { sessionId: this.sessionId } })
+              })
+            } else {
+              this.$router.replace(this.routerPath)
             }
-          })
-        } else {
-          this.stopFlag = true // 获取过题目可以点按钮
-          this.timeOver = true
-          this.textFlag = false
-          this.canUpload = false
-          this.audioFiles = []
-          this.videoFiles = []
-          this.questionData = JSON.parse(JSON.stringify(res.data))
-          this.copyquestionData = JSON.parse(JSON.stringify(res.data))
-          this.voicePopout = true
-          this.$refs.voice.playAudio(this.questionData.qAudioUrl)
-          this.getFaceFlag = true
-        }
-      }
-    },
-    // 初始化设备
-    initDevice (stream) {
-      this.recorder = new Recorder({ stream })
-      // 按钮边上的音量++
-      this.recorder.process.onaudioprocess = (e) => {
-        // console.log(e)
-        const buffer = e.inputBuffer.getChannelData(0)
-        this.recorder.audioBuffers.push(new Float32Array(buffer))
-        let maxVal = 0
-        buffer.forEach(e => {
-          if (maxVal < e) {
-            maxVal = e
           }
         })
-        if (this.waitwait) {
-          this.left_Voice = []
-          this.right_Voice = []
-        } else {
-          this.left_Voice = this.voiceLevel(maxVal * 100).reverse()
-          // this.left_Voice = this.voiceLevel(db).reverse()
-          this.right_Voice = this.voiceLevel(maxVal * 100)
-          // this.right_Voice = this.voiceLevel(db)
-        }
-        // console.log('录音中。。。', buffer)
-      }
-      if (this.aiEvalCamEnabled) {
-        this.mediaRecorder = new MediaRecorder(stream)
-        // this.$refs.videoBox.srcObject = this.stream
+      } else {
+        this.isEnd = false
+        this.btnShow = false
+        this.stopFlag = true // 获取过题目可以点按钮
+        this.timeOver = true
+        this.textFlag = false
+        this.canUpload = false
+        this.audioFiles = []
+        this.videoFiles = []
+        this.questionData = JSON.parse(JSON.stringify(res.data))
+        this.copyquestionData = JSON.parse(JSON.stringify(res.data))
+        this.voicePopout = true
+        this.$refs.voice.playAudio(this.questionData.qAudioUrl)
       }
     },
     initUserMedia () {
@@ -327,6 +298,57 @@ export default {
           this.$toast(errType)
         })
     },
+    // 初始化设备
+    initDevice (stream) {
+      this.recorder = new Recorder({ stream })
+      // 按钮边上的音量++
+      this.recorder.process.onaudioprocess = (e) => {
+        // console.log(e)
+        const buffer = e.inputBuffer.getChannelData(0)
+        this.recorder.audioBuffers.push(new Float32Array(buffer))
+        let maxVal = 0
+        buffer.forEach(e => {
+          if (maxVal < e) {
+            maxVal = e
+          }
+        })
+        if (this.waitwait) {
+          this.left_Voice = []
+          this.right_Voice = []
+        } else {
+          this.left_Voice = this.voiceLevel(maxVal * 100).reverse()
+          this.right_Voice = this.voiceLevel(maxVal * 100)
+        }
+      }
+      // 录像
+      if (this.aiEvalCamEnabled) {
+        this.mediaRecorder = new MediaRecorder(stream)
+        // this.$refs.videoBox.srcObject = this.stream
+        this.$refs.dragVideo.setSteam(stream)
+        /******************************
+         *          监听录像
+         *****************************/
+        this.mediaRecorder.onstart = e => {
+          console.log(e, '开始录像。。。')
+        }
+        this.mediaRecorder.onstop = e => {
+          console.log(e, '停止录像。。。', this.videoChunk)
+          if (this.canUpload && !this.noFace) {
+            // 视频文件处理
+            this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
+            this.videoFiles.push(this.videoFile)
+            // 音频文件处理
+            // 上传文件
+            this.audioCreate()
+            this.postQuesRes()
+          }
+        }
+        this.mediaRecorder.ondataavailable = e => {
+          console.log('视频生成。。。')
+          this.videoChunk = e.data
+        }
+      }
+    },
     // 倒计时&&固定语音播报结束
     close () {
       this.popoutShow = false
@@ -343,39 +365,23 @@ export default {
     },
     // 开始记录语音||开启摄像头---------------
     startRecorder () {
+      console.log('start', new Date())
       // audio
       this.recorder.start()
       // video
       if (this.aiEvalCamEnabled) {
-        this.$refs.videoBox.srcObject = this.stream
         console.log('录像初始化。。。')
         if (this.mediaRecorder.state !== 'recording') {
           this.mediaRecorder.start()
         }
-        this.$refs.videoBox.play()
-        /******************************
-         *          监听录像
-         *****************************/
-        this.mediaRecorder.onstart = e => {
-          console.log(e, '开始录像。。。')
-        }
-        this.mediaRecorder.onstop = e => {
-          console.log(e, '停止录像。。。', this.videoChunk)
-          if (this.canUpload && !this.noFace && this.getFaceFlag) {
-            // 视频文件处理
-            this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
-            this.videoFiles.push(this.videoFile)
-            // 音频文件处理
-            // 上传文件
-            this.audioCreate()
-            this.postQuesRes()
-          }
-        }
-        this.mediaRecorder.ondataavailable = e => {
-          console.log('视频生成。。。')
-          this.videoChunk = e.data
-        }
+        // this.$refs.videoBox.srcObject = this.stream
+        // this.$refs.videoBox.play()
+        this.$refs.dragVideo.restartVideo()
+        this.canUpload = true
       }
+      setTimeout(() => {
+        this.btnShow = true
+      }, 1500)
     },
     // 音量等级1-10
     voiceLevel (n) {
@@ -396,19 +402,20 @@ export default {
     },
     // 音频/视频先传qiniu云then提交给后端
     postAnswer () {
+      if (!this.btnShow) return
       if (this.error) {
         this.$toast.fail('请检查设备后再完成题目')
         return
       }
       this.waitwait = true // 提交有个过程
-      this.getFaceFlag = true
       this.textFlag = true
       if (this.stopFlag) {
         // 这个按钮不能疯狂点击
         this.stopFlag = false
         // 看交音频还是交音屏&&视频
         if (this.aiEvalCamEnabled) {
-          this.$refs.videoBox.pause()
+          this.$refs.dragVideo.pauseVideo()
+          // this.$refs.videoBox.pause()
           this.canUpload = true
           this.mediaRecorder.stop()
           console.log('提交audio,video')
@@ -541,10 +548,8 @@ export default {
         // 当你不想说话进行测试的时候填入这个吧
         posTableQues(this.postFormat({ video: video.url, audio: audio.url })).then(re => {
         // posTableQues(this.postFormat({ video: video.url, audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
-          if (re.code === 0) {
-            this.init()
-            this.clearSendData()
-          }
+          this.init()
+          this.clearSendData()
         }).catch(err => {
           if (err.code === 546) {
             // 没有说话重新回答 弹出错误提示 再点击确定后做题
@@ -587,7 +592,8 @@ export default {
       // 状态恢复数据清空
       this.audioFiles = []
       this.videoFiles = []
-      this.$refs.videoBox.play()
+      // this.$refs.videoBox.play()
+      this.btnShow = false
       this.waitwait = false
       this.textFlag = false
       this.stopFlag = true
@@ -598,7 +604,11 @@ export default {
         // 如果开启摄像头 要活动 并且做人脸识别检查
         this.mediaRecorder.start()
         this.onceFlag = false
-        setTimeout(() => { this.onPlay() }, 2000)
+        this.$refs.dragVideo.restartVideo()
+        // setTimeout(() => { this.onPlay() }, 2000)
+        setTimeout(() => {
+          this.btnShow = true
+        }, 1500)
       }
     },
     postFormat (urls = {}) {
@@ -630,92 +640,121 @@ export default {
       }
       return point
     },
-    // face的功能
-    async start () {
-      await faceapi.nets.tinyFaceDetector.loadFromUri('/models').then(
-        () => {
-          console.log('ready')
+    /******************************************
+     * 人脸识别
+    *******************************************/
+    // 监听人脸识别-new
+    getFace (e) {
+      const clear = () => {
+        if (this.faceTimer) {
+          clearInterval(this.faceTimer)
+          this.faceTimer = null
         }
-      )
-      // 加载了立刻查脸太快---查脸都是1.5秒
-      setTimeout(() => { this.onPlay() }, 1500)
-    },
-    // 检查脸
-    onPlay () {
-      const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
-      const el = this.$refs.videoBox
-      if (this.onceFlag || this.voicePopout) {
-        return false
       }
-      faceapi.detectSingleFace(el, options).then(
-        detection => {
-          this.onceFlag = true
-          console.log(detection)
-          if (detection) {
-            setTimeout(() => {
-              this.onceFlag = false
-              this.onPlay()
-            }, 2000)
-          } else {
-            // 无脸弹窗  注意其他弹窗
-            if (!this.errPopout && !this.waitwait) {
-              this.noFace = true
-              if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type)) {
-                this.$refs.minibox.clearData()
-                this.miniNextFlag = true
+      // 上传答题环节
+      if (!this.isEnd) {
+        // 答题录像环节
+        if (this.voicePopout) return clear()
+        if (this.errPopout) return clear()
+        if (this.waitwait) return clear()
+        if (!this.textFlag && this.canUpload) {
+          // 未检出人脸1S
+          if (!e) {
+            if (this.faceTimer) return
+            this.unFaceTime = (new Date()).getTime()
+            this.faceTimer = setInterval(() => {
+              const newTime = (new Date()).getTime()
+              if (newTime - this.unFaceTime >= 1000) {
+                // console.log('未检出人脸1S', new Date())
+                this.canUpload = false
+                this.$refs.dragVideo.pauseVideo()
+                // 代码判断有问题，再看看
+                if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type))) {
+                  this.mediaRecorder.stop()
+                  this.recorder.pause()
+                }
+                setTimeout(() => {
+                  this.noFace = true
+                }, 0)
+                clear()
               }
-            }
-            this.$refs.videoBox.pause()
+            }, 1)
+          } else {
+            clear()
           }
         }
-      ).catch(
-        err => {
-          console.log(err, 'err')
-        }
-      )
+      }
     },
-    // 没脸的处理->一些东西重新开始 && 状态恢复
-    getFace () {
+    // 关闭人脸提示-new
+    colseFaceTips () {
+      // console.log('关闭人脸提示', new Date())
       // 去找人脸重新录制===状态===
       this.questionData = JSON.parse(JSON.stringify(this.copyquestionData))
-      this.noFace = false
-      this.$refs.videoBox.play()
-      this.getFaceFlag = false
-      if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type))) {
-        this.mediaRecorder.stop()
-        this.recorder.pause()
-      }
+      this.$refs.dragVideo.restartVideo()
+      // 避免关闭太快，暂停事件为执行完
+      setTimeout(() => {
+        this.noFace = false
+        this.canUpload = true
+      }, 0)
       this.sureToAnswer()
-      // setTimeout(() => { this.onPlay() }, 1500)
     },
-    // face-box关于脱拽
-    dragStart () {
-      this.$refs.point.style.transition = 'none'
-    },
-    dragEnd () {
-      this.$refs.point.style.transition = 'all 0.3s'
-    },
-    dragMove (e) {
-      // 位置移动最小和最大的点
-      if (e.touches.length) {
-        const touch = e.touches[0]
-        this.moveLeft = touch.clientX - this.divWidth + 46
-        const fa = document.getElementsByClassName('test-do-other')[0]
-        if (this.moveLeft <= 0) {
-          this.moveLeft = 0
-        }
-        if (this.moveLeft >= fa.clientWidth - 92) {
-          this.moveLeft = fa.clientWidth - 92
-        }
-        this.moveTop = touch.clientY - this.divHeight + 46
-        if (this.moveTop <= 0) {
-          this.moveTop = 0
-        }
-        if (this.moveTop >= fa.clientHeight - 92) {
-          this.moveTop = fa.clientHeight - 92
-        }
-      }
-    },
+    // face的功能
+    // async start () {
+    //   await faceapi.nets.tinyFaceDetector.loadFromUri('/models').then(
+    //     () => {
+    //       console.log('ready')
+    //     }
+    //   )
+    //   // 加载了立刻查脸太快---查脸都是1.5秒
+    //   setTimeout(() => { this.onPlay() }, 1500)
+    // },
+    // // 检查脸
+    // onPlay () {
+    //   const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
+    //   const el = this.$refs.videoBox
+    //   if (this.onceFlag || this.voicePopout) {
+    //     return false
+    //   }
+    //   faceapi.detectSingleFace(el, options).then(
+    //     detection => {
+    //       // if (el.paused) return
+    //       this.onceFlag = true
+    //       if (detection) {
+    //         setTimeout(() => {
+    //           this.onceFlag = false
+    //           this.onPlay()
+    //         }, 2000)
+    //       } else {
+    //         // 无脸弹窗  注意其他弹窗
+    //         if (!this.errPopout && !this.waitwait) {
+    //           // this.noFace = true
+    //           if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type)) {
+    //             this.$refs.minibox.clearData()
+    //             this.miniNextFlag = true
+    //           }
+    //         }
+    //         this.$refs.videoBox.pause()
+    //       }
+    //     }
+    //   ).catch(
+    //     err => {
+    //       console.log(err, 'err')
+    //     }
+    //   )
+    // },
+    // // 没脸的处理->一些东西重新开始 && 状态恢复
+    // getFace () {
+    //   // 去找人脸重新录制===状态===
+    //   this.questionData = JSON.parse(JSON.stringify(this.copyquestionData))
+    //   this.noFace = false
+    //   this.$refs.videoBox.play()
+    //   if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type))) {
+    //     this.mediaRecorder.stop()
+    //     this.recorder.pause()
+    //   }
+    //   this.sureToAnswer()
+    //   // setTimeout(() => { this.onPlay() }, 1500)
+    // },
     // 弹窗封装
     thisDialog (message) {
       return Dialog.alert({
@@ -805,7 +844,7 @@ export default {
     .under-btn{
       background: #FFFFFF;
       width: calc(100% - 1.07rem);
-      height: 4.9459rem;
+      height: 170px;
       position: fixed;
       bottom: 0.8rem;
       border-radius: 10px;

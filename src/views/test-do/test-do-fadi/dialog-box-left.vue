@@ -205,7 +205,7 @@ export default {
   min-width: 40px;
   max-width: 70%;
   min-height: 20px;
-  padding: 14px 14px 14px 10px;
+  padding: 8px 12px;
   display: inline-flex;
   align-items: center;
   position: relative;
