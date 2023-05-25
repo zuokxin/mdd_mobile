@@ -8,17 +8,18 @@
         </p>
         <p>请将人脸放置在图像框内3秒</p>
         <p class="subtitle test-error" :class="{ 'hidden': faceSuccess || face }">未识别到人脸，请保持人脸在图像框内。</p>
-        <video-box
-          ref="thisVideo"
-          :faceDetection="true"
-          @getFace="getFace"
-          :icon="true"
-          size="172px"
-          style="margin: 0 auto;"
-        >
-        </video-box>
-        <p class="tips" style="margin-top: 0.27rem;">
-          <span v-if="!faceSuccess"><span class="test-success" style="font-size:0.8rem">{{ faceIndex }}</span>s</span>
+        <div class="text-center">
+          <video-box
+            ref="thisVideo"
+            :faceDetection="true"
+            @getFace="getFace"
+            :icon="true"
+            size="110px"
+          >
+          </video-box>
+        </div>
+        <p class="tips first">
+          <span v-if="!faceSuccess"><span class="test-success" style="font-size:0.8rem;margin-right: 7px;">{{ faceIndex }}</span>秒</span>
           <span v-if="faceSuccess" class="test-success">答题时始终保持人脸在图像框内</span>
         </p>
       </div>
@@ -142,7 +143,7 @@ export default {
       } else {
         this.faceSuccess = false
         if (this.faceTimer) {
-          this.faceIndex = 0
+          this.faceIndex = 3
           clearInterval(this.faceTimer)
         }
       }
@@ -352,7 +353,7 @@ export default {
   box-sizing: border-box;
   p {
     margin-top: 0;
-    margin-bottom: 4rem / @w;
+    margin-bottom: 0;
   }
   .test-wrap {
     background-color: #fff;
@@ -375,16 +376,23 @@ export default {
     }
   }
   .subtitle {
-    margin-bottom: 1.5vh;
+    // margin-bottom: 1.5vh;
+    height: 38rem / @w;
+    line-height: 38rem / @w;
     text-align: left;
   }
   .tips {
-    color: #BBB;
+    height: 86rem / @w;
+    margin: 0;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    margin-bottom: 14rem / @w;
+    color: #BBB;
     text-align: center;
+    &.first {
+      align-items: flex-start;
+      line-height: 80rem / @w;
+    }
     b {
       width: 80rem / @w;
       height: 80rem / @w;

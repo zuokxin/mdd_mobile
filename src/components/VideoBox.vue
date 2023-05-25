@@ -1,9 +1,9 @@
 <template>
-  <div class="img-box" :style="{ width: size, height: size }">
+  <div class="img-box" :style="{ height: size }">
     <video
       ref="videoBox"
       src=""
-      style="width: 100%; height:100%; object-fit: cover;"
+      style="height:100%; object-fit: cover;"
       muted
       playsinline="true"
       @loadedmetadata="started"
@@ -142,16 +142,29 @@ export default {
   position: relative;
   // width: 12rem;
   // height: 12rem;
-  border-radius: 50%;
+  display: inline-block;
+  border-radius: 16px;
   overflow: hidden;
+  &::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, .6);
+    z-index: 8;
+  }
   .icon {
     position: absolute;
-    width: 100% !important;
-    height: 100% !important;
+    height: 80px;
+    // width: 100% !important;
+    // height: 100% !important;
     top: 0;
-    left: 0;
+    left: 50%;
     z-index: 9;
-    background: rgba(255, 255, 255, .6);
+    transform: translate(-50%, 20%);
+    // background: rgba(255, 255, 255, .6);
   }
 }
 .err {

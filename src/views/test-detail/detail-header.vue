@@ -105,7 +105,6 @@ export default {
   padding-left: 20rem / @w;
   padding-right: 20rem / @w;
   padding-top: 16rem / @w;
-  padding-bottom: 20rem / @w;
   margin-top: -12rem / @w;
   background: #fff;
   .title {
