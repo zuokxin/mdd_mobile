@@ -45,6 +45,7 @@ class Recorder {
   }
 
   pause (cb) {
+    this.timeEnd = this.getCurTime()
     this.audioctx.suspend().then(() => {
       const status = true
       console.log(this.audioctx.getOutputTimestamp(), '2')
