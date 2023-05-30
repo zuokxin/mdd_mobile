@@ -124,8 +124,9 @@ export default {
         detection => {
           this.face = !!detection
           // this.faceArr = [...this.faceArr, this.face]
+          this.onPlay()
           this.$emit('getFace', this.face)
-          setTimeout(() => this.onPlay())
+          // setTimeout(() => this.onPlay())
         }
       ).catch(
         err => {

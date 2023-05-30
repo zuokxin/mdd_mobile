@@ -206,42 +206,50 @@ export default {
     *******************************************/
     // 监听人脸识别
     getFace (e) {
-      // 上传答题环节
-      if (!this.isEnd) {
-        // 答题录像环节
-        if (!this.loading && this.canUpload) {
-          // 未检出人脸1S
-          if (!e) {
-            if (this.faceTimer) return
-            this.unFaceTime = (new Date()).getTime()
-            this.faceTimer = setInterval(() => {
-              const newTime = (new Date()).getTime()
-              if (newTime - this.unFaceTime >= 1000) {
-                this.openFacrTips()
-                clearInterval(this.faceTimer)
-                this.faceTimer = null
-              }
-            }, 1)
-          } else {
-            if (this.faceTimer) {
-              clearInterval(this.faceTimer)
-              this.faceTimer = null
-            }
-          }
+      const clear = () => {
+        if (this.faceTimer) {
+          clearInterval(this.faceTimer)
+          this.faceTimer = null
         }
+      }
+      // 答题结束不再检测（当前流程待确认此行代码是否可删除）
+      if (this.isEnd) return
+      if (!this.canUpload) {
+        // console.log('不能上传了-有弹窗被开启了')
+        return
+      }
+      if (this.loading) {
+        // console.log('不能检测了-在提交答案')
+        return
+      }
+      // console.log('开始检测')
+      if (!e) {
+        // console.log('检测到')
+        // 未检出人脸1S
+        if (this.faceTimer) return
+        this.unFaceTime = (new Date()).getTime()
+        this.faceTimer = setInterval(() => {
+          const newTime = (new Date()).getTime()
+          if (newTime - this.unFaceTime >= 1000) {
+            // console.log('间隔1s', newTime, this.unFaceTime)
+            this.openFacrTips()
+            clear()
+          }
+        }, 1)
+      } else {
+        // console.log('未检测到')
+        clear()
       }
     },
     // 打开人脸提示
     openFacrTips () {
-      if (this.loading) return
-      // 不上传标志位
-      this.toNext(() => {
-        this.canUpload = false
-      })
+      // if (this.loading) return
+      // 不上传标志位后再暂停录制
+      this.canUpload = false
+      this.$refs.dragVideo.pauseVideo()
+      this.mediaRecorder.stop()
+      this.recorder.pause()
       this.faceShow = true
-      // setTimeout(() => {
-      //   this.faceShow = true
-      // }, 0)
     },
     // 关闭人脸提示
     colseFaceTips () {
