@@ -31,7 +31,7 @@
     <!-- 去绑定的弹窗 -->
     <popout v-if="popoutFlag">
       <template slot="btn">
-        <van-button class="sure-btn" type="primary" @click="toBind">确定</van-button>
+        <van-button class="sure-btn" type="primary" :disabled="toBindDisabled" @click="toBind">确定</van-button>
       </template>
     </popout>
     <!-- 联系客服的弹窗 -->
@@ -85,6 +85,7 @@ export default {
       userSelect: [], // 详细的选择表
       popoutFlag: false,
       contactServiceFlag: false,
+      toBindDisabled: false, // 绑定按钮的禁用效果
       errCode: 0,
       status: 0,
       continue: false,
@@ -216,12 +217,12 @@ export default {
     },
     // 确定&绑定下只会成功-不会有问题
     toBind () {
+      this.toBindDisabled = true
       createAndBind({ batchId: this.batchId, orgMarking: this.organ }).then(res => {
-        if (res.code === 0) {
-          this.popoutFlag = false
-          this.sessionId = res.data
-          this.getNeedTests()
-        }
+        this.popoutFlag = false
+        this.toBindDisabled = false
+        this.sessionId = res.data
+        this.getNeedTests()
       })
     },
     onClickButton () {
