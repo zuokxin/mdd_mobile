@@ -606,10 +606,10 @@ export default {
         this.onceFlag = false
         this.$refs.dragVideo.restartVideo()
         // setTimeout(() => { this.onPlay() }, 2000)
-        setTimeout(() => {
-          this.btnShow = true
-        }, 1500)
       }
+      setTimeout(() => {
+        this.btnShow = true
+      }, 1500)
     },
     postFormat (urls = {}) {
       const data = {
@@ -896,7 +896,7 @@ export default {
   }
   // 不正常的
   .question-box-update{
-    height: calc(100% - 1.6757rem);
+    height: calc(100vh - 1.6757rem);
     position: relative;
     padding-bottom: 2.7027rem;
     box-sizing: border-box;
