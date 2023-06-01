@@ -84,7 +84,14 @@ export default {
         this.videoEle.setAttribute('webkit-playsinline', 'webkit-playsinline')
         this.videoEle.setAttribute('playsinline', 'playsinline')
         document.getElementById('tableFadi').appendChild(this.videoEle)
-        this.$emit('openStartPrompt')
+        // 数据加载后再显示弹窗
+        const loadedmetadata = () => {
+          // ios需要先load()，否则拿不到第一帧
+          if (this.ios) this.videoEle.load()
+          this.$emit('openStartPrompt')
+          this.videoEle.removeEventListener('loadedmetadata', loadedmetadata)
+        }
+        this.videoEle.addEventListener('loadedmetadata', loadedmetadata)
       } else {
         // 视频元素已存在
         this.videoEle.autoplay = true
