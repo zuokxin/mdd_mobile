@@ -82,7 +82,7 @@ export default {
     // 媒体调用参数
     userMediaOptions () {
       if (this.aiEvalCamEnabled) {
-        return { audio: true, video: { facingMode: 'user' } }
+        return { audio: true, video: { facingMode: 'user', width: 1280, height: 720 } }
       } else {
         return { audio: true }
       }
@@ -133,6 +133,7 @@ export default {
         this.faceTimer = setInterval(() => {
           if (this.faceIndex === 1) {
             this.faceSuccess = true
+            console.log(this.$refs.thisVideo)
             this.$refs.thisVideo.pause()
             clearInterval(this.faceTimer)
             this.faceIndex = 1
