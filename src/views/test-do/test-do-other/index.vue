@@ -262,7 +262,7 @@ export default {
       const mediaObj = { audio: true }
       // 录音是必须的 看情况打开摄像头
       if (this.aiEvalCamEnabled) {
-        mediaObj.video = { facingMode: 'user', width: 1280, height: 720 }
+        mediaObj.video = { facingMode: 'user', height: 1280, width: 720 }
       }
       navigator.mediaDevices.getUserMedia(mediaObj)
         .then(stream => {
