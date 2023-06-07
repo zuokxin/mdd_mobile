@@ -9,7 +9,7 @@
         <div class="text-center">
           <video-box
             ref="thisVideo"
-            size="110px"
+            size="160px"
             :icon="true"
           >
           </video-box>
@@ -20,8 +20,7 @@
       </p>
       <p>进行环境语音检测</p>
       <p class="tips">
-        <b :style="{ color: '#0CB000' }">{{ db > 0 ? db : 0 }}</b>
-        <span style="margin-left: 10px">分贝</span>
+        <b :style="{ color: '#34B7B9' }">{{ db > 0 ? db : 0 }}</b>
       </p>
       <p class="test-success message">{{ curMessage }}</p>
     </div>
@@ -253,11 +252,9 @@ export default {
   }
   .tips {
     display: flex;
-    align-items: flex-end;
     justify-content: center;
-    color: #BBB;
-    text-align: center;
     b {
+      position: relative;
       width: 80px;
       height: 80px;
       box-shadow: 0px 4px 8px 1px rgba(0, 0, 0, 0.16);
@@ -265,6 +262,16 @@ export default {
       line-height: 80px;
       font-size: 36px;
       border-radius: 50%;
+      text-align: center;
+      &::after {
+        content: "分贝";
+        position: absolute;
+        right: -1rem;
+        bottom: -40%;
+        font-size: 14px;
+        font-weight: normal;
+        color: #BBB;
+      }
     }
   }
   .message {

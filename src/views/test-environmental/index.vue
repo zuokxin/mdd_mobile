@@ -14,7 +14,7 @@
             :faceDetection="true"
             @getFace="getFace"
             :icon="true"
-            size="110px"
+            size="160px"
           >
           </video-box>
         </div>
@@ -31,7 +31,6 @@
       <p class="subtitle test-error" :class="{ 'hidden': volumeTips }">当前噪音过大</p>
       <p class="tips">
         <b :style="{ color: volumeColor }">{{ db }}</b>
-        <span>分贝</span>
       </p>
     </div>
     <van-button round type="primary" :disabled="!(!volumeWarn && faceSuccess)" @click="start" style="display: block; width: 80%; margin: 20px auto 0;">开始答题</van-button>
@@ -88,7 +87,7 @@ export default {
       }
     },
     volumeColor () {
-      return this.db > 40 ? '#FFB183' : '#0CB000'
+      return this.db > 40 ? '#FFB183' : '#34B7B9'
     },
     volumeTips () {
       return this.db <= 40
@@ -395,6 +394,7 @@ export default {
       line-height: 80rem / @w;
     }
     b {
+      position: relative;
       width: 80rem / @w;
       height: 80rem / @w;
       box-shadow: 0px 4px 8px 1px rgba(0, 0, 0, 0.16);
@@ -404,6 +404,15 @@ export default {
       border-radius: 50%;
       margin-right: 8px;
       text-align: center;
+      &::after {
+        content: "分贝";
+        position: absolute;
+        right: -1rem;
+        bottom: -40%;
+        font-size: 14px;
+        font-weight: normal;
+        color: #BBB;
+      }
     }
   }
 }
