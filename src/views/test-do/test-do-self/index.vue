@@ -498,7 +498,6 @@ export default {
         padding: 0;
         margin-bottom: .426667rem;
         border-radius: 0.426667rem;
-        border: 1px solid #F6F6F6;
         overflow: hidden;
         .van-cell{
           padding: 0;
