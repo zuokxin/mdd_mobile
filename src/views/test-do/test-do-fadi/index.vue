@@ -850,21 +850,6 @@ export default {
         }
       }
     }
-    // .start-prompt {
-    //   margin-bottom: 3vh;
-    //   font-size: 28px;
-    //   color: #666;
-    // }
-    // .icon-wrong {
-    //   // position: fixed;
-    //   // left: 1vh;
-    //   // bottom: 1vh;
-    //   font-size: 1.65rem;
-    //   cursor: pointer;
-    //   &.el-icon-star-on {
-    //     font-size: 2.15rem;
-    //   }
-    // }
   }
 .main-in::-webkit-scrollbar {
   /*滚动条整体样式*/
@@ -936,6 +921,4 @@ export default {
     color: #666666;
   }
 }
-</style>
-<style lang="less">
 </style>

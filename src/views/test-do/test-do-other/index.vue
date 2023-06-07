@@ -621,7 +621,7 @@ export default {
         ...urls
       }
       // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
-      if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type)) {
+      if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo?.type)) {
         data.miniQInfo = this.miniData
         // 非必传
         delete data.audio
@@ -669,7 +669,7 @@ export default {
                 this.canUpload = false
                 this.$refs.dragVideo.pauseVideo()
                 // 代码判断有问题，再看看
-                if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type))) {
+                if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo?.type))) {
                   this.mediaRecorder.stop()
                   this.recorder.pause()
                 }
@@ -941,19 +941,19 @@ export default {
       }
     }
   }
-  .face-box{
-    position: absolute;
-    z-index: 10;
-    border-radius: 10px;
-    background-color: rgba(255,255,255,.2);
-    overflow: hidden;
-    filter: blur(2px);
-    box-shadow: 0 0 2px #333;
-    video{
-      mix-blend-mode: screen;
-      border-radius: 10px;
-    }
-  }
+  // .face-box{
+  //   position: absolute;
+  //   z-index: 10;
+  //   border-radius: 10px;
+  //   background-color: rgba(255,255,255,.2);
+  //   overflow: hidden;
+  //   filter: blur(2px);
+  //   box-shadow: 0 0 2px #333;
+  //   video{
+  //     mix-blend-mode: screen;
+  //     border-radius: 10px;
+  //   }
+  // }
   // lots of errors (popout)
   .errpopout{
     /deep/.popout_box{
