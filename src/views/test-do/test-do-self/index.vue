@@ -493,7 +493,6 @@ export default {
       .isCommentIsNecessary{
         width: 7.066667rem;
         height: 1.6rem;
-        background-color: pink;
         margin-left: auto;
         margin-right: auto;
         padding: 0;

@@ -17,6 +17,9 @@ export default {
 </script>
 
 <style lang="less">
+*:focus-visible {
+  outline: none;
+}
 #app {
   margin: 0 auto;
   max-width: 750px;
