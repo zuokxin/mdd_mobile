@@ -459,6 +459,8 @@ export default {
       this.miniNextFlag = true
     },
     sendMini () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       // 这儿用不着视频 音频 丢弃
       const data = {
         sessionId: this.sessionId,
@@ -484,6 +486,8 @@ export default {
     },
     // 提交回答-纯音频
     postQueResAudio () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const curData = {
         token: this.questionData.qiniuToken,
         customVars: {
@@ -495,6 +499,8 @@ export default {
       // 提交回答
       uploader({ file: this.audioFile, ...curData }).then(audio => {
         console.log(audio)
+        // 加一层返回保护
+        if (!this.sessionId || !this.tableCode) return
         // 当你不想说话进行测试的时候填入这个吧
         // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
         // posTableQues(this.postFormat({ video: '', audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
@@ -546,6 +552,8 @@ export default {
         // const [video] = res
         const [video, audio] = res
         // 当你不想说话进行测试的时候填入这个吧
+        // 加一层返回保护
+        if (!this.sessionId || !this.tableCode) return
         posTableQues(this.postFormat({ video: video.url, audio: audio.url })).then(re => {
         // posTableQues(this.postFormat({ video: video.url, audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
           this.init()

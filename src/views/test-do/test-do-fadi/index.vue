@@ -159,7 +159,7 @@ export default {
       videoPlayer: null, // 摄像头对象
       faceTimer: null, // 人脸识别计时器
       canUpload: true,
-      aiEvalCamEnabled: true,
+      aiEvalCamEnabled: false,
       btnShow: false
     }
   },
@@ -338,16 +338,17 @@ export default {
       this.videoChunk = null
       this.mediaRecorder.onstop = e => {
         console.log(e, '停止录像。。。')
-        // 视频文件处理
-        this.videoCreate()
-        // 音频文件处理
-        this.audioCreate()
-        bufferArray = []
         // 上传文件
         // 可上传：答题环节，可上传标志位（人脸时标志位不见）
         if (!this.isEnd && this.canUpload) {
+          // 视频文件处理
+          this.videoCreate()
+          // 音频文件处理
+          this.audioCreate()
+          bufferArray = []
           this.postQueRes()
         } else {
+          bufferArray = []
           this.recorder.audioBuffers = []
         }
       }
@@ -554,6 +555,8 @@ export default {
     },
     // 无须回答
     async notAnswer () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const data = {
         sessionId: this.sessionId,
         tableCode: this.tableCode,
@@ -566,6 +569,8 @@ export default {
     // 提交回答-纯音频
     async postQueResAudio () {
       this.loading = true
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const curData = {
         token: this.token,
         customVars: {
@@ -577,6 +582,8 @@ export default {
       try {
         const audio = await uploader({ file: this.audioFile, ...curData })
         try {
+          // 加一层返回保护
+          if (!this.sessionId || !this.tableCode) return
           // 提交回答
           const queRes = await posTableQues({
             sessionId: this.sessionId,
@@ -627,6 +634,8 @@ export default {
     // 提交回答-音频视频
     postQueRes () {
       this.loading = true
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const curData = {
         token: this.token,
         customVars: {
@@ -644,6 +653,8 @@ export default {
           const [video, audio] = res
           this.videoUrls[this.videoIndex] = video.url
           this.audioUrls[this.videoIndex] = audio.url
+          // 加一层返回保护
+          if (!this.sessionId || !this.tableCode) return
           // 提交回答
           const data = {
             sessionId: this.sessionId,
