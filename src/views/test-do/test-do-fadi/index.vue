@@ -285,7 +285,7 @@ export default {
         audio: true
       }
       if (this.aiEvalCamEnabled) {
-        params.video = { facingMode: 'user', height: 1280, width: 720 }
+        params.video = { facingMode: 'user', width: 1280, height: 720 }
       }
       // 使用前置摄像头
       navigator.mediaDevices.getUserMedia(params)

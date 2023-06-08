@@ -81,7 +81,7 @@ export default {
     // 媒体调用参数
     userMediaOptions () {
       if (this.aiEvalCamEnabled) {
-        return { audio: true, video: { facingMode: 'user', height: 1280, width: 720 } }
+        return { audio: true, video: { facingMode: 'user', width: 1280, height: 720 } }
       } else {
         return { audio: true }
       }
