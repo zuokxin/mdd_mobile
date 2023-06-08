@@ -220,6 +220,8 @@ export default {
     },
     // 获取题目
     async init () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const data = {
         sessionId: this.sessionId,
         tableCode: this.tableCode
@@ -460,7 +462,7 @@ export default {
     },
     sendMini () {
       // 加一层返回保护
-      if (!this.sessionId || !this.tableCode) return
+      if (!this.sessionId || !this.tableCode || !this.miniQInfo) return
       // 这儿用不着视频 音频 丢弃
       const data = {
         sessionId: this.sessionId,

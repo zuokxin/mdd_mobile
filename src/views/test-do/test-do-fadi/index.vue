@@ -380,6 +380,8 @@ export default {
     },
     // 获取题目
     getCurQue () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       this.queLoading = true
       getTableQues({
         sessionId: this.sessionId,
