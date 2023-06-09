@@ -335,7 +335,7 @@ export default {
         }
         this.mediaRecorder.onstop = e => {
           console.log(e, '停止录像。。。', this.videoChunk)
-          if (this.canUpload && !this.noFace) {
+          if (this.canUpload && !this.noFace && this.textFlag) {
             // 视频文件处理
             this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
             this.videoFiles.push(this.videoFile)
@@ -462,7 +462,7 @@ export default {
     },
     sendMini () {
       // 加一层返回保护
-      if (!this.sessionId || !this.tableCode || !this.miniQInfo) return
+      if (!this.sessionId || !this.tableCode || !this.miniData) return
       // 这儿用不着视频 音频 丢弃
       const data = {
         sessionId: this.sessionId,
@@ -678,11 +678,8 @@ export default {
                 // console.log('未检出人脸1S', new Date())
                 this.canUpload = false
                 this.$refs.dragVideo.pauseVideo()
-                // 代码判断有问题，再看看
-                if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo?.type))) {
-                  this.mediaRecorder.stop()
-                  this.recorder.pause()
-                }
+                this.mediaRecorder.stop()
+                this.recorder.pause()
                 setTimeout(() => {
                   this.noFace = true
                 }, 0)
