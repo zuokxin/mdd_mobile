@@ -220,6 +220,8 @@ export default {
     },
     // 获取题目
     async init () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const data = {
         sessionId: this.sessionId,
         tableCode: this.tableCode
@@ -262,7 +264,7 @@ export default {
       const mediaObj = { audio: true }
       // 录音是必须的 看情况打开摄像头
       if (this.aiEvalCamEnabled) {
-        mediaObj.video = { facingMode: 'user' }
+        mediaObj.video = { facingMode: 'user', width: 1280, height: 720 }
       }
       navigator.mediaDevices.getUserMedia(mediaObj)
         .then(stream => {
@@ -333,7 +335,7 @@ export default {
         }
         this.mediaRecorder.onstop = e => {
           console.log(e, '停止录像。。。', this.videoChunk)
-          if (this.canUpload && !this.noFace) {
+          if (this.canUpload && !this.noFace && this.textFlag) {
             // 视频文件处理
             this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
             this.videoFiles.push(this.videoFile)
@@ -459,6 +461,8 @@ export default {
       this.miniNextFlag = true
     },
     sendMini () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode || !this.miniData) return
       // 这儿用不着视频 音频 丢弃
       const data = {
         sessionId: this.sessionId,
@@ -484,6 +488,8 @@ export default {
     },
     // 提交回答-纯音频
     postQueResAudio () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const curData = {
         token: this.questionData.qiniuToken,
         customVars: {
@@ -495,6 +501,8 @@ export default {
       // 提交回答
       uploader({ file: this.audioFile, ...curData }).then(audio => {
         console.log(audio)
+        // 加一层返回保护
+        if (!this.sessionId || !this.tableCode) return
         // 当你不想说话进行测试的时候填入这个吧
         // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
         // posTableQues(this.postFormat({ video: '', audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
@@ -546,6 +554,8 @@ export default {
         // const [video] = res
         const [video, audio] = res
         // 当你不想说话进行测试的时候填入这个吧
+        // 加一层返回保护
+        if (!this.sessionId || !this.tableCode) return
         posTableQues(this.postFormat({ video: video.url, audio: audio.url })).then(re => {
         // posTableQues(this.postFormat({ video: video.url, audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
           this.init()
@@ -606,10 +616,10 @@ export default {
         this.onceFlag = false
         this.$refs.dragVideo.restartVideo()
         // setTimeout(() => { this.onPlay() }, 2000)
-        setTimeout(() => {
-          this.btnShow = true
-        }, 1500)
       }
+      setTimeout(() => {
+        this.btnShow = true
+      }, 1500)
     },
     postFormat (urls = {}) {
       const data = {
@@ -621,7 +631,7 @@ export default {
         ...urls
       }
       // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
-      if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type)) {
+      if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo?.type)) {
         data.miniQInfo = this.miniData
         // 非必传
         delete data.audio
@@ -668,11 +678,8 @@ export default {
                 // console.log('未检出人脸1S', new Date())
                 this.canUpload = false
                 this.$refs.dragVideo.pauseVideo()
-                // 代码判断有问题，再看看
-                if (this.aiEvalCamEnabled && !(this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo.type))) {
-                  this.mediaRecorder.stop()
-                  this.recorder.pause()
-                }
+                this.mediaRecorder.stop()
+                this.recorder.pause()
                 setTimeout(() => {
                   this.noFace = true
                 }, 0)
@@ -896,7 +903,7 @@ export default {
   }
   // 不正常的
   .question-box-update{
-    height: calc(100% - 1.6757rem);
+    height: calc(100vh - 1.6757rem);
     position: relative;
     padding-bottom: 2.7027rem;
     box-sizing: border-box;
@@ -941,19 +948,19 @@ export default {
       }
     }
   }
-  .face-box{
-    position: absolute;
-    z-index: 10;
-    border-radius: 10px;
-    background-color: rgba(255,255,255,.2);
-    overflow: hidden;
-    filter: blur(2px);
-    box-shadow: 0 0 2px #333;
-    video{
-      mix-blend-mode: screen;
-      border-radius: 10px;
-    }
-  }
+  // .face-box{
+  //   position: absolute;
+  //   z-index: 10;
+  //   border-radius: 10px;
+  //   background-color: rgba(255,255,255,.2);
+  //   overflow: hidden;
+  //   filter: blur(2px);
+  //   box-shadow: 0 0 2px #333;
+  //   video{
+  //     mix-blend-mode: screen;
+  //     border-radius: 10px;
+  //   }
+  // }
   // lots of errors (popout)
   .errpopout{
     /deep/.popout_box{

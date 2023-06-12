@@ -159,7 +159,7 @@ export default {
       videoPlayer: null, // 摄像头对象
       faceTimer: null, // 人脸识别计时器
       canUpload: true,
-      aiEvalCamEnabled: true,
+      aiEvalCamEnabled: false,
       btnShow: false
     }
   },
@@ -206,42 +206,50 @@ export default {
     *******************************************/
     // 监听人脸识别
     getFace (e) {
-      // 上传答题环节
-      if (!this.isEnd) {
-        // 答题录像环节
-        if (!this.loading && this.canUpload) {
-          // 未检出人脸1S
-          if (!e) {
-            if (this.faceTimer) return
-            this.unFaceTime = (new Date()).getTime()
-            this.faceTimer = setInterval(() => {
-              const newTime = (new Date()).getTime()
-              if (newTime - this.unFaceTime >= 1000) {
-                this.openFacrTips()
-                clearInterval(this.faceTimer)
-                this.faceTimer = null
-              }
-            }, 1)
-          } else {
-            if (this.faceTimer) {
-              clearInterval(this.faceTimer)
-              this.faceTimer = null
-            }
-          }
+      const clear = () => {
+        if (this.faceTimer) {
+          clearInterval(this.faceTimer)
+          this.faceTimer = null
         }
+      }
+      // 答题结束不再检测（当前流程待确认此行代码是否可删除）
+      if (this.isEnd) return
+      if (!this.canUpload) {
+        // console.log('不能上传了-有弹窗被开启了')
+        return
+      }
+      if (this.loading) {
+        // console.log('不能检测了-在提交答案')
+        return
+      }
+      // console.log('开始检测')
+      if (!e) {
+        // console.log('检测到')
+        // 未检出人脸1S
+        if (this.faceTimer) return
+        this.unFaceTime = (new Date()).getTime()
+        this.faceTimer = setInterval(() => {
+          const newTime = (new Date()).getTime()
+          if (newTime - this.unFaceTime >= 1000) {
+            // console.log('间隔1s', newTime, this.unFaceTime)
+            this.openFacrTips()
+            clear()
+          }
+        }, 1)
+      } else {
+        // console.log('未检测到')
+        clear()
       }
     },
     // 打开人脸提示
     openFacrTips () {
-      if (this.loading) return
-      // 不上传标志位
-      this.toNext(() => {
-        this.canUpload = false
-      })
+      // if (this.loading) return
+      // 不上传标志位后再暂停录制
+      this.canUpload = false
+      this.$refs.dragVideo.pauseVideo()
+      this.mediaRecorder.stop()
+      this.recorder.pause()
       this.faceShow = true
-      // setTimeout(() => {
-      //   this.faceShow = true
-      // }, 0)
     },
     // 关闭人脸提示
     colseFaceTips () {
@@ -330,16 +338,17 @@ export default {
       this.videoChunk = null
       this.mediaRecorder.onstop = e => {
         console.log(e, '停止录像。。。')
-        // 视频文件处理
-        this.videoCreate()
-        // 音频文件处理
-        this.audioCreate()
-        bufferArray = []
         // 上传文件
         // 可上传：答题环节，可上传标志位（人脸时标志位不见）
         if (!this.isEnd && this.canUpload) {
+          // 视频文件处理
+          this.videoCreate()
+          // 音频文件处理
+          this.audioCreate()
+          bufferArray = []
           this.postQueRes()
         } else {
+          bufferArray = []
           this.recorder.audioBuffers = []
         }
       }
@@ -371,6 +380,8 @@ export default {
     },
     // 获取题目
     getCurQue () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       this.queLoading = true
       getTableQues({
         sessionId: this.sessionId,
@@ -546,6 +557,8 @@ export default {
     },
     // 无须回答
     async notAnswer () {
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const data = {
         sessionId: this.sessionId,
         tableCode: this.tableCode,
@@ -558,6 +571,8 @@ export default {
     // 提交回答-纯音频
     async postQueResAudio () {
       this.loading = true
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const curData = {
         token: this.token,
         customVars: {
@@ -569,6 +584,8 @@ export default {
       try {
         const audio = await uploader({ file: this.audioFile, ...curData })
         try {
+          // 加一层返回保护
+          if (!this.sessionId || !this.tableCode) return
           // 提交回答
           const queRes = await posTableQues({
             sessionId: this.sessionId,
@@ -619,6 +636,8 @@ export default {
     // 提交回答-音频视频
     postQueRes () {
       this.loading = true
+      // 加一层返回保护
+      if (!this.sessionId || !this.tableCode) return
       const curData = {
         token: this.token,
         customVars: {
@@ -636,6 +655,8 @@ export default {
           const [video, audio] = res
           this.videoUrls[this.videoIndex] = video.url
           this.audioUrls[this.videoIndex] = audio.url
+          // 加一层返回保护
+          if (!this.sessionId || !this.tableCode) return
           // 提交回答
           const data = {
             sessionId: this.sessionId,
@@ -842,21 +863,6 @@ export default {
         }
       }
     }
-    // .start-prompt {
-    //   margin-bottom: 3vh;
-    //   font-size: 28px;
-    //   color: #666;
-    // }
-    // .icon-wrong {
-    //   // position: fixed;
-    //   // left: 1vh;
-    //   // bottom: 1vh;
-    //   font-size: 1.65rem;
-    //   cursor: pointer;
-    //   &.el-icon-star-on {
-    //     font-size: 2.15rem;
-    //   }
-    // }
   }
 .main-in::-webkit-scrollbar {
   /*滚动条整体样式*/
@@ -928,6 +934,4 @@ export default {
     color: #666666;
   }
 }
-</style>
-<style lang="less">
 </style>

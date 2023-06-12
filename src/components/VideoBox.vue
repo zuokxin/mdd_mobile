@@ -1,5 +1,8 @@
 <template>
-  <div class="img-box" :style="{ height: size }">
+  <div
+    class="img-box"
+    :style="{ maxWidth: maxWidth, height: size}"
+  >
     <video
       ref="videoBox"
       src=""
@@ -27,7 +30,7 @@ export default {
     },
     size: {
       type: String,
-      default: '12rem'
+      default: '150px'
     },
     faceDetection: {
       type: Boolean,
@@ -49,8 +52,28 @@ export default {
       timer: null
     }
   },
+  computed: {
+    maxWidth () {
+      const computeWidth = (param) => {
+        const numStr = this.size.split(param)[0]
+        const newNum = +numStr / 9 * 6
+        return newNum.toFixed(2) + param
+      }
+      let res = '100px'
+      if (this.size.includes('rem')) {
+        res = computeWidth('rem')
+      } else if (this.size.includes('px')) {
+        res = computeWidth('px')
+      }
+      return res
+    }
+  },
   mounted: async function () {
     this.videoBox = this.$refs.videoBox
+    // this.$nextTick(() => {
+    //   console.log(this.$refs.videoBox.parentElement.clientWidth)
+    //   console.log(this.$refs.videoBox.clientWidth)
+    // })
     // this.$nextTick(() => {
     //   const c = document.getElementById('videoCanvas')
     //   this.ctx = c.getContext('2d')
@@ -66,13 +89,6 @@ export default {
     //     }, 40)
     //   })
     // })
-    // if (this.faceDetection) {
-    //   faceapi.nets.tinyFaceDetector.loadFromUri('/models').then(
-    //     () => {
-    //       console.log('ready')
-    //     }
-    //   )
-    // }
   },
   // watch: {
   //   stream (n, o) {
@@ -92,6 +108,8 @@ export default {
       }, 40)
     },
     play () {
+      // console.log(this.$refs.videoBox.parentElement.clientWidth)
+      // console.log(this.$refs.videoBox.clientWidth)
       this.videoBox.play()
       // this.onPlay()
     },
@@ -124,8 +142,9 @@ export default {
         detection => {
           this.face = !!detection
           // this.faceArr = [...this.faceArr, this.face]
+          this.onPlay()
           this.$emit('getFace', this.face)
-          setTimeout(() => this.onPlay())
+          // setTimeout(() => this.onPlay())
         }
       ).catch(
         err => {
@@ -145,6 +164,7 @@ export default {
   display: inline-block;
   border-radius: 16px;
   overflow: hidden;
+  z-index: 1;
   &::before {
     content: "";
     width: 100%;
@@ -157,14 +177,18 @@ export default {
   }
   .icon {
     position: absolute;
-    height: 80px;
-    // width: 100% !important;
+    height: 60%;
+    // width: 100%;
     // height: 100% !important;
-    top: 0;
+    // top: 0;
+    // left: 0;
+    // right: 0;
+    // bottom: 0;
+    // margin: auto;
+    top: 50%;
     left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 9;
-    transform: translate(-50%, 20%);
-    // background: rgba(255, 255, 255, .6);
   }
 }
 .err {

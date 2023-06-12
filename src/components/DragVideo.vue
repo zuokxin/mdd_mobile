@@ -6,7 +6,7 @@
       :faceDetection="true"
       @getFace="getFace"
       :icon="true"
-      size="120px"
+      size="150px"
     >
     </video-box>
   </div>
@@ -27,8 +27,8 @@ export default {
       // 摄像头信息
       moveLeft: 0, // 左边界&drop
       moveTop: 0, // 上边界&drop
-      divWidth: 90,
-      divHeight: 120,
+      divWidth: 100,
+      divHeight: 150,
       face: null,
       videoObject: null
     }

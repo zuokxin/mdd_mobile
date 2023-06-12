@@ -192,7 +192,7 @@ export default {
     initUserMedia () {
       // 使用前置摄像头
       const mediaObj = { audio: true }
-      if (this.aiEvalCamEnabled !== -1) mediaObj.video = { facingMode: 'user' }
+      if (this.aiEvalCamEnabled !== -1) mediaObj.video = { facingMode: 'user', width: 1280, height: 720 }
       navigator.mediaDevices.getUserMedia(mediaObj)
         .then(stream => this.startUserMedia(stream))
         .catch(err => {

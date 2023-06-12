@@ -73,6 +73,7 @@ export default {
   name: 'do-self',
   data () {
     return {
+      loading: true, // 题目正在提交
       sessionId: '',
       allData: {},
       tableCode: '',
@@ -136,6 +137,7 @@ export default {
         delete data.questionId
       }
       const res = await getTableQues(data)
+      this.loading = false
       if (res.code === 0) {
         if (this.tableCode === 'psqi') {
           this.psqiFinish = false
@@ -321,6 +323,7 @@ export default {
         tableCode: this.tableCode
       }
       const res = await getTableQues(data)
+      this.loading = false
       if (res.code === 0) {
         this.end = false
         this.allData = res.data
@@ -338,6 +341,12 @@ export default {
     // 下一题
     async next () {
       // console.log(this.options)
+      // 正在提交不可提交
+      if (this.loading) {
+        console.log('正在提交不可提交')
+        return
+      }
+      this.loading = true
       const data = {
         id: this.allData.id,
         sessionId: this.sessionId,
@@ -360,6 +369,8 @@ export default {
         // console.log(res)
         if ((this.allData.id + 1) !== this.allData.questionTotal) {
           this.getQues(this.allData.id + 1)
+        } else {
+          this.loading = false
         }
       } else {
         this.$toast(res.message)
@@ -493,13 +504,11 @@ export default {
       .isCommentIsNecessary{
         width: 7.066667rem;
         height: 1.6rem;
-        background-color: pink;
         margin-left: auto;
         margin-right: auto;
         padding: 0;
         margin-bottom: .426667rem;
         border-radius: 0.426667rem;
-        border: 1px solid #F6F6F6;
         overflow: hidden;
         .van-cell{
           padding: 0;

@@ -84,7 +84,35 @@ export default {
         this.videoEle.setAttribute('webkit-playsinline', 'webkit-playsinline')
         this.videoEle.setAttribute('playsinline', 'playsinline')
         document.getElementById('tableFadi').appendChild(this.videoEle)
+        // ios需要先load()，否则拿不到第一帧
+        // if (this.ios) this.videoEle.load()
         this.$emit('openStartPrompt')
+        // 数据加载后再显示弹窗
+        // let isLoad = false
+        // const loadedmetadata = () => {
+        //   isLoad = true
+        //   // ios需要先load()，否则拿不到第一帧
+        //   if (this.ios) this.videoEle.load()
+        //   this.$emit('openStartPrompt')
+        //   this.videoEle.removeEventListener('loadedmetadata', loadedmetadata)
+        // }
+        // this.videoEle.addEventListener('loadedmetadata', loadedmetadata)
+        // // 部分ios微信端监听不到loadedmetadata事件
+        // // 手动执行loadedmetadata事件后还是存在画面无法绘制的问题
+        // let times = 1
+        // const waitLoad = setInterval(() => {
+        //   // 是否监听到加载
+        //   if (isLoad) {
+        //     clearInterval(waitLoad)
+        //   } else {
+        //     if (times === 3) {
+        //       clearInterval(waitLoad)
+        //       // 手动触发加载
+        //       loadedmetadata()
+        //     }
+        //     times++
+        //   }
+        // }, 500)
       } else {
         // 视频元素已存在
         this.videoEle.autoplay = true
