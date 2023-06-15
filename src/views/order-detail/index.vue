@@ -73,6 +73,7 @@ export default {
   },
   data () {
     return {
+      openid: '', // openid只记录在当前页面
       tableName: '',
       discountAmount: 0, // 折扣价格
       showPay: false, // 付款弹窗
@@ -139,10 +140,22 @@ export default {
     this.$nextTick(async () => {
       // 微信授权
       this.code = params.get('code') || ''
-      if (!localStorage.openid && this.code) {
+      // 授权第一次刷新页面
+      if (this.code) {
+        // 获取openid,存储将地址替换（防止刷新页面再次使用旧code请求）
         await postUserCode(this.code).then(res => {
-          localStorage.openid = res.data.openid
+          // 缓存openid
+          sessionStorage.openid = res.data.openid
+          const newPath = window.location.href.replace(window.location.search, '')
+          location.replace(newPath)
         })
+      } else {
+        // 如果是授权第二次刷新页面，获取到openid记录在页面上
+        if (sessionStorage.openid) {
+          this.openid = sessionStorage.openid
+          this.showPay = true
+          sessionStorage.removeItem('openid')
+        }
       }
       // 支付页面回调
       const redirect = this.$route.query.redirect
@@ -241,7 +254,9 @@ export default {
       if (this.errText) {
         this.errPopout = true
       } else {
-        if (browser().weixin && !localStorage.openid) {
+        // if (browser().weixin && !localStorage.openid) {
+        // 每次支付都授权
+        if (browser().weixin && !this.openid) {
           const appid = 'wxb073a9d513bbcd43'
           const redirect = encodeURIComponent(window.location.href)
           window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${redirect}&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect`
