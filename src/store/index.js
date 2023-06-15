@@ -28,11 +28,9 @@ export default new Vuex.Store({
         getUserAuth().then(
           ({ data = {} }) => {
             const {
-              phone,
-              openid
+              phone
             } = data
             localStorage.phone = phone
-            localStorage.openid = openid
             resolve(data)
           }
         ).catch(
@@ -41,7 +39,6 @@ export default new Vuex.Store({
             // 登录状态已过期状态下清空
             if (err.code === 605) {
               localStorage.removeItem('phone')
-              localStorage.removeItem('openid')
             }
           }
         )
