@@ -85,7 +85,7 @@ export default {
         this.videoEle.setAttribute('playsinline', 'playsinline')
         document.getElementById('tableFadi').appendChild(this.videoEle)
         // ios需要先load()，否则拿不到第一帧
-        // if (this.ios) this.videoEle.load()
+        if (this.ios) this.videoEle.load()
         this.$emit('openStartPrompt')
         // 数据加载后再显示弹窗
         // let isLoad = false
@@ -191,7 +191,7 @@ export default {
       }
       // 初始记录第一帧图片
       this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
-      this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
+      // this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
       // 间隔40毫秒绘制一次
       const i = setInterval(() => {
         this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
@@ -204,8 +204,10 @@ export default {
       // 暂停并将视频归位
       // this.videoEle.currentTime = 0
       // 画布重绘第一帧
-      this.ctx.putImageData(this.imageData, 0, 0)
+      // this.ctx.putImageData(this.imageData, 0, 0)
       this.$emit('playVideo', true)
+      // 视频清空（ios会有回音，产生原因不明）
+      this.videoEle.src = ''
       this.videoEle.removeEventListener('play', this.played)
       this.videoEle.removeEventListener('pause', this.paused)
     },
