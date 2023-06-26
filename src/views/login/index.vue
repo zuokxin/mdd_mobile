@@ -154,7 +154,6 @@ export default {
           localStorage.phone = res.data.phone
           localStorage.isNewUser = res.data.isNewUser
           localStorage.userId = res.data.userId
-          res.data.openid && (localStorage.openid = res.data.openid) // 微信内授权状态
           if (this.$route.query.url) {
             const { url, ...otherQuery } = this.$route.query
             this.$router.push({ path: url, query: otherQuery })
