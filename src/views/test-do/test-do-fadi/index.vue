@@ -8,7 +8,6 @@
       <div class="main" ref="mainIn">
         <div class="main-in">
           <div v-if="historRecods.length > 0">
-            <!-- <TimeShow class="mt-4 mb-2" :type="true"></TimeShow> -->
             <div v-for="item in historRecods" :key="item.index">
               <DialogBoxLeft
                 :textLeft="item.title"
@@ -18,17 +17,16 @@
             </div>
           </div>
           <div v-for="(record, index) in chatRecords" :key="record + index">
-            <!-- <TimeShow class="mt-4 mb-2" v-if="record.timeShow && historRecods.length === 0" :type="record.timeType"></TimeShow> -->
+            <!-- :needAnswer="record.needAnswer" -->
             <DialogBoxLeft
               :ref="'DialogBoxLeft' + index"
               v-if="record.component === 'left' && record.status === false"
-              :needAnswer="record.needAnswer"
               :url="record.url"
               :textLeft="record.text"
               @playVideo="e => playVideo(e, index)"
               @openStartPrompt="openStartPrompt"
             ></DialogBoxLeft>
-            <DialogBoxRight v-if="record.component === 'right'" :textRight="record.time"></DialogBoxRight>
+            <DialogBoxRight v-if="record.component === 'right'" :textRight="record.audioDuration"></DialogBoxRight>
           </div>
           <div v-show="queLoading" style="margin-left: 26px;">
             <img src="@/assets/img/test/wait.gif" alt="wait" width="60">
@@ -101,7 +99,6 @@
 </template>
 
 <script>
-// import TimeShow from './time-show'
 import DialogBoxLeft from './dialog-box-left'
 import DialogBoxRight from './dialog-box-right'
 import XyButton from './xy-button'
@@ -118,7 +115,6 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'test-do-fadi',
   components: {
-    // TimeShow,
     DialogBoxLeft,
     DialogBoxRight,
     XyButton,
@@ -136,8 +132,8 @@ export default {
       volumeVal: 0,
       queLoading: false,
       midwayBackBool: true, // true代表着中途返回
-      quesUrl: '',
-      error: true,
+      // quesUrl: '',
+      error: false,
       audioFiles: [],
       audioUrls: [],
       videoFiles: [],
@@ -148,19 +144,20 @@ export default {
       timer: null,
       isEnd: false,
       queObj: {},
-      titleIndex: 0,
+      // titleIndex: 0,
       videoFile: null,
       audioFile: null,
       loading: false,
       init: true,
-      finishBtnDisable: true,
+      finishBtnDisable: true, // 完成按钮禁用状态
       lastTime: 0,
       audioDuration: 0, // 音频时长，类型为int，单位是秒
       videoPlayer: null, // 摄像头对象
       faceTimer: null, // 人脸识别计时器
       canUpload: true,
       aiEvalCamEnabled: false,
-      btnShow: false
+      btnShow: false,
+      timeover: false
     }
   },
   computed: {
@@ -198,7 +195,7 @@ export default {
     }
   },
   created () {
-    this.getBatchInfo()
+    this.mediaInitFirst()
   },
   methods: {
     /******************************************
@@ -243,32 +240,24 @@ export default {
     },
     // 打开人脸提示
     openFacrTips () {
-      // if (this.loading) return
       // 不上传标志位后再暂停录制
       this.canUpload = false
+      this.recorderShow = false
+      this.btnShow = false
       this.$refs.dragVideo.pauseVideo()
       this.mediaRecorder.stop()
-      this.recorder.pause()
-      this.faceShow = true
+      this.recorder.pause(() => {
+        this.closeMedia(window.mediaStream)
+        this.faceShow = true
+        console.log('人脸识别暂停，打开提示窗口')
+      })
     },
     // 关闭人脸提示
     colseFaceTips () {
-      // 上传标志位归位
-      this.canUpload = true
       this.handleDialog()
-    },
-    // 摄像头再启动
-    openVideo () {
-      if (this.aiEvalCamEnabled) {
-        this.$refs.dragVideo.restartVideo()
-      }
     },
     // 弹窗逻辑处理（人脸识别和无答案）
     handleDialog () {
-      // 打开摄像头
-      // this.openVideo()
-      // 隐藏提交按钮
-      this.recorderShow = false
       // 重新读题
       const lastChild = this.chatRecords.pop()
       lastChild.status = false
@@ -279,107 +268,65 @@ export default {
     /******************************************
      * 媒体设备
     ******************************************/
-    // 获取媒体
-    initUserMedia () {
+    // 设备参数
+    getDevicesParams () {
       const params = {
         audio: true
       }
       if (this.aiEvalCamEnabled) {
         params.video = { facingMode: 'user', width: 1280, height: 720 }
       }
-      // 使用前置摄像头
-      navigator.mediaDevices.getUserMedia(params)
-        .then(stream => this.startUserMedia(stream))
-        .catch(err => {
-          this.error = true
-          console.log(`错误:${err}`)
-          Notify({ type: 'danger', message: mediaErrorTypes(err.name) })
-        })
+      return params
     },
-    // 音视频控件初始化
-    startUserMedia (stream) {
-      window.mediaStream = stream
-      this.getCurQue()
-
-      console.log('Media stream created.')
-      this.recorder = new Recorder({ stream })
-      console.log('录音初始化。。。')
-      // if (!this.init) {
-      //   this.init = true
-      // }
-
-      // 监听录音
-      let bufferArray = []
-      this.recorder.process.onaudioprocess = e => {
-        const buffer = e.inputBuffer.getChannelData(0)
-        bufferArray = [...bufferArray, new Float32Array(buffer)]
-        console.log('录音中。。。')
-        var maxVal = 0
-        for (var i = 0; i < buffer.length; i++) {
-          if (maxVal < buffer[i]) {
-            maxVal = buffer[i]
-          }
+    // 关闭媒体
+    closeMedia (stream) {
+      stream.getTracks().forEach((track) => {
+        // track.stop()
+        if (track.kind === 'audio') {
+          track.stop()
         }
-        // 显示音量值
-        this.volumeVal = Math.round(maxVal * 100)
-        this.recorder.audioBuffers.push(new Float32Array(buffer))
-      }
-
-      // 不开启摄像头
-      if (!this.aiEvalCamEnabled) return
-
-      this.$refs.dragVideo.setSteam(stream)
-      this.mediaRecorder = new MediaRecorder(stream)
-      console.log('录像初始化。。。')
-      // 监听录像
-      this.mediaRecorder.onstart = e => {
-        console.log(e, '开始录像。。。')
-      }
-      this.videoChunk = null
-      this.mediaRecorder.onstop = e => {
-        console.log(e, '停止录像。。。')
-        // 上传文件
-        // 可上传：答题环节，可上传标志位（人脸时标志位不见）
-        if (!this.isEnd && this.canUpload) {
-          // 视频文件处理
-          this.videoCreate()
-          // 音频文件处理
-          this.audioCreate()
-          bufferArray = []
-          this.postQueRes()
-        } else {
-          bufferArray = []
-          this.recorder.audioBuffers = []
-        }
-      }
-      this.mediaRecorder.ondataavailable = e => {
-        console.log('视频生成。。。')
-        this.videoChunk = e.data
+      })
+    },
+    // 第一次获取权限
+    async mediaInitFirst () {
+      const params = this.getDevicesParams()
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(params)
+        this.closeMedia(stream)
+        console.log('3')
+        await this.getBatchInfo()
+      } catch (err) {
+        console.log(`错误:${err}`)
+        Notify({ type: 'danger', message: mediaErrorTypes(err.name) })
       }
     },
     // 获取时间
-    setTime () {
-      const time = new Date()
-      const timeStamp = time.getTime()
-      const timeType = !this.lastTime
-      const timeJson = { timeStamp, timeType, timeShow: false }
-      if (this.lastTime && timeStamp - this.lastTime < 300000) return timeJson
-      this.lastTime = timeStamp
-      // timeJson.timeShow = true
-      return timeJson
-    },
+    // setTime () {
+    //   const time = new Date()
+    //   const timeStamp = time.getTime()
+    //   const timeType = !this.lastTime
+    //   const timeJson = { timeStamp, timeType, timeShow: false }
+    //   if (this.lastTime && timeStamp - this.lastTime < 300000) return timeJson
+    //   this.lastTime = timeStamp
+    //   // timeJson.timeShow = true
+    //   return timeJson
+    // },
     // 是否需要打开摄像头&&需要做哪些量表的信息
     async getBatchInfo () {
       try {
         const res = await batchInfo({ sessionId: this.sessionId })
+        console.log(res)
         this.aiEvalCamEnabled = res.data.aiEvalCamEnabled
-        this.initUserMedia()
+        console.log('4')
+        this.getCurQue()
+        // this.initUserMedia()
       } catch (err) {
         console.log(err)
       }
     },
     // 获取题目
     getCurQue () {
+      console.log('5')
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       this.queLoading = true
@@ -389,89 +336,100 @@ export default {
         midwayBackBool: this.midwayBackBool
       }).then(
         res => {
+          console.log('6')
+          // 数据初始化
+          this.queLoading = false
+          // 参数初始化
+          this.canUpload = false
+          this.btnShow = false
+          this.recorderShow = false
+          this.loading = false
+          // 后面就不是中途返回了
+          this.midwayBackBool = false
           const {
             isEnd,
             qiniuToken,
-            id,
             title,
-            topic,
             qVideoUrl,
-            // qAudioUrl,
-            hintsTitle,
-            isNeedAnswer,
-            proDisplay,
-            progress,
-            showProgress,
-            choice
+            hintsTitle
           } = res.data
           this.isEnd = isEnd
           // this.qVideoUrl = qVideoUrl
-          this.queObj = { id, title, topic, isNeedAnswer, proDisplay, progress, showProgress, choice }
-          setTimeout(() => {
-            this.queLoading = false
-            // 判断是否已经完成所有题目
-            if (!isEnd) {
-              const record = {
-                component: 'left',
-                status: false
-              }
-              let status = false
-              if (hintsTitle && hintsTitle.length > 0) {
-                status = true
-                const timeJson = this.setTime()
-                hintsTitle.forEach((v, index) => {
-                  if (index !== hintsTitle.length - 1) {
-                    this.historRecods.push({
-                      title: v.title,
-                      audioDuration: v.audioDuration
-                    })
-                  } else {
-                    const statusTitle = false
-                    this.chatRecords.push({
-                      component: 'left',
-                      needAnswer: false,
-                      text: v.title,
-                      url: v.qVideoUrl,
-                      status: statusTitle,
-                      ...timeJson
-                    })
-                  }
-                })
-              }
-              if (qVideoUrl) {
-                record.text = title
-                record.url = qVideoUrl
-                const timeJson = this.setTime()
-                if (status) record.status = status
-                this.chatRecords.push(Object.assign({ ...timeJson, needAnswer: true }, record))
-              }
-              this.token = qiniuToken
-              this.titleIndex++
-              this.quesUrl = qVideoUrl
-            } else {
-              this.recorderShow = true
-              this.finishBtnDisable = false
-              if (hintsTitle && hintsTitle.length > 0) {
-                hintsTitle.forEach((v, index) => {
-                  const timeJson = this.setTime()
-                  const status = !!index
+          this.queObj = res.data
+          this.token = qiniuToken
+          // setTimeout(() => {
+          // 判断是否已经完成所有题目
+          if (!isEnd) {
+            let status = false
+            if (hintsTitle && hintsTitle.length > 0) {
+              status = true
+              // const timeJson = this.setTime()
+              hintsTitle.forEach((v, index) => {
+                if (index !== hintsTitle.length - 1) {
+                  this.historRecods.push({
+                    title: v.title,
+                    audioDuration: v.audioDuration
+                  })
+                } else {
+                  // const statusTitle = false
                   this.chatRecords.push({
                     component: 'left',
-                    needAnswer: false,
+                    // needAnswer: false,
                     text: v.title,
                     url: v.qVideoUrl,
-                    status,
-                    ...timeJson
+                    status: false
+                    // ...timeJson
                   })
-                })
-              }
+                }
+              })
             }
-            this.midwayBackBool = false
-            // 让滚动条始终在最底部
-            this.$nextTick(() => {
-              this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
-            })
-          }, 1000)
+            // const record = {
+            //   component: 'left',
+            //   status: false
+            // }
+            if (qVideoUrl) {
+              // record.text = title
+              // record.url = qVideoUrl
+              // const timeJson = this.setTime()
+              // if (status) record.status = status
+              // this.chatRecords.push(Object.assign({ ...timeJson, needAnswer: true }, record))
+              // this.chatRecords.push(Object.assign({ needAnswer: true }, record))
+              this.chatRecords.push({
+                component: 'left',
+                text: title,
+                url: qVideoUrl,
+                status
+              })
+            }
+            // this.token = qiniuToken
+            // this.titleIndex++
+            // this.quesUrl = qVideoUrl
+          } else {
+            // 在这里显示还是在读好后显示？
+            this.recorderShow = true
+            this.finishBtnDisable = false
+            if (hintsTitle && hintsTitle.length > 0) {
+              hintsTitle.forEach((v, index) => {
+                // const timeJson = this.setTime()
+                // 第一条显示开始读逐条读完
+                const status = !!index
+                this.chatRecords.push({
+                  component: 'left',
+                  // needAnswer: false,
+                  text: v.title,
+                  url: v.qVideoUrl,
+                  status
+                  // ...timeJson
+                })
+              })
+            }
+          }
+          // 让滚动条始终在最底部
+          this.$nextTick(() => {
+            console.log('7')
+            this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
+          })
+          // }, 1000)
         }
       )
     },
@@ -487,7 +445,7 @@ export default {
       this.startShow = false
     },
     // 音频播放结束
-    playVideo (data, index) {
+    async playVideo (data, index) {
       if (index + 1 !== this.chatRecords.length) {
         // 缓冲下一题
         setTimeout(() => {
@@ -500,28 +458,84 @@ export default {
       } else if (!this.queObj.isNeedAnswer && !this.isEnd) {
         // 无需回答
         this.notAnswer()
+      } else if (this.isEnd) {
+        this.finishBtnDisable = false
       } else {
         // 打开录音
         // if (this.isEnd) {
         //   this.finishBtnDisable = false
         //   return
         // }
-        if (this.error) this.error = false
-        this.recorder.start()
-        if (this.aiEvalCamEnabled) {
-          this.mediaRecorder.start()
-          this.openVideo()
-        }
-        // 显示录音答题，过1.5S可提交
-        this.btnShow = false
-        this.recorderShow = true
-        this.canUpload = true
-        setTimeout(() => {
-          this.btnShow = true
-        }, 1500)
+        // if (this.error) this.error = false
+        // console.log('cs')
+        await this.initUserMedia()
+        // this.recorder.start()
+        // if (this.aiEvalCamEnabled) {
+        //   this.mediaRecorder.start()
+        // }
       }
     },
-    // 下一题
+    // 再次获取媒体
+    async initUserMedia () {
+      const params = this.getDevicesParams()
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(params)
+        this.startUserMedia(stream)
+      } catch (err) {
+        this.error = true
+        console.log(`错误:${err}`)
+        Notify({ type: 'danger', message: mediaErrorTypes(err.name) })
+      }
+    },
+    // 音视频控件初始化
+    startUserMedia (stream) {
+      window.mediaStream = stream
+      console.log('Media stream created.')
+
+      // 开启摄像头
+      if (this.aiEvalCamEnabled) {
+        this.$refs.dragVideo.setSteam(stream)
+        console.log('录像初始化。。。')
+        this.mediaRecorder = new MediaRecorder(stream)
+        this.mediaRecorder.start()
+        // 监听录像
+        this.mediaRecorder.onstart = e => {
+          this.$refs.dragVideo.restartVideo()
+          console.log(e, '开始录像。。。')
+        }
+      }
+      console.log('录音初始化。。。')
+      this.recorder = new Recorder({ stream })
+
+      // 监听录音
+      this.bufferArray = []
+      this.recorder.process.onaudioprocess = e => {
+        const buffer = e.inputBuffer.getChannelData(0)
+        this.bufferArray = [...this.bufferArray, new Float32Array(buffer)]
+        console.log('录音中。。。')
+        var maxVal = 0
+        for (var i = 0; i < buffer.length; i++) {
+          if (maxVal < buffer[i]) {
+            maxVal = buffer[i]
+          }
+        }
+        // 显示音量值
+        this.volumeVal = Math.round(maxVal * 100)
+        this.recorder.audioBuffers.push(new Float32Array(buffer))
+      }
+      this.recorder.start(() => {
+        // 显示录音答题，过1.5S可提交
+        this.recorderShow = true
+        this.canUpload = true
+        this.btnShow = false
+        console.log('btnShow')
+        setTimeout(() => {
+          this.btnShow = true
+          console.log('btnShow2')
+        }, 1500)
+      })
+    },
+    // 下一题-停止录音录像
     toNext (cb) {
       // 禁用无法进入
       if (this.loading || !this.canUpload || !this.btnShow) return
@@ -532,26 +546,57 @@ export default {
       if (this.mediaRecorder && this.mediaRecorder.state === 'inactive') {
         return
       }
-      if (cb) cb()
+      // if (cb) cb()
+      // 按钮禁用，文字改变，音频视频可上传
+      this.loading = true
+      this.btnShow = false
+      this.canUpload = true
       // 是否用摄像头
       if (this.aiEvalCamEnabled) {
         this.$refs.dragVideo.pauseVideo()
-        this.mediaRecorder.stop()
-        this.recorder.pause()
-        // 避免提交过程中摄像头检出
-        if (this.faceTimer) {
-          clearInterval(this.faceTimer)
-          this.faceTimer = null
+        this.videoChunk = null
+        this.mediaRecorder.onstop = e => {
+          console.log(e, '停止录像。。。')
+          // 上传文件
+          // 可上传：答题环节，可上传标志位（人脸时标志位不见）
+          if (this.canUpload) {
+            // 视频文件处理
+            this.videoCreate()
+            // 音频文件处理
+            this.audioCreate()
+            this.postQueRes()
+            // 关闭权限
+            this.closeMedia(window.mediaStream)
+            // this.bufferArray = []
+          } else {
+            // this.bufferArray = []
+            // this.recorder.audioBuffers = []
+          }
         }
+        this.mediaRecorder.ondataavailable = e => {
+          console.log('视频生成。。。')
+          this.videoChunk = e.data
+        }
+        this.recorder.pause()
+        this.mediaRecorder.stop()
+        // 避免提交过程中摄像头检出
+        // if (this.faceTimer) {
+        //   clearInterval(this.faceTimer)
+        //   this.faceTimer = null
+        // }
       } else {
         this.recorder.pause(() => {
-          this.audioCreate()
-          // 上传文件
+          // 上传文件(this.isEnd是否有必要)
           if (!this.isEnd && this.canUpload) {
+            this.audioCreate()
             this.postQueResAudio()
           } else {
-            this.recorder.audioBuffers = []
+            // 也许可以不用设置
+            // this.bufferArray = []
+            // this.recorder.audioBuffers = []
           }
+          // 关闭权限
+          this.closeMedia(window.mediaStream)
         })
       }
     },
@@ -565,12 +610,11 @@ export default {
         ...this.queObj
       }
       await posTableQues(data)
-      this.midwayBackBool = false
       this.getCurQue()
     },
     // 提交回答-纯音频
     async postQueResAudio () {
-      this.loading = true
+      // this.loading = true
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       const curData = {
@@ -595,22 +639,27 @@ export default {
             audioDuration: this.audioDuration,
             ...this.queObj
           })
-          this.loading = false
+          // this.loading = false
           // 添加回答
           const answer = queRes.data || ''
-          const timeJson = this.setTime()
-          this.chatRecords.push({ component: 'right', text: answer, time: this.audioDuration, ...timeJson })
-          this.getCurQue()
-          this.recorderShow = false
+          // const timeJson = this.setTime()
+          // this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration, ...timeJson })
+          this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration })
+          // this.recorderShow = false
           // 让滚动条始终在最底部
           this.$nextTick(() => {
             this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
           })
+          this.getCurQue()
         } catch (err) {
           if (err.code === 546) {
+            // 参数初始化
+            this.canUpload = false
+            this.btnShow = false
+            this.recorderShow = false
+            this.loading = false
             this.thisDialog('未听到您的回答,请重新回答题目', '重新做题').then(
               () => {
-                this.loading = false
                 this.handleDialog()
               }
             )
@@ -635,7 +684,7 @@ export default {
     },
     // 提交回答-音频视频
     postQueRes () {
-      this.loading = true
+      // this.loading = true
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       const curData = {
@@ -668,30 +717,33 @@ export default {
           }
           posTableQues(data).then(
             queRes => {
-              this.midwayBackBool = false
-              this.loading = false
+              // this.loading = false
               // 清除提问高亮
-              const len = this.chatRecords.length
-              const { needAnswer, component } = this.chatRecords[len - 1] || {}
-              if (component === 'left' && needAnswer) this.chatRecords[len - 1].needAnswer = false
+              // const len = this.chatRecords.length
+              // const { needAnswer, component } = this.chatRecords[len - 1] || {}
+              // if (component === 'left' && needAnswer) this.chatRecords[len - 1].needAnswer = false
               // 添加回答
               const answer = queRes.data || ''
-              const timeJson = this.setTime()
-              this.chatRecords.push({ component: 'right', text: answer, time: this.audioDuration, ...timeJson })
-              this.getCurQue()
-              // this.openVideo()
-              this.recorderShow = false
+              // const timeJson = this.setTime()
+              // this.chatRecords.push({ component: 'right', text: answer, time: this.audioDuration, ...timeJson })
+              this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration })
               // 让滚动条始终在最底部
               this.$nextTick(() => {
                 this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
               })
+              this.getCurQue()
+              // this.recorderShow = false
             }
           ).catch(
             err => {
               if (err.code === 546) {
+                // 参数初始化
+                this.canUpload = false
+                this.btnShow = false
+                this.recorderShow = false
+                this.loading = false
                 this.thisDialog('未听到您的回答,请重新回答题目', '重新做题').then(
                   () => {
-                    this.loading = false
                     this.handleDialog()
                   }
                 )
