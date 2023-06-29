@@ -111,15 +111,15 @@ import errpopout from './errpopout'
 import voice from './voice'
 import { mapGetters } from 'vuex'
 import { Dialog } from 'vant'
-document.addEventListener('visibilitychange', function () {
-  if (document.visibilityState === 'hidden') {
-    // window.location.reload()
-    // 隐藏就不刷新了
-  } else {
-    // 可见刷新
-    window.location.reload()
-  }
-})
+// document.addEventListener('visibilitychange', function () {
+//   if (document.visibilityState === 'hidden') {
+//     // window.location.reload()
+//     // 隐藏就不刷新了
+//   } else {
+//     // 可见刷新
+//     window.location.reload()
+//   }
+// })
 export default {
   name: 'do-other',
   components: {
@@ -152,7 +152,7 @@ export default {
       videoSrc: null,
       videoChunk: null,
       canUpload: false,
-      onceFlag: false,
+      // onceFlag: false,
       aiEvalCamEnabled: false, // 是否需要开始摄像头的
       voicePopout: false, // 每个题目播报弹窗
       errPopout: false, // 回答有问题的弹窗
@@ -209,14 +209,60 @@ export default {
     this.getBatchInfo()
   },
   methods: {
+    // 错误类型
+    errType (name) {
+      let errType = '摄像头或麦克风调用错误'
+      switch (name) {
+        case 'NotAllowedError':
+        case 'PermissionDeniedError':
+          errType = '用户已禁止网页调用摄像头或麦克风设备'
+          break
+        case 'NotFoundError':
+        case 'DevicesNotFoundError':
+          errType = '摄像头或麦克风设备未找到'
+          break
+        case 'NotSupportedError':
+          errType = '不支持摄像头或麦克风功能'
+          break
+      }
+      return errType
+    },
+    // 进度条分值展示
+    toPoint (str, tablename) {
+      let point = ''
+      if (tablename === 'MINI') {
+        // mini进度条
+        const a = str.split('/')[0] / str.split('/')[1] * 100
+        point = a.toFixed(0)
+      } else {
+        // 其他进度条
+        point = str.replace('%', '')
+      }
+      return point
+    },
+    postFormat (urls = {}) {
+      const data = {
+        sessionId: this.sessionId,
+        tableCode: this.tableCode,
+        id: this.questionData.id,
+        title: this.questionData.title,
+        topic: this.questionData.topic,
+        ...urls
+      }
+      // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
+      if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo?.type)) {
+        data.miniQInfo = this.miniData
+        // 非必传
+        delete data.audio
+      }
+      return data
+    },
     // 是否需要打开摄像头&&需要做哪些量表的信息
     async getBatchInfo () {
       const res = await batchInfo({ sessionId: this.sessionId })
       // console.log(res)
-      if (res.code === 0) {
-        this.aiEvalCamEnabled = res.data.aiEvalCamEnabled
-        this.initUserMedia()
-      }
+      this.aiEvalCamEnabled = res.data.aiEvalCamEnabled
+      this.firstUserMedia()
     },
     // 获取题目
     async init () {
@@ -235,20 +281,18 @@ export default {
           sessionId: this.sessionId,
           tableCode: this.tableCode
         }).then(res => {
-          if (res.code === 0) {
-            if (next) {
-              this.thisDialog('您将进入下一个量表进行测试').then(() => {
-                this.$router.replace(this.routerPath)
-              })
-            } else {
+          if (next) {
+            this.thisDialog('您将进入下一个量表进行测试').then(() => {
               this.$router.replace(this.routerPath)
-            }
+            })
+          } else {
+            this.$router.replace(this.routerPath)
           }
         })
       } else {
         this.isEnd = false
         this.btnShow = false
-        this.stopFlag = true // 获取过题目可以点按钮
+        // this.stopFlag = true // 获取过题目可以点按钮
         this.timeOver = true
         this.textFlag = false
         this.canUpload = false
@@ -260,19 +304,25 @@ export default {
         this.$refs.voice.playAudio(this.questionData.qAudioUrl)
       }
     },
-    initUserMedia () {
+    mediaObj () {
       const mediaObj = { audio: true }
       // 录音是必须的 看情况打开摄像头
       if (this.aiEvalCamEnabled) {
         mediaObj.video = { facingMode: 'user', width: 1280, height: 720 }
       }
-      navigator.mediaDevices.getUserMedia(mediaObj)
+      return mediaObj
+    },
+    // 进入第一次获取权限
+    firstUserMedia () {
+      navigator.mediaDevices.getUserMedia(this.mediaObj())
         .then(stream => {
-          window.yunyuStream = stream
           // 初始化---
-          this.stream = stream
+          stream.getTracks().forEach((track) => {
+            if (track.kind === 'audio') {
+              track.stop()
+            }
+          })
           this.popoutShow = true
-          this.initDevice(stream)
           // 没问题就开始播报语音
           const countTime = setInterval(() => {
             this.countTime = this.countTime - 1
@@ -282,30 +332,36 @@ export default {
           }, 1000)
         })
         .catch(err => {
-          let errType = '摄像头或麦克风调用错误'
-          switch (err.name) {
-            case 'NotAllowedError':
-            case 'PermissionDeniedError':
-              errType = '用户已禁止网页调用摄像头或麦克风设备'
-              break
-            case 'NotFoundError':
-            case 'DevicesNotFoundError':
-              errType = '摄像头或麦克风设备未找到'
-              break
-            case 'NotSupportedError':
-              errType = '不支持摄像头或麦克风功能'
-              break
-          }
+          const errType = this.errType(err.name)
+          this.error = true
+          this.$toast(errType)
+        })
+    },
+    // 每次答题前都初始化
+    initUserMedia () {
+      navigator.mediaDevices.getUserMedia((this.mediaObj()))
+        .then(stream => {
+          window.yunyuStream = stream
+          // 初始化---
+          this.stream = stream
+          this.initDevice(stream)
+        })
+        .catch(err => {
+          const errType = this.errType(err.name)
           this.error = true
           this.$toast(errType)
         })
     },
     // 初始化设备
     initDevice (stream) {
+      // 开始时按钮状态炜禁用
+      this.btnShow = false
+      // 录音
       this.recorder = new Recorder({ stream })
+      this.recorder.audioBuffers = []
       // 按钮边上的音量++
       this.recorder.process.onaudioprocess = (e) => {
-        // console.log(e)
+        console.log('录音中')
         const buffer = e.inputBuffer.getChannelData(0)
         this.recorder.audioBuffers.push(new Float32Array(buffer))
         let maxVal = 0
@@ -324,6 +380,7 @@ export default {
       }
       // 录像
       if (this.aiEvalCamEnabled) {
+        console.log('录像初始化。。。')
         this.mediaRecorder = new MediaRecorder(stream)
         // this.$refs.videoBox.srcObject = this.stream
         this.$refs.dragVideo.setSteam(stream)
@@ -331,25 +388,34 @@ export default {
          *          监听录像
          *****************************/
         this.mediaRecorder.onstart = e => {
+          this.$refs.dragVideo.restartVideo()
+          this.faceRecognition = true
           console.log(e, '开始录像。。。')
         }
-        this.mediaRecorder.onstop = e => {
-          console.log(e, '停止录像。。。', this.videoChunk)
-          if (this.canUpload && !this.noFace && this.textFlag) {
-            // 视频文件处理
-            this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
-            this.videoFiles.push(this.videoFile)
-            // 音频文件处理
-            // 上传文件
-            this.audioCreate()
-            this.postQuesRes()
-          }
-        }
-        this.mediaRecorder.ondataavailable = e => {
-          console.log('视频生成。。。')
-          this.videoChunk = e.data
-        }
+        this.mediaRecorder.start()
+        // this.mediaRecorder.onstop = e => {
+        //   console.log(e, '停止录像。。。', this.videoChunk)
+        //   if (this.canUpload && !this.noFace && this.textFlag) {
+        //     // 视频文件处理
+        //     this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
+        //     this.videoFiles.push(this.videoFile)
+        //     // 音频文件处理
+        //     // 上传文件
+        //     this.audioCreate()
+        //     this.postQuesRes()
+        //   }
+        // }
+        // this.mediaRecorder.ondataavailable = e => {
+        //   console.log('视频生成。。。')
+        //   this.videoChunk = e.data
+        // }
       }
+      this.recorder.start(() => {
+        this.canUpload = true
+        setTimeout(() => {
+          this.btnShow = true
+        }, 1500)
+      })
     },
     // 倒计时&&固定语音播报结束
     close () {
@@ -363,28 +429,29 @@ export default {
       this.voicePopout = false
       this.faceFlag = true
       this.waitwait = false
-      this.startRecorder()
+      this.initUserMedia()
     },
     // 开始记录语音||开启摄像头---------------
-    startRecorder () {
-      console.log('start', new Date())
-      // audio
-      this.recorder.start()
-      // video
-      if (this.aiEvalCamEnabled) {
-        console.log('录像初始化。。。')
-        if (this.mediaRecorder.state !== 'recording') {
-          this.mediaRecorder.start()
-        }
-        // this.$refs.videoBox.srcObject = this.stream
-        // this.$refs.videoBox.play()
-        this.$refs.dragVideo.restartVideo()
-        this.canUpload = true
-      }
-      setTimeout(() => {
-        this.btnShow = true
-      }, 1500)
-    },
+    // startRecorder () {
+    //   console.log('start', new Date())
+    //   // audio
+    //   this.recorder.start()
+    //   // video
+    //   if (this.aiEvalCamEnabled) {
+    //     console.log('录像初始化。。。')
+    //     if (this.mediaRecorder.state !== 'recording') {
+    //       this.faceRecognition = true
+    //       this.mediaRecorder.start()
+    //     }
+    //     // this.$refs.videoBox.srcObject = this.stream
+    //     // this.$refs.videoBox.play()
+    //     this.$refs.dragVideo.restartVideo()
+    //     this.canUpload = true
+    //   }
+    //   setTimeout(() => {
+    //     this.btnShow = true
+    //   }, 1500)
+    // },
     // 音量等级1-10
     voiceLevel (n) {
       // 10 一级
@@ -411,23 +478,49 @@ export default {
       }
       this.waitwait = true // 提交有个过程
       this.textFlag = true
-      if (this.stopFlag) {
-        // 这个按钮不能疯狂点击
-        this.stopFlag = false
-        // 看交音频还是交音屏&&视频
-        if (this.aiEvalCamEnabled) {
-          this.$refs.dragVideo.pauseVideo()
-          // this.$refs.videoBox.pause()
-          this.canUpload = true
-          this.mediaRecorder.stop()
-          console.log('提交audio,video')
-        } else {
-          this.recorder.pause(() => {
+      this.btnShow = false
+      // if (this.stopFlag) {
+      // 这个按钮不能疯狂点击
+      // this.stopFlag = false
+      // 看交音频还是交音屏&&视频
+      if (this.aiEvalCamEnabled) {
+        this.recorder.pause()
+        this.faceRecognition = false // 提交过程不需要人脸识别
+        this.$refs.dragVideo.pauseVideo()
+        this.mediaRecorder.ondataavailable = e => {
+          console.log('视频生成。。。')
+          this.videoChunk = e.data
+        }
+        this.mediaRecorder.onstop = e => {
+          console.log(e, '停止录像。。。', this.videoChunk)
+          if (this.canUpload && !this.noFace && this.textFlag) {
+            // 视频文件处理
+            this.videoCreate()
+            // 音频文件处理
             this.audioCreate()
-            this.postQueResAudio()
+            // 上传文件
+            this.postQuesRes()
+          }
+          window.yunyuStream.getTracks().forEach((track) => {
+            if (track.kind === 'audio') {
+              track.stop()
+            }
           })
         }
+        this.mediaRecorder.stop()
+        console.log('提交audio,video')
+      } else {
+        this.recorder.pause(() => {
+          window.yunyuStream.getTracks().forEach((track) => {
+            if (track.kind === 'audio') {
+              track.stop()
+            }
+          })
+          this.audioCreate()
+          this.postQueResAudio()
+        })
       }
+      // }
     },
     // 音频文件处理
     audioCreate () {
@@ -435,16 +528,12 @@ export default {
       this.audioFile = this.recorder.createFile(`${this.tableCode}_${this.questionData.id}_${this.sessionId}`)
       this.audioFiles.push(this.audioFile)
     },
+    // 视频文件处理
     videoCreate () {
-      this.videoFile = this.fileCreate([this.videoChunk], '.mp4', 'video/mp4')
-      this.videoFiles.push(this.videoFile)
-    },
-    // 创建文件
-    fileCreate (blobArr, suffix, type) {
-      // const fileName = `抑郁症辅助诊断_${this.queObj.id}_${this.sessionId}`
       const fileName = `${this.tableCode}_${this.questionData.id}_${this.sessionId}`
       const dateNow = Date.now()
-      return new File(blobArr, `${fileName}${suffix}`, { type, lastModified: dateNow })
+      this.videoFile = new File([this.videoChunk], `${fileName}.mp4`, { type: 'video/mp4', lastModified: dateNow })
+      this.videoFiles.push(this.videoFile)
     },
     // 提交mini
     sendData (d) {
@@ -456,36 +545,37 @@ export default {
       // 不可以点
       this.miniNextFlag = true
     },
-    clearSendData () {
-      this.miniData = ''
-      this.miniNextFlag = true
-    },
-    sendMini () {
-      // 加一层返回保护
-      if (!this.sessionId || !this.tableCode || !this.miniData) return
-      // 这儿用不着视频 音频 丢弃
-      const data = {
-        sessionId: this.sessionId,
-        tableCode: this.tableCode,
-        miniQInfo: this.miniData,
-        id: this.questionData.id,
-        title: this.questionData.title,
-        topic: this.questionData.topic
-      }
-      posTableQues(data).then(res => {
-        console.log(res)
-        if (res.code === 0) {
-          this.clearSendData()
-          this.init()
-        }
-      }).catch(err => {
-        // 707时间选项非法
-        console.log(err)
-        if (err.code) {
-          this.$toast(err.message)
-        }
-      })
-    },
+    // clearSendData () {
+    //   this.miniData = ''
+    //   this.miniNextFlag = true
+    // },
+    // 已被注释
+    // sendMini () {
+    //   // 加一层返回保护
+    //   if (!this.sessionId || !this.tableCode || !this.miniData) return
+    //   // 这儿用不着视频 音频 丢弃
+    //   const data = {
+    //     sessionId: this.sessionId,
+    //     tableCode: this.tableCode,
+    //     miniQInfo: this.miniData,
+    //     id: this.questionData.id,
+    //     title: this.questionData.title,
+    //     topic: this.questionData.topic
+    //   }
+    //   posTableQues(data).then(res => {
+    //     console.log(res)
+    //     this.miniData = ''
+    //     this.miniNextFlag = true
+    //     // this.clearSendData()
+    //     this.init()
+    //   }).catch(err => {
+    //     // 707时间选项非法
+    //     console.log(err)
+    //     if (err.code) {
+    //       this.$toast(err.message)
+    //     }
+    //   })
+    // },
     // 提交回答-纯音频
     postQueResAudio () {
       // 加一层返回保护
@@ -507,33 +597,33 @@ export default {
         // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
         // posTableQues(this.postFormat({ video: '', audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
         posTableQues(this.postFormat({ video: '', audio: audio.url })).then(re => {
-          if (re.code === 0) {
-            this.init()
-            this.clearSendData()
-          }
+          this.miniData = ''
+          this.miniNextFlag = true
+          this.init()
+          // this.clearSendData()
         }).catch(errr => {
           // 没有说话重新回答 弹出错误提示 再点击确定后做题
           if (errr.code === 546) {
-            if (!this.noFace) {
-              this.errPopout = true
-            }
+            this.errPopout = true
           } else if (errr.code === 547) {
             // 547是 mini回答是否的问题
-            if (!this.noFace) {
-              this.yesNoMiniDialogFlag = true
-            }
+            this.yesNoMiniDialogFlag = true
           } else {
-            if (!this.noFace) {
-              this.$toast(errr.message)
-            }
-            this.sureToAnswer()
+            const errMessage = errr.message || errr
+            this.thisDialog(`答题失败，请刷新重做，错误类型(${errMessage})`).then(
+              () => {
+                location.reload()
+              }
+            )
+            // this.$toast(errr.message)
+            // this.sureToAnswer()
           }
         })
       }).catch(err => {
         if (!this.errPopout) {
           this.$toast.fail(`上传失败(${err})`)
         }
-        this.sureToAnswer()
+        // this.sureToAnswer()
       })
     },
     // 提交回答两个
@@ -558,25 +648,26 @@ export default {
         if (!this.sessionId || !this.tableCode) return
         posTableQues(this.postFormat({ video: video.url, audio: audio.url })).then(re => {
         // posTableQues(this.postFormat({ video: video.url, audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
+          this.miniData = ''
+          this.miniNextFlag = true
           this.init()
-          this.clearSendData()
+          // this.clearSendData()
         }).catch(err => {
           if (err.code === 546) {
             // 没有说话重新回答 弹出错误提示 再点击确定后做题
-            if (!this.noFace) {
-              this.errPopout = true
-            }
+            this.errPopout = true
           } else if (err.code === 547) {
             // 547是 mini回答是否的问题
-            if (!this.noFace) {
-              this.yesNoMiniDialogFlag = true
-            }
+            this.yesNoMiniDialogFlag = true
           } else {
-            if (!this.noFace) {
-              this.$toast(err.message)
-            }
+            const errMessage = err.message || err
+            this.thisDialog(`答题失败，请刷新重做，错误类型(${errMessage})`).then(
+              () => {
+                location.reload()
+              }
+            )
             // this.$toast(err.message)
-            this.sureToAnswer()
+            // this.sureToAnswer()
           }
         })
       }
@@ -585,14 +676,14 @@ export default {
           if (!this.errPopout) {
             this.$toast.fail(`上传失败(${err})`)
           }
-          this.sureToAnswer()
+          // this.sureToAnswer()
         }
       )
     },
     // 弹出错误弹窗
-    reAnswer () {
-      this.voicePopout = true
-    },
+    // reAnswer () {
+    //   this.voicePopout = true
+    // },
     // 重新回答不播放语音
     sureToAnswer () {
       // mini
@@ -603,52 +694,25 @@ export default {
       this.audioFiles = []
       this.videoFiles = []
       // this.$refs.videoBox.play()
-      this.btnShow = false
+      // this.btnShow = false
       this.waitwait = false
       this.textFlag = false
-      this.stopFlag = true
+      // this.stopFlag = true
       this.errPopout = false
-      this.recorder.audioBuffers = [] // 丢弃录制的音频&&重新开始录制
-      this.recorder.start()
-      if (this.aiEvalCamEnabled) {
-        // 如果开启摄像头 要活动 并且做人脸识别检查
-        this.mediaRecorder.start()
-        this.onceFlag = false
-        this.$refs.dragVideo.restartVideo()
-        // setTimeout(() => { this.onPlay() }, 2000)
-      }
-      setTimeout(() => {
-        this.btnShow = true
-      }, 1500)
-    },
-    postFormat (urls = {}) {
-      const data = {
-        sessionId: this.sessionId,
-        tableCode: this.tableCode,
-        id: this.questionData.id,
-        title: this.questionData.title,
-        topic: this.questionData.topic,
-        ...urls
-      }
-      // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
-      if (this.tableCode === 'MINI' && this.miniType.includes(this.questionData.miniQInfo?.type)) {
-        data.miniQInfo = this.miniData
-        // 非必传
-        delete data.audio
-      }
-      return data
-    },
-    toPoint (str, tablename) {
-      let point = ''
-      if (tablename === 'MINI') {
-        // mini进度条
-        const a = str.split('/')[0] / str.split('/')[1] * 100
-        point = a.toFixed(0)
-      } else {
-        // 其他进度条
-        point = str.replace('%', '')
-      }
-      return point
+      // this.recorder.audioBuffers = [] // 丢弃录制的音频&&重新开始录制
+      // this.recorder.start()
+      // if (this.aiEvalCamEnabled) {
+      //   // 如果开启摄像头 要活动 并且做人脸识别检查
+      //   // this.faceRecognition = true
+      //   // this.mediaRecorder.start()
+      //   this.onceFlag = false
+      //   // this.$refs.dragVideo.restartVideo()
+      //   // setTimeout(() => { this.onPlay() }, 2000)
+      // }
+      this.initUserMedia()
+      // setTimeout(() => {
+      //   this.btnShow = true
+      // }, 1500)
     },
     /******************************************
      * 人脸识别
@@ -661,35 +725,68 @@ export default {
           this.faceTimer = null
         }
       }
+      // 是否需要人脸识别
+      if (!this.faceRecognition) return clear()
+      // this.faceRecognition = true
       // 上传答题环节
       if (!this.isEnd) {
-        // 答题录像环节
-        if (this.voicePopout) return clear()
-        if (this.errPopout) return clear()
-        if (this.waitwait) return clear()
-        if (!this.textFlag && this.canUpload) {
-          // 未检出人脸1S
-          if (!e) {
-            if (this.faceTimer) return
-            this.unFaceTime = (new Date()).getTime()
-            this.faceTimer = setInterval(() => {
-              const newTime = (new Date()).getTime()
-              if (newTime - this.unFaceTime >= 1000) {
-                // console.log('未检出人脸1S', new Date())
-                this.canUpload = false
-                this.$refs.dragVideo.pauseVideo()
-                this.mediaRecorder.stop()
-                this.recorder.pause()
-                setTimeout(() => {
-                  this.noFace = true
-                }, 0)
-                clear()
-              }
-            }, 1)
-          } else {
-            clear()
-          }
+        // 未检出人脸1S
+        if (!e) {
+          if (this.faceTimer) return
+          this.unFaceTime = (new Date()).getTime()
+          this.faceTimer = setInterval(() => {
+            const newTime = (new Date()).getTime()
+            if (newTime - this.unFaceTime >= 1000) {
+              // console.log('未检出人脸1S', new Date())
+              // this.canUpload = false
+              this.faceRecognition = false
+              this.$refs.dragVideo.pauseVideo()
+              this.mediaRecorder.stop()
+              this.recorder.pause(() => {
+                window.yunyuStream.getTracks().forEach((track) => {
+                  if (track.kind === 'audio') {
+                    track.stop()
+                    console.log('' + track.readyState)
+                  }
+                })
+                this.noFace = true
+                // setTimeout(() => {
+                //   this.noFace = true
+                // }, 0)
+              })
+              clear()
+            }
+          }, 1)
+        } else {
+          clear()
         }
+        // 答题录像环节
+        // if (this.voicePopout) return clear()
+        // if (this.errPopout) return clear()
+        // if (this.waitwait) return clear()
+        // if (!this.textFlag && this.canUpload) {
+        //   // 未检出人脸1S
+        //   if (!e) {
+        //     if (this.faceTimer) return
+        //     this.unFaceTime = (new Date()).getTime()
+        //     this.faceTimer = setInterval(() => {
+        //       const newTime = (new Date()).getTime()
+        //       if (newTime - this.unFaceTime >= 1000) {
+        //         // console.log('未检出人脸1S', new Date())
+        //         this.canUpload = false
+        //         this.$refs.dragVideo.pauseVideo()
+        //         this.mediaRecorder.stop()
+        //         this.recorder.pause()
+        //         setTimeout(() => {
+        //           this.noFace = true
+        //         }, 0)
+        //         clear()
+        //       }
+        //     }, 1)
+        //   } else {
+        //     clear()
+        //   }
+        // }
       }
     },
     // 关闭人脸提示-new
@@ -697,12 +794,13 @@ export default {
       // console.log('关闭人脸提示', new Date())
       // 去找人脸重新录制===状态===
       this.questionData = JSON.parse(JSON.stringify(this.copyquestionData))
-      this.$refs.dragVideo.restartVideo()
+      // this.$refs.dragVideo.restartVideo()
       // 避免关闭太快，暂停事件为执行完
-      setTimeout(() => {
-        this.noFace = false
-        this.canUpload = true
-      }, 0)
+      // setTimeout(() => {
+      //   this.noFace = false
+      //   // this.canUpload = true
+      // }, 0)
+      this.noFace = false
       this.sureToAnswer()
     },
     // face的功能
