@@ -4,6 +4,7 @@
     :style="{ maxWidth: maxWidth, height: size}"
   >
     <video
+      id="video"
       ref="videoBox"
       src=""
       style="height:100%; object-fit: cover;"
@@ -18,7 +19,9 @@
 </template>
 
 <script>
-import * as faceapi from 'face-api.js'
+// import * as faceapi from 'face-api.js'
+import tracking from 'tracking/build/tracking-min'
+import 'tracking/build/data/face-min'
 export default {
   name: 'video-box',
   components: {
@@ -124,33 +127,22 @@ export default {
       }
     },
     async started () {
+      console.log(this.videoBox.srcObject)
       if (this.faceDetection) {
-        await faceapi.nets.tinyFaceDetector.loadFromUri('/models').then(
-          () => {
-            console.log('ready')
+        console.log(tracking)
+        const tracker = new window.tracking.ObjectTracker('face')
+        console.log(window.tracking)
+        console.log(tracker)
+        tracker.on('track', (event) => {
+          if (event.data.length === 0) { // 未检测到人脸
+            this.$emit('getFace', false)
+          } else { // 检测到人脸
+            this.$emit('getFace', true)
           }
-        )
-        this.onPlay()
+          // console.log(event, 'test')
+        })
+        window.tracking.track('#video', tracker)
       }
-    },
-    onPlay () {
-      if (!this.faceDetection) return
-      if (this.videoBox.paused) return
-      const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.5 })
-      const el = this.$refs.videoBox
-      faceapi.detectSingleFace(el, options).then(
-        detection => {
-          this.face = !!detection
-          // this.faceArr = [...this.faceArr, this.face]
-          this.onPlay()
-          this.$emit('getFace', this.face)
-          // setTimeout(() => this.onPlay())
-        }
-      ).catch(
-        err => {
-          console.log(err, 'err')
-        }
-      )
     }
   }
 }

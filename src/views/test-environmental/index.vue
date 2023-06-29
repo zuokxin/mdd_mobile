@@ -7,7 +7,7 @@
           <img width="28" :src="curImg(faceSuccess)" alt="check-icon">
         </p>
         <p>请将人脸放置在图像框内3秒</p>
-        <p class="subtitle test-error" :class="{ 'hidden': faceSuccess || face }">未识别到人脸，请保持人脸在图像框内。</p>
+        <p class="subtitle test-error" :class="{ 'hidden': faceIndex < 3 }">未识别到人脸，请保持人脸在图像框内。</p>
         <div class="text-center">
           <video-box
             ref="thisVideo"
@@ -70,7 +70,6 @@ export default {
       db: 0,
       volumeWarn: true,
       timer: null,
-      face: true,
       faceSuccess: false,
       faceTimer: null,
       faceIndex: 3,
@@ -125,29 +124,6 @@ export default {
     }
   },
   watch: {
-    face (n) {
-      if (this.faceSuccess) return
-      if (n) {
-        this.faceIndex = 3
-        this.faceTimer = setInterval(() => {
-          if (this.faceIndex === 1) {
-            this.faceSuccess = true
-            console.log(this.$refs.thisVideo)
-            this.$refs.thisVideo.pause()
-            clearInterval(this.faceTimer)
-            this.faceIndex = 1
-          } else {
-            this.faceIndex--
-          }
-        }, 1000)
-      } else {
-        this.faceSuccess = false
-        if (this.faceTimer) {
-          this.faceIndex = 3
-          clearInterval(this.faceTimer)
-        }
-      }
-    }
   },
   methods: {
     // 勾选图片
@@ -162,8 +138,25 @@ export default {
       this.initUserMedia()
     },
     // 人脸识别
-    getFace (e) {
-      this.face = e
+    getFace (n) {
+      if (this.faceSuccess) return
+      if (!n) {
+        if (this.faceTimer) {
+          clearInterval(this.faceTimer)
+          this.faceTimer = null
+        }
+        this.faceIndex = 3
+        this.faceTimer = setInterval(() => {
+          if (this.faceIndex === 1) {
+            this.faceSuccess = true
+            this.$refs.thisVideo.pause()
+            clearInterval(this.faceTimer)
+            this.faceIndex = 1
+          } else {
+            this.faceIndex--
+          }
+        }, 1000)
+      }
     },
     initUserMedia () {
       const message = browser().weixin
