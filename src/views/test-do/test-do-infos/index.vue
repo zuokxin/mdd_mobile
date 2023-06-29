@@ -97,7 +97,7 @@ export default {
       currentDate: new Date(),
       maxDate: new Date(),
       eduShow: false,
-      eduList: [{ name: '文盲' }, { name: '小学' }, { name: '初中' }, { name: '高中' }, { name: '中专' }, { name: '大专' }, { name: '本科' }, { name: '研究生' }],
+      eduList: [{ name: '小学' }, { name: '初中' }, { name: '高中' }, { name: '中专' }, { name: '大专' }, { name: '本科' }, { name: '研究生' }],
       marShow: false,
       marList: [{ name: '单身' }, { name: '恋爱关系稳定没有同居' }, { name: '恋爱关系稳定并同居' }, { name: '已婚' }, { name: '离异' }, { name: '丧偶' }, { name: '分居' }],
       tasteShow: false,

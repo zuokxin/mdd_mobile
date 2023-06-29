@@ -27,8 +27,9 @@
                 <img class="check" v-else src="@/assets/checked.png">
               </span>
             </div>
-            <div class="isCommentIsNecessary" v-if="it.checked && it.commentIsNecessary">
-              <van-field v-model.trim="it.comment" @input="psqiDisposeComment(index)" rows="2" autosize  label="" type="textarea" :placeholder="it.commentHint" show-word-limit/>
+            <div v-if="it.checked && it.commentIsNecessary">
+              <span class="commentHint">{{it.commentHint}}</span>
+              <van-field class="each-comment" v-model.trim="it.comment" @input="psqiDisposeComment(index)" type="textarea" maxlength="100"/>
             </div>
           </div>
         </div>
@@ -44,8 +45,8 @@
               <img class="check" v-else src="@/assets/checked.png">
             </span>
           </div>
-          <span v-if="it.commentHint && it.requiredComment && it.checked" class="commentHint">{{it.commentHint}}:</span>
-          <van-field class="each-comment" maxlength="100" @input="theInput(it.requiredComment)" type="textarea" v-if="it.requiredComment && it.checked" v-model="it.comment"/>
+          <span v-if="it.commentHint && it.requiredComment && it.checked" class="commentHint">{{it.commentHint}}</span>
+          <van-field v-if="it.requiredComment && it.checked" class="each-comment" v-model="it.comment" @input="theInput(it.requiredComment)" type="textarea" maxlength="100"/>
         </div>
       </div>
     </div>
@@ -482,21 +483,22 @@ export default {
       }
       .question{
         font-size: .533333rem;
-        padding: .426667rem.32rem;
+        padding: .426667rem .32rem;
         color: #000000;
         font-weight: 600;
         text-align: left;
       }
       .commentHint {
         display: block;
-        width: 6.066667rem;
+        width: 5.75rem;
+        margin-top: -.426667rem;
         margin-left: auto;
         margin-right: auto;
+        line-height: 2;
         text-align: left;
         font-size: 12px;
-        font-weight: 700;
-        line-height: 2;
-        color: #999999;
+        font-weight: 500;
+        color: #D5D5D5;
       }
       .each-choice-active{
         border: 1px solid #34B7B9 !important;
@@ -561,7 +563,7 @@ export default {
         border: 1px solid #F6F6F6;
         background-color: #F6F6F6;
         margin-bottom: .426667rem;
-        border-radius: .426667rem;
+        border-radius: .267rem;
         box-sizing: border-box;
         margin-left: auto;
         margin-right: auto;
