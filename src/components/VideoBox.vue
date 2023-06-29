@@ -20,7 +20,7 @@
 
 <script>
 // import * as faceapi from 'face-api.js'
-import tracking from 'tracking/build/tracking-min'
+import 'tracking/build/tracking-min'
 import 'tracking/build/data/face-min'
 export default {
   name: 'video-box',
@@ -127,12 +127,12 @@ export default {
       }
     },
     async started () {
-      console.log(this.videoBox.srcObject)
+      // console.log(this.videoBox.srcObject)
       if (this.faceDetection) {
-        console.log(tracking)
+        // console.log(tracking)
         const tracker = new window.tracking.ObjectTracker('face')
-        console.log(window.tracking)
-        console.log(tracker)
+        // console.log(window.tracking)
+        // console.log(tracker)
         tracker.on('track', (event) => {
           if (event.data.length === 0) { // 未检测到人脸
             this.$emit('getFace', false)

@@ -80,9 +80,12 @@ export default {
         }, 100)
         vm.player.source.onended = () => {
           vm.player.source.playStatus = 1
-          if (vm.popoutShow) {
-            vm.$emit('close')
-          }
+          // console.log('end')
+          vm.$emit('close')
+          // if (vm.popoutShow) {
+          //   console.log('end2')
+          //   vm.$emit('close')
+          // }
         }
       })
     },
@@ -92,7 +95,8 @@ export default {
       if (this.player?.source.playStatus === 2) {
         this.player.source.stop()
       }
-      this.$emit('close')
+      // console.log('end3')
+      // this.$emit('close')
     }
   },
   beforeDestroy () {
