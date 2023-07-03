@@ -112,6 +112,15 @@ import { mediaErrorTypes } from '@/utils/types'
 // import { throttle } from '@/utils/throttle'
 import Recorder from '@/utils/media/recorder'
 import { mapGetters } from 'vuex'
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'hidden') {
+    // window.location.reload()
+    // 隐藏就不刷新了
+  } else {
+    // 可见刷新
+    window.location.reload()
+  }
+})
 export default {
   name: 'test-do-fadi',
   components: {
@@ -247,7 +256,7 @@ export default {
       this.$refs.dragVideo.pauseVideo()
       this.mediaRecorder.stop()
       this.recorder.pause(() => {
-        this.closeMedia(window.mediaStream)
+        this.closeMedia()
         this.faceShow = true
         console.log('人脸识别暂停，打开提示窗口')
       })
@@ -279,12 +288,9 @@ export default {
       return params
     },
     // 关闭媒体
-    closeMedia (stream) {
-      stream.getTracks().forEach((track) => {
-        // track.stop()
-        if (track.kind === 'audio') {
-          track.stop()
-        }
+    closeMedia () {
+      window.mediaStream.getTracks().forEach((track) => {
+        track.stop()
       })
     },
     // 第一次获取权限
@@ -292,7 +298,8 @@ export default {
       const params = this.getDevicesParams()
       try {
         const stream = await navigator.mediaDevices.getUserMedia(params)
-        this.closeMedia(stream)
+        window.mediaStream = stream
+        this.closeMedia()
         console.log('3')
         await this.getBatchInfo()
       } catch (err) {
@@ -566,7 +573,7 @@ export default {
             this.audioCreate()
             this.postQueRes()
             // 关闭权限
-            this.closeMedia(window.mediaStream)
+            this.closeMedia()
             // this.bufferArray = []
           } else {
             // this.bufferArray = []
@@ -596,7 +603,7 @@ export default {
             // this.recorder.audioBuffers = []
           }
           // 关闭权限
-          this.closeMedia(window.mediaStream)
+          this.closeMedia()
         })
       }
     },
