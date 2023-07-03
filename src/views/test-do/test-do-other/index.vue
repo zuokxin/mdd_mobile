@@ -50,9 +50,10 @@
     </div>
     <!-- 人脸 -->
     <DragVideo
-      v-show="timeOver && aiEvalCamEnabled && readOver"
+      v-if="aiEvalCamEnabled"
       ref="dragVideo"
       @getFace="getFace"
+      :style="{ opacity: timeOver && readOver ? 1 : 0 }"
       :location="{ right: 10, bottom: 210 }"
     >
     </DragVideo>

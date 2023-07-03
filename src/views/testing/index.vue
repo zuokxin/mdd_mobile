@@ -36,6 +36,15 @@ import Recorder from '@/utils/media/recorder'
 // import adapter from 'webrtc-adapter'
 import { Dialog } from 'vant'
 import browser from '@/utils/browser'
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'hidden') {
+    // window.location.reload()
+    // 隐藏就不刷新了
+  } else {
+    // 可见刷新
+    window.location.reload()
+  }
+})
 export default {
   name: 'ToolsTest',
   beforeRouteLeave (to, from, next) {
