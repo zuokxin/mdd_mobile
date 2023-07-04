@@ -11,6 +11,7 @@
       muted
       playsinline="true"
       @loadedmetadata="started"
+      @play="onPlay"
     >
     </video>
     <!-- <canvas id="videoCanvas" width="150" height="150"></canvas> -->
@@ -19,8 +20,7 @@
 </template>
 
 <script>
-// import * as faceapi from 'face-api.js'
-import tracking from 'tracking/build/tracking-min'
+import 'tracking/build/tracking-min'
 import 'tracking/build/data/face-min'
 export default {
   name: 'video-box',
@@ -52,7 +52,8 @@ export default {
       face: true,
       faceArr: [],
       faceError: false,
-      timer: null
+      timer: null,
+      tracker: null
     }
   },
   computed: {
@@ -73,31 +74,7 @@ export default {
   },
   mounted: async function () {
     this.videoBox = this.$refs.videoBox
-    // this.$nextTick(() => {
-    //   console.log(this.$refs.videoBox.parentElement.clientWidth)
-    //   console.log(this.$refs.videoBox.clientWidth)
-    // })
-    // this.$nextTick(() => {
-    //   const c = document.getElementById('videoCanvas')
-    //   this.ctx = c.getContext('2d')
-    //   this.videoBox.addEventListener('play', () => {
-    //     const i = window.setInterval(() => {
-    //       this.ctx.drawImage(this.videoBox, 0, 0, 150, 150)
-    //       // 打印当前视频的播放时间
-    //       // console.log(v.currentTime)
-    //       // 当视频结束或者暂停的时候去掉循环
-    //       if (this.videoBox.paused) {
-    //         clearInterval(i)
-    //       }
-    //     }, 40)
-    //   })
-    // })
   },
-  // watch: {
-  //   stream (n, o) {
-  //     console.log(n, o, 'stream')
-  //   }
-  // },
   methods: {
     start () {
       const i = window.setInterval(() => {
@@ -111,13 +88,19 @@ export default {
       }, 40)
     },
     play () {
-      // console.log(this.$refs.videoBox.parentElement.clientWidth)
-      // console.log(this.$refs.videoBox.clientWidth)
       this.videoBox.play()
       // this.onPlay()
     },
     pause () {
+      if (this.tracker) {
+        this.tracker.removeListener('track', this.handleTracked)
+      }
       this.videoBox.pause()
+    },
+    onPlay () {
+      if (this.tracker) {
+        window.tracking.track('#video', this.tracker)
+      }
     },
     async setVideoSrc (stream) {
       this.videoBox.srcObject = stream
@@ -127,21 +110,20 @@ export default {
       }
     },
     async started () {
-      console.log(this.videoBox.srcObject)
+      console.log('started')
+      // console.log(this.videoBox.srcObject)
       if (this.faceDetection) {
-        console.log(tracking)
-        const tracker = new window.tracking.ObjectTracker('face')
-        console.log(window.tracking)
-        console.log(tracker)
-        tracker.on('track', (event) => {
-          if (event.data.length === 0) { // 未检测到人脸
-            this.$emit('getFace', false)
-          } else { // 检测到人脸
-            this.$emit('getFace', true)
-          }
-          // console.log(event, 'test')
-        })
-        window.tracking.track('#video', tracker)
+        this.tracker = new window.tracking.ObjectTracker('face')
+        // console.log(window.tracking)
+        // console.log(this.tracker)
+        this.tracker.on('track', this.handleTracked)
+      }
+    },
+    handleTracked (event) {
+      if (event.data.length === 0) { // 未检测到人脸
+        this.$emit('getFace', false)
+      } else { // 检测到人脸
+        this.$emit('getFace', true)
       }
     }
   }
