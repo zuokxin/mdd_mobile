@@ -110,14 +110,13 @@ export default {
       }
     },
     async started () {
-      console.log('started')
-      // console.log(this.videoBox.srcObject)
       if (this.faceDetection) {
         this.tracker = new window.tracking.ObjectTracker('face')
         // console.log(window.tracking)
         // console.log(this.tracker)
         this.tracker.on('track', this.handleTracked)
       }
+      this.$emit('loadedmetadata')
     },
     handleTracked (event) {
       if (event.data.length === 0) { // 未检测到人脸
