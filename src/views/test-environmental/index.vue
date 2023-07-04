@@ -214,9 +214,9 @@ export default {
       this.mediaRecorder = new MediaRecorder(stream)
       this.mediaRecorder.start()
       this.$refs.thisVideo.videoBox.srcObject = stream
-      setTimeout(() => {
-        this.face = false
-      }, 1)
+      // setTimeout(() => {
+      //   this.face = false
+      // }, 1)
       console.log('录像初始化。。。')
 
       /******************************
