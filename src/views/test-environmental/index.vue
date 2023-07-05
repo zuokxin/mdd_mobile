@@ -7,7 +7,7 @@
           <img width="28" :src="curImg(faceSuccess)" alt="check-icon">
         </p>
         <p>请将人脸放置在图像框内3秒</p>
-        <p class="subtitle test-error" :class="{ 'hidden': faceIndex < 3 }">未识别到人脸，请保持人脸在图像框内。</p>
+        <p class="subtitle test-error" :class="{ 'hidden': !face || faceIndex < 3 }">未识别到人脸，请保持人脸在图像框内。</p>
         <div class="text-center">
           <video-box
             ref="thisVideo"
@@ -79,6 +79,7 @@ export default {
       db: 0,
       volumeWarn: true,
       timer: null,
+      face: false,
       faceSuccess: false,
       faceTimer: null,
       faceIndex: 3,
@@ -148,13 +149,17 @@ export default {
     },
     // 人脸识别
     getFace (n) {
+      // 人脸识别启动时再显示提示文字
+      this.face = true
       if (this.faceSuccess) return
       if (!n) {
         if (this.faceTimer) {
+          this.faceIndex = 3
           clearInterval(this.faceTimer)
           this.faceTimer = null
         }
-        this.faceIndex = 3
+      } else {
+        if (this.faceTimer) return
         this.faceTimer = setInterval(() => {
           if (this.faceIndex === 1) {
             this.faceSuccess = true
@@ -214,9 +219,6 @@ export default {
       this.mediaRecorder.start()
       this.$refs.thisVideo.videoBox.srcObject = stream
       this.$refs.thisVideo.play()
-      // setTimeout(() => {
-      //   this.face = false
-      // }, 1)
       console.log('录像初始化。。。')
 
       /******************************
@@ -232,9 +234,6 @@ export default {
         console.log('视频生成。。。', e.data)
       }
     },
-    // loadedmetadata () {
-    //   this.$refs.thisVideo.play()
-    // },
     getTimer () {
       this.timer = setInterval(() => {
         if (this.db > 40) {
