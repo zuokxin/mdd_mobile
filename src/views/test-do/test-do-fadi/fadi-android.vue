@@ -211,7 +211,6 @@ export default {
     *******************************************/
     // 监听人脸识别
     getFace (e) {
-      console.log(e)
       const clear = () => {
         if (this.faceTimer) {
           clearInterval(this.faceTimer)
@@ -483,6 +482,7 @@ export default {
           this.$refs.dragVideo.restartVideo()
         }
         // 显示录音答题，过1.5S可提交
+        this.canFace = true
         this.btnShow = false
         this.recorderShow = true
         this.canUpload = true
@@ -503,6 +503,7 @@ export default {
         return
       }
       if (cb) cb()
+      this.canFace = false
       // 是否用摄像头
       if (this.aiEvalCamEnabled) {
         this.$refs.dragVideo.pauseVideo()
