@@ -15,7 +15,6 @@
             @getFace="getFace"
             :icon="true"
             size="160px"
-            @loadedmetadata="loadedmetadata"
           >
           </video-box>
         </div>
@@ -214,6 +213,7 @@ export default {
       this.mediaRecorder = new MediaRecorder(stream)
       this.mediaRecorder.start()
       this.$refs.thisVideo.videoBox.srcObject = stream
+      this.$refs.thisVideo.play()
       // setTimeout(() => {
       //   this.face = false
       // }, 1)
@@ -232,9 +232,9 @@ export default {
         console.log('视频生成。。。', e.data)
       }
     },
-    loadedmetadata () {
-      this.$refs.thisVideo.play()
-    },
+    // loadedmetadata () {
+    //   this.$refs.thisVideo.play()
+    // },
     getTimer () {
       this.timer = setInterval(() => {
         if (this.db > 40) {

@@ -11,7 +11,6 @@
       muted
       playsinline="true"
       @loadedmetadata="started"
-      @play="onPlay"
     >
     </video>
     <!-- <canvas id="videoCanvas" width="150" height="150"></canvas> -->
@@ -97,11 +96,11 @@ export default {
       }
       this.videoBox.pause()
     },
-    onPlay () {
-      if (this.tracker) {
-        window.tracking.track('#video', this.tracker)
-      }
-    },
+    // onPlay () {
+    //   if (this.tracker) {
+    //     window.tracking.track('#video', this.tracker)
+    //   }
+    // },
     async setVideoSrc (stream) {
       this.videoBox.srcObject = stream
       if (!this.isPlay) {
@@ -115,8 +114,9 @@ export default {
         // console.log(window.tracking)
         // console.log(this.tracker)
         this.tracker.on('track', this.handleTracked)
+        window.tracking.track('#video', this.tracker)
       }
-      this.$emit('loadedmetadata')
+      // this.$emit('loadedmetadata')
     },
     handleTracked (event) {
       if (event.data.length === 0) { // 未检测到人脸
