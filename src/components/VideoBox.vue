@@ -96,11 +96,6 @@ export default {
       }
       this.videoBox.pause()
     },
-    // onPlay () {
-    //   if (this.tracker) {
-    //     window.tracking.track('#video', this.tracker)
-    //   }
-    // },
     async setVideoSrc (stream) {
       this.videoBox.srcObject = stream
       if (!this.isPlay) {
@@ -111,12 +106,13 @@ export default {
     async started () {
       if (this.faceDetection) {
         this.tracker = new window.tracking.ObjectTracker('face')
+        // 设置步长
+        this.tracker.setStepSize(1.5)
         // console.log(window.tracking)
         // console.log(this.tracker)
         this.tracker.on('track', this.handleTracked)
         window.tracking.track('#video', this.tracker)
       }
-      // this.$emit('loadedmetadata')
     },
     handleTracked (event) {
       if (event.data.length === 0) { // 未检测到人脸
