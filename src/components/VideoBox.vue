@@ -92,7 +92,9 @@ export default {
     },
     pause () {
       if (this.tracker) {
+        console.log('pause')
         this.tracker.removeListener('track', this.handleTracked)
+        this.tracker = null
       }
       this.videoBox.pause()
     },
@@ -105,6 +107,8 @@ export default {
     },
     async started () {
       if (this.faceDetection) {
+        if (this.tracker) return
+        console.log('started')
         this.tracker = new window.tracking.ObjectTracker('face')
         // 设置步长
         this.tracker.setStepSize(1.5)
