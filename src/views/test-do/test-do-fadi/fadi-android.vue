@@ -739,6 +739,15 @@ export default {
         confirmButtonColor: '#34B7B9'
       })
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    // 离开后摄像头红点消失
+    if (window.mediaStream) {
+      const [media01, media02] = window.mediaStream.getTracks()
+      if (media01) media01.stop()
+      if (media02) media02.stop()
+    }
+    next()
   }
 }
 </script>

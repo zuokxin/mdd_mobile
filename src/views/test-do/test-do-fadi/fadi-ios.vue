@@ -206,6 +206,7 @@ export default {
   },
   created () {
     console.log('IOS')
+    this.closeMedia()
     this.mediaInitFirst()
   },
   methods: {
@@ -288,9 +289,11 @@ export default {
     },
     // 关闭媒体
     closeMedia () {
-      window.mediaStream.getTracks().forEach((track) => {
-        track.stop()
-      })
+      if (window.mediaStream) {
+        window.mediaStream.getTracks().forEach((track) => {
+          track.stop()
+        })
+      }
     },
     // 第一次获取权限
     async mediaInitFirst () {
@@ -769,6 +772,11 @@ export default {
         confirmButtonColor: '#34B7B9'
       })
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    // 离开后摄像头红点消失
+    this.closeMedia()
+    next()
   }
 }
 </script>
