@@ -651,7 +651,7 @@ export default {
               // 添加回答
               const answer = queRes.data || ''
               // const timeJson = this.setTime()
-              this.chatRecords.push({ component: 'right', text: answer, time: this.audioDuration })
+              this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration })
               this.getCurQue()
               this.recorderShow = false
               // 让滚动条始终在最底部
