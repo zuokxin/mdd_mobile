@@ -206,6 +206,7 @@ export default {
   },
   created () {
     console.log('IOS')
+    this.closeMedia()
     this.mediaInitFirst()
   },
   methods: {
@@ -227,13 +228,7 @@ export default {
       //   // console.log('不能上传了-有弹窗被开启了')
       //   return
       // }
-      // if (this.loading) {
-      //   // console.log('不能检测了-在提交答案')
-      //   return
-      // }
-      // console.log('开始检测')
       if (!e) {
-        // console.log('检测到')
         // 未检出人脸1S
         if (this.faceTimer) return
         this.unFaceTime = (new Date()).getTime()
@@ -294,9 +289,11 @@ export default {
     },
     // 关闭媒体
     closeMedia () {
-      window.mediaStream.getTracks().forEach((track) => {
-        track.stop()
-      })
+      if (window.mediaStream) {
+        window.mediaStream.getTracks().forEach((track) => {
+          track.stop()
+        })
+      }
     },
     // 第一次获取权限
     async mediaInitFirst () {
@@ -305,7 +302,6 @@ export default {
         const stream = await navigator.mediaDevices.getUserMedia(params)
         window.mediaStream = stream
         this.closeMedia()
-        console.log('3')
         await this.getBatchInfo()
       } catch (err) {
         console.log(`错误:${err}`)
@@ -318,7 +314,6 @@ export default {
         const res = await batchInfo({ sessionId: this.sessionId })
         console.log(res)
         this.aiEvalCamEnabled = res.data.aiEvalCamEnabled
-        console.log('4')
         this.getCurQue()
         // this.initUserMedia()
       } catch (err) {
@@ -327,7 +322,6 @@ export default {
     },
     // 获取题目
     getCurQue () {
-      console.log('5')
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       this.queLoading = true
@@ -337,7 +331,6 @@ export default {
         midwayBackBool: this.midwayBackBool
       }).then(
         res => {
-          console.log('6')
           // 数据初始化
           this.queLoading = false
           // 参数初始化
@@ -409,7 +402,6 @@ export default {
           }
           // 让滚动条始终在最底部
           this.$nextTick(() => {
-            console.log('7')
             this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
           })
           // }, 1000)
@@ -445,17 +437,7 @@ export default {
         this.finishBtnDisable = false
       } else {
         // 打开录音
-        // if (this.isEnd) {
-        //   this.finishBtnDisable = false
-        //   return
-        // }
-        // if (this.error) this.error = false
-        // console.log('cs')
         await this.initUserMedia()
-        // this.recorder.start()
-        // if (this.aiEvalCamEnabled) {
-        //   this.mediaRecorder.start()
-        // }
       }
     },
     // 再次获取媒体
@@ -474,7 +456,9 @@ export default {
     startUserMedia (stream) {
       window.mediaStream = stream
       console.log('Media stream created.')
-
+      // 显示录音答题
+      this.recorderShow = true
+      this.btnShow = false
       // 开启摄像头
       if (this.aiEvalCamEnabled) {
         this.$refs.dragVideo.setSteam(stream)
@@ -508,19 +492,15 @@ export default {
         this.recorder.audioBuffers.push(new Float32Array(buffer))
       }
       this.recorder.start(() => {
-        // 显示录音答题，过1.5S可提交
-        this.recorderShow = true
         this.canUpload = true
-        this.btnShow = false
-        console.log('btnShow')
+        // 过1.5S可提交
         setTimeout(() => {
           this.btnShow = true
-          console.log('btnShow2')
         }, 1500)
       })
     },
     // 下一题-停止录音录像
-    toNext (cb) {
+    toNext () {
       // 禁用无法进入
       if (this.loading || !this.canUpload || !this.btnShow) return
       if (this.error) {
@@ -530,7 +510,6 @@ export default {
       if (this.mediaRecorder && this.mediaRecorder.state === 'inactive') {
         return
       }
-      // if (cb) cb()
       // 按钮禁用，文字改变，音频视频可上传
       this.canFace = false
       this.loading = true
@@ -551,11 +530,8 @@ export default {
             this.audioCreate()
             this.postQueRes()
             // 关闭权限
-            this.closeMedia()
+            // this.closeMedia()
             // this.bufferArray = []
-          } else {
-            // this.bufferArray = []
-            // this.recorder.audioBuffers = []
           }
         }
         this.mediaRecorder.ondataavailable = e => {
@@ -564,24 +540,15 @@ export default {
         }
         this.recorder.pause()
         this.mediaRecorder.stop()
-        // 避免提交过程中摄像头检出
-        // if (this.faceTimer) {
-        //   clearInterval(this.faceTimer)
-        //   this.faceTimer = null
-        // }
       } else {
         this.recorder.pause(() => {
           // 上传文件(this.isEnd是否有必要)
           if (!this.isEnd && this.canUpload) {
             this.audioCreate()
             this.postQueResAudio()
-          } else {
-            // 也许可以不用设置
-            // this.bufferArray = []
-            // this.recorder.audioBuffers = []
           }
-          // 关闭权限
-          this.closeMedia()
+          // // 关闭权限
+          // this.closeMedia()
         })
       }
     },
@@ -599,7 +566,6 @@ export default {
     },
     // 提交回答-纯音频
     async postQueResAudio () {
-      // this.loading = true
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       const curData = {
@@ -624,19 +590,21 @@ export default {
             audioDuration: this.audioDuration,
             ...this.queObj
           })
-          // this.loading = false
           // 添加回答
           const answer = queRes.data || ''
           // const timeJson = this.setTime()
           // this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration, ...timeJson })
           this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration })
-          // this.recorderShow = false
           // 让滚动条始终在最底部
           this.$nextTick(() => {
             this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
           })
+          // 关闭权限
+          this.closeMedia()
           this.getCurQue()
         } catch (err) {
+          // 关闭权限
+          this.closeMedia()
           if (err.code === 546) {
             // 参数初始化
             this.canUpload = false
@@ -658,6 +626,8 @@ export default {
           }
         }
       } catch (err) {
+        // 关闭权限
+        this.closeMedia()
         let message = ''
         if (err.includes('xhr request failed')) {
           message = '网络异常'
@@ -669,7 +639,6 @@ export default {
     },
     // 提交回答-音频视频
     postQueRes () {
-      // this.loading = true
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       const curData = {
@@ -702,7 +671,6 @@ export default {
           }
           posTableQues(data).then(
             queRes => {
-              // this.loading = false
               // 清除提问高亮
               // const len = this.chatRecords.length
               // const { needAnswer, component } = this.chatRecords[len - 1] || {}
@@ -716,11 +684,14 @@ export default {
               this.$nextTick(() => {
                 this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
               })
+              // 关闭权限
+              this.closeMedia()
               this.getCurQue()
-              // this.recorderShow = false
             }
           ).catch(
             err => {
+              // 关闭权限
+              this.closeMedia()
               if (err.code === 546) {
                 // 参数初始化
                 this.canUpload = false
@@ -745,6 +716,8 @@ export default {
         }
       ).catch(
         err => {
+          // 关闭权限
+          this.closeMedia()
           let message = ''
           if (err.includes('xhr request failed')) {
             message = '网络异常'
@@ -799,6 +772,11 @@ export default {
         confirmButtonColor: '#34B7B9'
       })
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    // 离开后摄像头红点消失
+    this.closeMedia()
+    next()
   }
 }
 </script>

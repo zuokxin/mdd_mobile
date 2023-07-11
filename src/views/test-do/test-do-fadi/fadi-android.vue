@@ -651,7 +651,7 @@ export default {
               // 添加回答
               const answer = queRes.data || ''
               // const timeJson = this.setTime()
-              this.chatRecords.push({ component: 'right', text: answer, time: this.audioDuration })
+              this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration })
               this.getCurQue()
               this.recorderShow = false
               // 让滚动条始终在最底部
@@ -739,6 +739,15 @@ export default {
         confirmButtonColor: '#34B7B9'
       })
     }
+  },
+  beforeRouteLeave (to, from, next) {
+    // 离开后摄像头红点消失
+    if (window.mediaStream) {
+      const [media01, media02] = window.mediaStream.getTracks()
+      if (media01) media01.stop()
+      if (media02) media02.stop()
+    }
+    next()
   }
 }
 </script>

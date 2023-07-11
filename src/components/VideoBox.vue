@@ -11,6 +11,7 @@
       muted
       playsinline="true"
       @loadedmetadata="started"
+      @play="played"
     >
     </video>
     <!-- <canvas id="videoCanvas" width="150" height="150"></canvas> -->
@@ -52,7 +53,8 @@ export default {
       faceArr: [],
       faceError: false,
       timer: null,
-      tracker: null
+      tracker: null,
+      trackerTask: null // 追踪事件
     }
   },
   computed: {
@@ -73,6 +75,23 @@ export default {
   },
   mounted: async function () {
     this.videoBox = this.$refs.videoBox
+    this.$nextTick(() => {
+      if (this.faceDetection) {
+        this.tracker = new window.tracking.ObjectTracker('face')
+        // 设置步长
+        this.tracker.setStepSize(1.5)
+        // 监听追踪
+        this.tracker.on('track', this.handleTracked)
+        // 开始追踪
+        this.trackerTask = window.tracking.track('#video', this.tracker)
+        // 初始先暂停追踪
+        this.trackerTask.stop()
+      }
+    })
+  },
+  beforeDestroy () {
+    // 解除追踪的监听
+    if (this.tracker) this.tracker.removeListener('track', this.handleTracked)
   },
   methods: {
     start () {
@@ -86,13 +105,22 @@ export default {
         }
       }, 40)
     },
+    // 监听play事件-需要人脸识别时开启追踪
+    played () {
+      if (this.tracker) {
+        console.log('tracker-played')
+        this.trackerTask.run()
+      }
+    },
     play () {
       this.videoBox.play()
       // this.onPlay()
     },
     pause () {
+      // 需要人脸识别时暂停停止追踪
       if (this.tracker) {
-        this.tracker.removeListener('track', this.handleTracked)
+        console.log('tracker-pause')
+        this.trackerTask.stop()
       }
       this.videoBox.pause()
     },
@@ -103,17 +131,10 @@ export default {
         this.isPlay = true
       }
     },
-    async started () {
-      if (this.faceDetection) {
-        this.tracker = new window.tracking.ObjectTracker('face')
-        // 设置步长
-        this.tracker.setStepSize(1.5)
-        // console.log(window.tracking)
-        // console.log(this.tracker)
-        this.tracker.on('track', this.handleTracked)
-        window.tracking.track('#video', this.tracker)
-      }
+    started () {
+      console.log('started')
     },
+    // 监听追踪的事件
     handleTracked (event) {
       if (event.data.length === 0) { // 未检测到人脸
         this.$emit('getFace', false)
