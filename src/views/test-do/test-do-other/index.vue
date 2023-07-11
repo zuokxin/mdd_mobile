@@ -505,7 +505,7 @@ export default {
         // 加一层返回保护
         if (!this.sessionId || !this.tableCode) return
         // 当你不想说话进行测试的时候填入这个吧
-        // data.audio = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
+        // audio.url = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
         // posTableQues(this.postFormat({ video: '', audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
         posTableQues(this.postFormat({ video: '', audio: audio.url })).then(re => {
           if (re.code === 0) {
@@ -845,7 +845,7 @@ export default {
     }
     .question-textyn{
       color: #FFB56B;
-      font-size: 14px;
+      font-size: .4267rem;
       line-height: 14px;
       padding: 0rem .3243rem ;
     }
@@ -915,13 +915,13 @@ export default {
       overflow-y: auto;
       height: 100%;
       .question-text{
-        font-size: 13px;
+        font-size: .4267rem;
         padding: .4324rem .3243rem;
         color: #333333;
         line-height: 28px;
       }
       .question-topic{
-        font-size: 15px;
+        font-size: .3467rem;
         padding: .4324rem .3243rem 0rem;
         color: #333333;
         font-weight: 500;
