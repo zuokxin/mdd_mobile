@@ -117,6 +117,7 @@ export default {
         // 视频元素已存在
         this.videoEle.autoplay = true
         this.videoEle.src = this.url
+        // this.play()
         // 渲染后开始计时
         this.setTimer()
       }
@@ -131,6 +132,7 @@ export default {
   },
   beforeDestroy () {
     // 页面离开暂停播放
+    console.log('页面离开暂停播放')
     this.pauseVideo()
   },
   methods: {
@@ -172,6 +174,7 @@ export default {
     },
     // 开始播放
     played () {
+      console.log('触发played事件')
       if (this.timer) {
         clearInterval(this.timer)
         this.timer = null
@@ -179,22 +182,17 @@ export default {
       this.isReady = true
       this.isPlay = true
       // 计算裁切部分
-      const { videoWidth, videoHeight } = this.videoEle
-      const scaleVideoHeight = videoWidth * (this.canvas.height / this.canvas.width)
-      const vParam = this.ios ? 1.1 : 2 // ios需要整体上拉一些防止盖住脸
-      const videoY = (videoHeight - scaleVideoHeight) / vParam
-      this.sParams = {
-        sx: 0,
-        sy: videoY,
-        sw: videoWidth,
-        sh: scaleVideoHeight
-      }
+      this.calc()
       // 初始记录第一帧图片
       this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
       // this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
       // 间隔40毫秒绘制一次
       const i = setInterval(() => {
-        this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
+        if (this.sParams.sh === 0) {
+          this.calc()
+        } else {
+          this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
+        }
         if (this.videoEle.ended || this.videoEle.paused) clearInterval(i)
       }, 0)
     },
@@ -215,6 +213,20 @@ export default {
     pauseVideo () {
       if (!this.isPlay) return
       this.videoEle.pause()
+    },
+    // 计算裁切部分
+    calc () {
+      this.videoEle = document.getElementById('dialogVideo')
+      const { videoWidth, videoHeight } = this.videoEle
+      const scaleVideoHeight = videoWidth * (this.canvas.height / this.canvas.width)
+      const vParam = this.ios ? 1.1 : 2 // ios需要整体上拉一些防止盖住脸
+      const videoY = (videoHeight - scaleVideoHeight) / vParam
+      this.sParams = {
+        sx: 0,
+        sy: videoY,
+        sw: videoWidth,
+        sh: scaleVideoHeight
+      }
     }
   }
 }
