@@ -153,6 +153,50 @@ export default {
     tableInfo(this.tableCode).then(
       res => {
         this.table = Object.assign(this.table, res.data)
+        this.$nextTick(async () => {
+          // 微信授权
+          this.code = params.get('code') || ''
+          // 授权第一次刷新页面
+          if (this.code) {
+            // 获取openid,存储将地址替换（防止刷新页面再次使用旧code请求）
+            await postUserCode(this.code).then(res => {
+              // 缓存openid
+              sessionStorage.openid = res.data.openid
+              const newPath = window.location.href.replace(window.location.search, '')
+              location.replace(newPath)
+            })
+          } else {
+            // 如果是授权第二次刷新页面，获取到openid记录在页面上
+            if (sessionStorage.openid) {
+              this.openid = sessionStorage.openid
+              if (this.table.tableType === 1) {
+                this.showPay = true
+              } else {
+                // 他评的情况
+                this.otherTestOpen()
+              }
+              sessionStorage.removeItem('openid')
+            }
+          }
+          // 支付页面回调
+          const redirect = this.$route.query.redirect
+          const orderid = this.$route.query.orderid
+          // h5支付
+          if (redirect === 'h5pay' && orderid) {
+            this.thisDialog('刚才的订单支付了吗？', '已支付', 'confirm').then(() => {
+              this.finishPay(orderid)
+            }).catch(() => {
+              this.payReplace()
+            })
+          } else if (redirect === 'alipay' && orderid) { // 支付宝支付
+            if (this.$route.query.type === 'return') {
+              this.finishPay(orderid)
+            } else {
+              // 取消支付的情况直接返回
+              this.$router.go(-1)
+            }
+          }
+        })
         // 获取优惠码
         this.discountCode = this.$route.query.discountCode
         if (this.discountCode) {
@@ -176,45 +220,6 @@ export default {
         this.share()
       }
     )
-    this.$nextTick(async () => {
-      // 微信授权
-      this.code = params.get('code') || ''
-      // 授权第一次刷新页面
-      if (this.code) {
-        // 获取openid,存储将地址替换（防止刷新页面再次使用旧code请求）
-        await postUserCode(this.code).then(res => {
-          // 缓存openid
-          sessionStorage.openid = res.data.openid
-          const newPath = window.location.href.replace(window.location.search, '')
-          location.replace(newPath)
-        })
-      } else {
-        // 如果是授权第二次刷新页面，获取到openid记录在页面上
-        if (sessionStorage.openid) {
-          this.openid = sessionStorage.openid
-          this.showPay = true
-          sessionStorage.removeItem('openid')
-        }
-      }
-      // 支付页面回调
-      const redirect = this.$route.query.redirect
-      const orderid = this.$route.query.orderid
-      // h5支付
-      if (redirect === 'h5pay' && orderid) {
-        this.thisDialog('刚才的订单支付了吗？', '已支付', 'confirm').then(() => {
-          this.finishPay(orderid)
-        }).catch(() => {
-          this.payReplace()
-        })
-      } else if (redirect === 'alipay' && orderid) { // 支付宝支付
-        if (this.$route.query.type === 'return') {
-          this.finishPay(orderid)
-        } else {
-          // 取消支付的情况直接返回
-          this.$router.go(-1)
-        }
-      }
-    })
   },
   methods: {
     onClickButton () {
