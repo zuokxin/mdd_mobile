@@ -426,9 +426,10 @@ export default {
       }
       .block{
         .title{
+          margin-bottom: .3243rem;
+          font-size: .374rem;
           color: #555555;
           font-weight: 500;
-          margin-bottom: .3243rem;
         }
         .choice-list{
           display: flex;
