@@ -180,9 +180,10 @@ export default {
         this.timer = null
       }
       this.isReady = true
-      this.isPlay = true
       // 计算裁切部分
       this.calc()
+      // 能绘制就显示播放
+      if (this.sParams.sh !== 0) this.isPlay = true
       // 初始记录第一帧图片
       this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
       // this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
@@ -191,6 +192,8 @@ export default {
         if (this.sParams.sh === 0) {
           this.calc()
         } else {
+          // 如果上面第一次绘制没有触发
+          if (!this.isPlay) this.isPlay = true
           this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
         }
         if (this.videoEle.ended || this.videoEle.paused) clearInterval(i)
