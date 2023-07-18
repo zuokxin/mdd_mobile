@@ -920,6 +920,7 @@ export default {
         font-size: .4267rem;
         padding: .4324rem .3243rem;
         color: #333333;
+        font-weight: 500;
         line-height: 28px;
       }
       .question-topic{
