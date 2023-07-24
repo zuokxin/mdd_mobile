@@ -38,8 +38,8 @@
               <span v-for="(it, index) in voice" :key="it" :class="{active: left_Voice[index]}"></span>
             </div>
             <div class="center same">
-              <img @click="postAnswer" v-if="!textFlag && btnShow" src="@/assets/img/stop.png" alt="">
-              <img @click="postAnswer" v-if="textFlag || !btnShow" src="@/assets/img/wait.png" alt="">
+              <img @click="postAnswer" v-show="!textFlag && btnShow" src="@/assets/img/stop.png" alt="stop">
+              <img @click="postAnswer" v-show="textFlag || !btnShow" src="@/assets/img/wait.png" alt="wait">
             </div>
             <div class="right same">
               <span v-for="(it, index) in voice" :key="it" :class="{active: right_Voice[index]}"></span>
@@ -412,6 +412,7 @@ export default {
       }
       this.waitwait = true // 提交有个过程
       this.textFlag = true
+      this.btnShow = false
       if (this.stopFlag) {
         // 这个按钮不能疯狂点击
         this.stopFlag = false
@@ -557,6 +558,7 @@ export default {
         // 当你不想说话进行测试的时候填入这个吧
         // 加一层返回保护
         if (!this.sessionId || !this.tableCode) return
+        // audio.url = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
         posTableQues(this.postFormat({ video: video.url, audio: audio.url })).then(re => {
         // posTableQues(this.postFormat({ video: video.url, audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
           this.init()
@@ -918,6 +920,7 @@ export default {
         font-size: .4267rem;
         padding: .4324rem .3243rem;
         color: #333333;
+        font-weight: 500;
         line-height: 28px;
       }
       .question-topic{

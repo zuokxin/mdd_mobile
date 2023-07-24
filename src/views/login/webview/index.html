@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://turing.captcha.qcloud.com/TCaptcha.js"></script>
+</head>
+<body>
+  <!-- 与app端交互html文件 -->
+  <script>
+    // 判断设备是否为ios
+    function browser(){
+      const u = navigator.userAgent
+      return {
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), // ios终端
+      }
+    }
+    // 无感验证回调
+    function callback (res) {
+      if ((res.ret === 0 && !res.errorCode) || (res.ret === 0 && res.errorCode === 1001)) {
+        if(browser().ios  == true){
+          window.webkit.messageHandlers.jsToOcWithPrams.postMessage({"params":res});
+        } else {
+          let result = JSON.stringify(res)
+          window.jsBridge.jsTo0cWithPrams(result)
+        }
+      } else {
+        if (res.ret === 0) {
+          loadErrorCallback()
+        }
+      }
+    }
+     // 定义验证码js加载错误处理函数
+    function loadErrorCallback() {
+        var appid = '192871241';
+        // 生成容灾票据或自行做其它处理
+        var ticket = 'terror_1001_' + appid + '_' + Math.floor(new Date().getTime() / 1000);
+        callback({
+          ret: 0,
+          randstr: '@'+ Math.random().toString(36).substr(2),
+          ticket: ticket,
+          errorCode: 1001,
+          errorMessage: 'jsload_error'
+        });
+     }
+
+    // 定义验证码触发事件
+    window.onload = function(){
+            try {
+                  // 生成一个验证码对象
+                  // CaptchaAppId：登录验证码控制台，从【验证管理】页面进行查看。如果未创建过验证，请先新建验证。注意：不可使用客户端类型为小程序的CaptchaAppId，会导致数据统计错误。
+                  //callback：定义的回调函数
+                  var captcha = new TencentCaptcha('192871241', callback, {"loading": false});
+                  // 调用方法，显示验证码
+                  captcha.show(); 
+            } catch (error) {
+            // 加载异常，调用验证码js加载错误处理函数
+                  loadErrorCallback();
+            }
+    }
+
+  </script>
+</body>
+</html>

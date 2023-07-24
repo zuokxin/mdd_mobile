@@ -35,7 +35,6 @@
         </div>
       </div>
       <div class="question-box" :class="{'question-box-psqi': tableCode === 'psqi'}" v-else>
-        <!-- {{end}}{{allData.id}} -->
         <div class="question">{{(allData.id + 1)? (allData.id + 1): ''}}.{{allData.title}}</div>
         <div v-for="(it,index) in options" :key="index">
           <div class="each-choice" @click="dispose(index)">
@@ -377,11 +376,32 @@ export default {
         this.$toast(res.message)
       }
     },
+    // 自定义题最后一题为单选非必填空
+    async isNeedSubmit () {
+      if (this.tableCode !== 'psqi') {
+        const curObj = this.options.find(v => v.checked)
+        if (curObj.requiredComment && !curObj.commentIsNecessary) {
+          const data = {
+            id: this.allData.id,
+            sessionId: this.sessionId,
+            tableCode: this.tableCode
+          }
+          this.allData.form.formItems[0].options = JSON.parse(JSON.stringify(this.options))
+          data.form = this.allData.form
+          try {
+            await postTableQues(data)
+          } catch (err) {
+            return true
+          }
+        }
+      }
+    },
     // 完成
     async finished () {
       const next = this.nextTable(this.thisTable)
-      // console.log(next)
-      // console.log(this.thisTable)
+      // 最后一题是非必填选择再加一次提交
+      const error = await this.isNeedSubmit()
+      if (error) return
       if (this.needSend) {
         this.allData.form.formItems[0].options = this.options
         const data = {
