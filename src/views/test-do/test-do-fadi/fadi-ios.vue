@@ -328,7 +328,8 @@ export default {
       getTableQues({
         sessionId: this.sessionId,
         tableCode: this.tableCode,
-        midwayBackBool: this.midwayBackBool
+        midwayBackBool: this.midwayBackBool,
+        virtualPortrait: sessionStorage.fadiGender
       }).then(
         res => {
           // 数据初始化
