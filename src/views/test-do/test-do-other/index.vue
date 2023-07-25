@@ -207,9 +207,18 @@ export default {
     // 弹窗S errPopout noFace（动作waitwait）
     this.sessionId = this.$route.query.sessionId
     this.tableCode = this.$route.query.tableCode
+    this.closeMedia()
     this.getBatchInfo()
   },
   methods: {
+    // 关闭媒体
+    closeMedia () {
+      if (window.yunyuStream) {
+        window.yunyuStream.getTracks().forEach((track) => {
+          track.stop()
+        })
+      }
+    },
     // 是否需要打开摄像头&&需要做哪些量表的信息
     async getBatchInfo () {
       const res = await batchInfo({ sessionId: this.sessionId })
@@ -779,11 +788,12 @@ export default {
   beforeRouteLeave (to, from, next) {
     // 离开后摄像头红点消失
     this.recorder.close()
-    if (window.yunyuStream) {
-      const [media01, media02] = window.yunyuStream.getTracks()
-      if (media01) media01.stop()
-      if (media02) media02.stop()
-    }
+    this.closeMedia()
+    // if (window.yunyuStream) {
+    //   const [media01, media02] = window.yunyuStream.getTracks()
+    //   if (media01) media01.stop()
+    //   if (media02) media02.stop()
+    // }
     next()
   }
 }
