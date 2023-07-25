@@ -8,9 +8,6 @@ const sexArr = [
 ]
 const educateArr = [
   {
-    name: '文盲'
-  },
-  {
     name: '小学'
   },
   {

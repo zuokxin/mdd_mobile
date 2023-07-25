@@ -81,7 +81,8 @@ export default {
       show: false,
       searchList: [],
       // searchFinished: false,
-      defaultF: true
+      defaultF: true,
+      appid: '192871241'
     }
   },
   mounted () {
@@ -114,7 +115,44 @@ export default {
     },
     // 获取验证码
     getMsgCode () {
-      getCode({ phone: this.username, countryCode: this.countryCode }).then(res => {
+      try {
+        // eslint-disable-next-line no-unused-vars, no-undef
+        var captcha = new TencentCaptcha(this.appid, this.callback, { loading: false })
+        // eslint-disable-next-line no-undef
+        captcha.show()
+        // eslint-disable-next-line no-undef
+      } catch (error) {
+        this.loadErrorCallback(error)
+      }
+    },
+    // 无感验证回调
+    callback (res) {
+      console.log('callback', 'res', res)
+      if ((res.ret === 0 && !res.errorCode) || (res.ret === 0 && res.errorCode === 1001)) {
+        this.getMessageCode(res.ticket, res.randstr)
+      } else {
+        if (res.ret === 0) {
+          this.loadErrorCallback()
+        }
+      }
+    },
+    // 腾讯云验证js加载失败回调
+    loadErrorCallback (error) {
+      console.log('loadErrorCallback', error)
+      // 生成容灾票据或自行做其它处理
+      var ticket = 'terror_1001' + this.appid + '_' + Math.floor(new Date().getTime() / 1000)
+      this.callback({
+        ret: 0,
+        randstr: '@' + Math.random().toString(36).substr(2),
+        ticket: ticket,
+        errorCode: 1001,
+        errorMessage: 'jsload_error'
+      })
+    },
+    // 获取验证码
+    getMessageCode (ticket, randstr) {
+      console.log('getCode')
+      getCode({ ticket: ticket, randStr: randstr, phone: this.username, countryCode: this.countryCode }).then(res => {
         if (res.code === 0) {
           this.timeFlag = true
           this.countDown(60)
