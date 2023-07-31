@@ -155,14 +155,14 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
   document.title = to.meta.title || '云愈心理'
   // 只有fadi不会自动关闭
-  if (from.path === '/test-do-fadi') {
-    if (window.mediaStream) {
-      window.mediaStream.getTracks().forEach((track) => {
-        track.stop()
-      })
-      window.mediaStream = null
-    }
-  }
+  // if (from.path === '/test-do-fadi') {
+  //   if (window.mediaStream) {
+  //     window.mediaStream.getTracks().forEach((track) => {
+  //       track.stop()
+  //     })
+  //     window.mediaStream = null
+  //   }
+  // }
   // if (!init) {
   //   try {
   //     await store.dispatch('getToken')

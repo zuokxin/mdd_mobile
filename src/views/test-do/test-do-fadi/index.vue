@@ -22,6 +22,18 @@ export default {
   created () {
     if (browser().ios) this.browserType = 'isIOS'
     console.log(this.browserType)
+  },
+  beforeRouteLeave (to, from, next) {
+    // 离开后摄像头红点消失
+    if (window.mediaStream) {
+      window.mediaStream.getTracks().forEach((track) => {
+        track.stop()
+      })
+    }
+    console.log('beforeRouteLeave2', to, from)
+    // 离开后摄像头红点消失
+    // this.closeMedia()
+    next()
   }
 }
 </script>
