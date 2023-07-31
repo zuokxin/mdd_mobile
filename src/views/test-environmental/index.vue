@@ -132,6 +132,9 @@ export default {
     if (this.timer) {
       clearInterval(this.timer)
     }
+    if (this.faceTimer) {
+      clearInterval(this.faceTimer)
+    }
   },
   watch: {
   },
