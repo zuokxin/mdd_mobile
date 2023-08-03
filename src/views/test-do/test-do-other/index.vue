@@ -167,7 +167,8 @@ export default {
       miniNextFlag: true,
       miniType: ['check', 'select', 'radio', 'selectRange', 'radioGroup', 'dateRange'],
       yesNoMiniDialogFlag: false, // mini 回答是否的错误弹窗
-      btnShow: false
+      btnShow: false,
+      canFace: false
     }
   },
   computed: {
@@ -390,6 +391,7 @@ export default {
         // this.$refs.videoBox.play()
         this.$refs.dragVideo.restartVideo()
         this.canUpload = true
+        this.canFace = true
       }
       setTimeout(() => {
         this.btnShow = true
@@ -419,6 +421,7 @@ export default {
         this.$toast.fail('请检查设备后再完成题目')
         return
       }
+      this.canFace = false
       this.waitwait = true // 提交有个过程
       this.textFlag = true
       this.btnShow = false
@@ -525,18 +528,21 @@ export default {
         }).catch(errr => {
           // 没有说话重新回答 弹出错误提示 再点击确定后做题
           if (errr.code === 546) {
-            if (!this.noFace) {
-              this.errPopout = true
-            }
+            // if (!this.noFace) {
+            //   this.errPopout = true
+            // }
+            this.errPopout = true
           } else if (errr.code === 547) {
             // 547是 mini回答是否的问题
-            if (!this.noFace) {
-              this.yesNoMiniDialogFlag = true
-            }
+            // if (!this.noFace) {
+            //   this.yesNoMiniDialogFlag = true
+            // }
+            this.yesNoMiniDialogFlag = true
           } else {
-            if (!this.noFace) {
-              this.$toast(errr.message)
-            }
+            // if (!this.noFace) {
+            //   this.$toast(errr.message)
+            // }
+            this.$toast(errr.message)
             this.sureToAnswer()
           }
         })
@@ -575,19 +581,21 @@ export default {
         }).catch(err => {
           if (err.code === 546) {
             // 没有说话重新回答 弹出错误提示 再点击确定后做题
-            if (!this.noFace) {
-              this.errPopout = true
-            }
+            // if (!this.noFace) {
+            //   this.errPopout = true
+            // }
+            this.errPopout = true
           } else if (err.code === 547) {
             // 547是 mini回答是否的问题
-            if (!this.noFace) {
-              this.yesNoMiniDialogFlag = true
-            }
+            // if (!this.noFace) {
+            //   this.yesNoMiniDialogFlag = true
+            // }
+            this.yesNoMiniDialogFlag = true
           } else {
-            if (!this.noFace) {
-              this.$toast(err.message)
-            }
-            // this.$toast(err.message)
+            // if (!this.noFace) {
+            //   this.$toast(err.message)
+            // }
+            this.$toast(err.message)
             this.sureToAnswer()
           }
         })
@@ -625,8 +633,9 @@ export default {
       if (this.aiEvalCamEnabled) {
         // 如果开启摄像头 要活动 并且做人脸识别检查
         this.mediaRecorder.start()
-        this.onceFlag = false
         this.$refs.dragVideo.restartVideo()
+        this.canFace = true
+        this.onceFlag = false
         // setTimeout(() => { this.onPlay() }, 2000)
       }
       setTimeout(() => {
@@ -675,33 +684,59 @@ export default {
       }
       // 上传答题环节
       if (!this.isEnd) {
-        // 答题录像环节
-        if (this.voicePopout) return clear()
-        if (this.errPopout) return clear()
-        if (this.waitwait) return clear()
-        if (!this.textFlag && this.canUpload) {
-          // 未检出人脸1S
-          if (!e) {
-            if (this.faceTimer) return
-            this.unFaceTime = (new Date()).getTime()
-            this.faceTimer = setInterval(() => {
-              const newTime = (new Date()).getTime()
-              if (newTime - this.unFaceTime >= 1000) {
-                // console.log('未检出人脸1S', new Date())
-                this.canUpload = false
-                this.$refs.dragVideo.pauseVideo()
-                this.mediaRecorder.stop()
-                this.recorder.pause()
-                setTimeout(() => {
-                  this.noFace = true
-                }, 0)
-                clear()
-              }
-            }, 1)
-          } else {
-            clear()
-          }
+        if (!this.canFace) return clear()
+        // 未检出人脸1S
+        if (!e) {
+          if (this.faceTimer) return
+          this.unFaceTime = (new Date()).getTime()
+          this.faceTimer = setInterval(() => {
+            const newTime = (new Date()).getTime()
+            if (newTime - this.unFaceTime >= 1000) {
+              // console.log('未检出人脸1S', new Date())
+              if (!this.canFace) return clear()
+              this.canFace = false
+              this.canUpload = false
+              this.$refs.dragVideo.pauseVideo()
+              this.mediaRecorder.stop()
+              this.recorder.pause()
+              setTimeout(() => {
+                this.noFace = true
+              }, 0)
+              clear()
+            }
+          }, 1)
+        } else {
+          clear()
         }
+        // 答题录像环节
+        // if (this.voicePopout) return clear()
+        // if (this.errPopout) return clear()
+        // if (this.waitwait) return clear()
+        // if (!this.textFlag && this.canUpload) {
+        //   // 未检出人脸1S
+        //   if (!e) {
+        //     if (this.faceTimer) return
+        //     this.unFaceTime = (new Date()).getTime()
+        //     this.faceTimer = setInterval(() => {
+        //       const newTime = (new Date()).getTime()
+        //       if (newTime - this.unFaceTime >= 1000) {
+        //         // console.log('未检出人脸1S', new Date())
+        //         if (!this.canFace) return
+        //         this.canFace = false
+        //         this.canUpload = false
+        //         this.$refs.dragVideo.pauseVideo()
+        //         this.mediaRecorder.stop()
+        //         this.recorder.pause()
+        //         setTimeout(() => {
+        //           this.noFace = true
+        //         }, 0)
+        //         clear()
+        //       }
+        //     }, 1)
+        //   } else {
+        //     clear()
+        //   }
+        // }
       }
     },
     // 关闭人脸提示-new

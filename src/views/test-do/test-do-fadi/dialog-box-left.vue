@@ -196,7 +196,10 @@ export default {
           if (!this.isPlay) this.isPlay = true
           this.ctx.drawImage(this.videoEle, this.sParams.sx, this.sParams.sy, this.sParams.sw, this.sParams.sh, 0, 0, this.canvas.width, this.canvas.height)
         }
-        if (this.videoEle.ended || this.videoEle.paused) clearInterval(i)
+        if (this.videoEle.ended || this.videoEle.paused) {
+          this.isPlay = false
+          clearInterval(i)
+        }
       }, 0)
     },
     // 视频暂停（自动播放结束和手动暂停）

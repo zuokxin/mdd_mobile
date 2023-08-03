@@ -774,11 +774,16 @@ export default {
       })
     }
   },
-  beforeRouteLeave (to, from, next) {
-    // 离开后摄像头红点消失
-    this.closeMedia()
-    next()
+  beforeDestroy () {
+    if (this.recorder) this.recorder.close()
+    console.log(this.recorder)
   }
+  // beforeRouteLeave (to, from, next) {
+  //   console.log('beforeRouteLeave', this)
+  //   // 离开后摄像头红点消失
+  //   this.closeMedia()
+  //   next()
+  // }
 }
 </script>
 
