@@ -21,6 +21,9 @@
       <!-- 轮播图 -->
       <van-swipe :autoplay="5000">
         <van-swipe-item>
+          <img @click.stop="openCbt" src="@/assets/img/banner1.png" alt="心理疏导">
+        </van-swipe-item>
+        <van-swipe-item>
           <img class="game" @click.stop="playGame" src="@/assets/img/test/game.png" alt="game">
         </van-swipe-item>
         <van-swipe-item v-for="(item, index) in swipList" :key="index">
@@ -151,6 +154,16 @@ export default {
     selectHandle (id, index) {
       this.active = index
       this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
+    },
+    openCbt () {
+      if (
+        window.location.hostname.includes('127.0.0.1') ||
+        window.location.hostname.includes('10.0.0')
+      ) {
+        window.location.href = 'https://depression.local.fubianmed.com/share/?type=Y2J0MDE='
+      } else {
+        window.location.href = window.location.hostname + '/share/?type=Y2J0MDE='
+      }
     },
     playGame () {
       const userId = localStorage.getItem('userId')
