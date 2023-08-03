@@ -10,8 +10,14 @@ import Vconsole from 'vconsole'
 export default {
   name: 'App',
   mounted () {
-    const vConsole = new Vconsole()
-    console.log(vConsole)
+    // 控制Vcosole
+    const openVconsole = true
+    const condition1 = window.location.hostname === 'depression.fubianmed.com'
+    if (openVconsole && !condition1) {
+      const vConsole = new Vconsole()
+      console.log(vConsole)
+    }
+    console.log(Vconsole)
   }
 }
 </script>
