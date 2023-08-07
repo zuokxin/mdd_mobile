@@ -162,7 +162,7 @@ export default {
       ) {
         window.location.href = 'https://depression.local.fubianmed.com/share/?type=Y2J0MDE='
       } else {
-        window.location.href = window.location.hostname + '/share/?type=Y2J0MDE='
+        window.location.href = window.location.origin + '/share/?type=Y2J0MDE='
       }
     },
     playGame () {
