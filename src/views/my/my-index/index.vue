@@ -8,7 +8,7 @@
           <div class="center-left"><img src="../../../assets/img/yunyuicon.png" alt=""><span>云愈币 {{isLogin ?  yunyu_coins : '***'}}</span></div>
           <div class="center-right" v-if="userId"><span>ID：{{ userId }}</span><img @click="copy(userId)" src="@/assets/img/my/copy.png" alt=""></div>
         </div>
-        <div class="under"><span class="round"><span>i</span> </span><span class="last"> <span>云愈币仅可在云愈心理APP中消费，暂不支持网页消费</span> </span></div>
+        <div class="under"><span class="round"><span>i</span> </span><span class="last"> <span>云愈币仅可在云愈心理App中消费，暂不支持网页消费</span> </span></div>
       </div>
     </div>
     <div class="content">
@@ -54,7 +54,7 @@
         </div>
         <div class="card" @click="skip">
           <img src="@/assets/img/my/app.png" alt="app">
-          <div class="tip">下载APP</div>
+          <div class="tip">下载App</div>
         </div>
       </div>
       <van-button class="login-out" :class="{'invisible ': !isLogin}" @click="loginOut">退出登录</van-button>
