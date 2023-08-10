@@ -144,6 +144,12 @@ const routes = [
     name: '环境测试',
     meta: { title: '环境测试' },
     component: resolve => require(['../views/test-environmental/index.vue'], resolve)
+  },
+  {
+    path: '/cbt-detail',
+    name: 'cbt课程详情',
+    meta: { title: '课程详情' },
+    component: resolve => require(['../views/cbt-detail/index.vue'], resolve)
   }
 ]
 
