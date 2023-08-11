@@ -34,6 +34,7 @@ import DetailContent from './detail-content.vue'
 import { Dialog } from 'vant'
 import { getCbtCourseInfo, wxSignatures } from '@/api/index'
 import wxShare from '@/utils/wxShare'
+import browser from '@/utils/browser'
 // const params = new URLSearchParams(window.location.search)
 export default {
   name: 'cbt-detail',
@@ -55,7 +56,10 @@ export default {
         time: 0,
         cnt: 0
       },
-      courseId: ''
+      courseId: '',
+      ios: browser().ios,
+      weixin: browser().weixin,
+      android: browser().android
     }
   },
   created () {
@@ -85,6 +89,30 @@ export default {
     onClickButton () {
       // 未登录
       console.log('onClickButton')
+      let params = ''
+      if (this.courseId === '0') {
+        // 系统体验课
+        params = 'CBTTrialIntro'
+      } else if (this.courseId === '1') {
+        // 系统思维课
+        params = 'CBTATIntro'
+      } else {
+        params = 'ThemeCourse_' + this.courseId
+      }
+      // ios
+      if (this.ios) {
+        window.location.href = 'fubian://fubianmed.com/welcome?path=' + params
+        window.setTimeout(() => {
+          window.location.href = 'https://apps.apple.com/cn/app/id1540713920'
+        }, 3000)
+      }
+      // 安卓
+      if (this.android) {
+        window.location.href = 'app://fubianmed.com/welcome?path=' + params
+        window.setTimeout(() => {
+          window.location.href = 'https://a.app.qq.com/o/simple.jsp?pkgname=com.fubian.depressiondetection'
+        }, 3000)
+      }
     },
     // 弹窗封装
     thisDialog (message, btnText = '确定', type = 'alert') {
