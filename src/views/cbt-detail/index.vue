@@ -16,15 +16,51 @@
     <!-- 详情描述 -->
     <detail-content :detailPageImages="course.detailPageImages"></detail-content>
     <!-- 足部操作区 -->
-    <van-goods-action :safe-area-inset-bottom="true">
-      <van-goods-action-icon to="/cbt-more" text="更多疏导"/>
-      <van-goods-action-button
+    <div class="van-goods-action">
+      <div class="van-goods-action-icon" style="min-width: 55px;">更多疏导</div>
+      <van-button
+        v-if="!weixinBtn"
+        class="to-cbt"
+        round
         type="primary"
-        text="去App疏导"
+        block
         :disabled="canGo"
         @click="onClickButton"
-      />
-    </van-goods-action>
+      >去App疏导吧</van-button>
+      <!-- 微信内按钮 -->
+      <wx-open-launch-app
+        v-else
+        id="launch-btn"
+        appid="wx4d94fab8d9952d73"
+        :extinfo="extinfo"
+      >
+        <script type="text/wxtag-template">
+          <style>
+            .wx-cbt-btn {
+              position: relative;
+              display: inline-block;
+              box-sizing: border-box;
+              width: 100%;
+              height: 40px;
+              padding: 0 15px;
+              margin-left: 10px;
+              margin-right: 10px;
+              font-size: 16rem / @w;
+              line-height: 40px;
+              text-align: center;
+              border-radius: 20px;
+              cursor: pointer;
+              transition: opacity 0.2s;
+              -webkit-appearance: none;
+              color: #fff;
+              background-color: #34B7B9;
+              border: 1px solid #34B7B9;
+            }
+          </style>
+          <div class="wx-cbt-btn">去App疏导吧</div>
+        </script>
+      </wx-open-launch-app>
+    </div>
   </div>
 </template>
 
@@ -59,14 +95,24 @@ export default {
       courseId: '',
       ios: browser().ios,
       weixin: browser().weixin,
-      android: browser().android
+      android: browser().android,
+      extinfo: '{}',
+      path: '',
+      weixinBtn: false
     }
   },
   created () {
     this.courseId = this.$route.query.courseId
     // 云愈CBT体验课和云愈CBT自动思维课程显示名字，其余叫课程详情
-    if (this.courseId === '0') document.title = '云愈CBT体验课'
-    if (this.courseId === '1') document.title = '云愈CBT自动思维课程'
+    if (this.courseId === '0') {
+      document.title = '云愈CBT体验课'
+      this.path = 'CBTTrialIntro'
+    } else if (this.courseId === '1') {
+      document.title = '云愈CBT自动思维课程'
+      this.path = 'CBTATIntro'
+    } else {
+      this.path = 'ThemeCourse_' + this.courseId
+    }
   },
   async mounted () {
     // cbt信息
@@ -89,19 +135,11 @@ export default {
     onClickButton () {
       // 未登录
       console.log('onClickButton')
-      let params = ''
-      if (this.courseId === '0') {
-        // 系统体验课
-        params = 'CBTTrialIntro'
-      } else if (this.courseId === '1') {
-        // 系统思维课
-        params = 'CBTATIntro'
-      } else {
-        params = 'ThemeCourse_' + this.courseId
-      }
+      const params = this.path
+      console.log(params, 'app')
       // ios
       if (this.ios) {
-        window.location.href = 'fubian://fubianmed.com/welcome?path=' + params
+        window.location.href = 'fubian://' + params
         window.setTimeout(() => {
           window.location.href = 'https://apps.apple.com/cn/app/id1540713920'
         }, 3000)
@@ -146,8 +184,23 @@ export default {
         imgUrl: this.course.courseImage
       }
       wxSignatures({ url: currentUrl }).then(res => {
+        this.extinfo = JSON.stringify({ path: this.path })
         if (res.code === 0) {
-          wxShare.getJSSDK(res.data, dataForm)
+          wxShare.getJSSDK(res.data, dataForm, (e) => {
+            if (e.type === 'ready' && e.code === 200) {
+              this.weixinBtn = true
+              console.log('ready')
+              this.$nextTick(() => {
+                const btn = document.getElementById('launch-btn')
+                btn.addEventListener('launch', function () {
+                  console.log('success')
+                })
+                btn.addEventListener('error', function (e) {
+                  console.log(e.detail)
+                })
+              })
+            }
+          })
         }
       })
     }
@@ -198,8 +251,12 @@ export default {
   }
   /deep/.van-button__content {
     font-size: 16rem / @w;
-    font-weight: 700;
     color: #FFFFFF;
+  }
+  .to-cbt {
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 40px;
   }
 }
 </style>
