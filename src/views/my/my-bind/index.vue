@@ -66,7 +66,7 @@
                   <div class="blocks"><div class="name">{{item.courseName}}</div>
                   <div class="buy-infos"><div class="left"><span>批次号: {{item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...': item.batchId}}</span></div></div>
                   <div class="buy-infos"><div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div></div>
-                  <div class="function-btns"><div class="psqi">仅支持在APP中测试</div></div>
+                  <div class="function-btns"><div class="psqi">仅支持在App中测试</div></div>
               </div>
               </div>
             </div>
