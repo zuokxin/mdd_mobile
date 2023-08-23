@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <van-nav-bar
-      title="下载APP"
+      title="下载App"
       left-arrow
       @click-left="onClickLeft"
       fixed

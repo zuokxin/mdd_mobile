@@ -8,7 +8,7 @@ const headers = {
   'Content-Type': 'application/json; charset=utf-8',
   'x-client-type': 'h5',
   'x-client-channel': 'h5',
-  'x-client-version': ''
+  'x-client-version': '100.0.0'
   // 'x-client-version': window.navigator.userAgent
 }
 const http = axios.create({

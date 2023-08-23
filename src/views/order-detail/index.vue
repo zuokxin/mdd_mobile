@@ -476,7 +476,6 @@ export default {
   }
   /deep/.van-button__content {
     font-size: 16rem / @w;
-    font-weight: 700;
     color: #FFFFFF;
   }
 }

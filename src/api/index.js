@@ -85,3 +85,12 @@ export const postTableRes = data => fetch({
   method: 'post',
   data
 })
+
+// 获得cbt课程详情
+export const getCbtCourseInfo = courseId => fetch({
+  url: '/api/cbtCourse/h5/userCourseInfo',
+  method: 'get',
+  params: {
+    courseId
+  }
+})
