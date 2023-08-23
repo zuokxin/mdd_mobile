@@ -17,7 +17,7 @@
     <detail-content :detailPageImages="course.detailPageImages"></detail-content>
     <!-- 足部操作区 -->
     <div class="van-goods-action">
-      <div class="van-goods-action-icon" style="min-width: 55px;">更多疏导</div>
+      <div class="van-goods-action-icon more-cbt" @click="$router.push('/cbt-more')">更多疏导</div>
       <van-button
         v-if="!weixinBtn"
         class="to-cbt"
@@ -252,6 +252,11 @@ export default {
   /deep/.van-button__content {
     font-size: 16rem / @w;
     color: #FFFFFF;
+  }
+  .more-cbt {
+    min-width: 90rem / @w;
+    text-align: center;
+    padding: 0;
   }
   .to-cbt {
     margin-left: 10px;
