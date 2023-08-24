@@ -94,7 +94,7 @@ export default {
       this.loading = false
     },
     async getCbtCourseList () {
-      const res = await cbtCourseList({ type: 'show' })
+      const res = await cbtCourseList({ type: 'show', pageType: 'cbtHome' })
       console.log('res', res)
       if (res.code === 0) {
         this.cbtCourseList = res.data.courseList
@@ -241,6 +241,7 @@ export default {
           border-radius: 8rem/@w 0 8rem/@w 0;
           background-color: #e4a434;
           text-align: center;
+          white-space: nowrap;
           font-size: 10rem/@w;
           line-height: 20rem/@w;
           color: #fff;
