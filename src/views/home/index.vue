@@ -37,7 +37,7 @@
           <div class="train-box">
             <div class="train-box-content" v-for="v in cbtCourseList" :key="v.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
               <div class="tag" v-if="Number(v.price) === 0">限时免费</div>
-              <div class="tag" v-if="Number(v.price) === 1.99">限时优惠</div>
+              <div class="tag" v-if="Number(v.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
               <div class="img"><img :src="v.courseImage" alt="专题训练"></div>
               <p class="name">{{ v.courseName }}</p>
               <p class="price"><span>￥</span>{{ Number(v.price).toFixed(2) }}</p>
@@ -93,6 +93,7 @@ import { h5ActivitylList, cbtCourseList, carefulSelection, courseList } from '@/
 import MainTabbar from '@/components/MainTabbar'
 import NewPersonGift from '@/components/newPerson'
 export default {
+  name: 'home',
   components: {
     MainTabbar,
     NewPersonGift
@@ -288,6 +289,7 @@ export default {
       h5{
         margin: 0;
         font-size: 16rem/@w;
+        font-weight: 500;
         line-height: 22rem/@w;
       }
       span{
@@ -376,6 +378,7 @@ export default {
       line-height: 22rem/@w;
       h5{
         font-size: 16rem/@w;
+        font-weight: 500;
         color: #333;
         margin: 0;
       }
