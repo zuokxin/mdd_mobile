@@ -232,9 +232,11 @@ export default {
   display: flex;
   justify-content: space-between;
   .search {
+    flex: 1;
     display: flex;
     align-items: center;
-    width: 240rem/@w;
+    // width: 240rem/@w;
+    margin-right: 10rem/@w;
     height: 33rem/@w;
     background: #fff;
     border-radius: 17rem/@w;
