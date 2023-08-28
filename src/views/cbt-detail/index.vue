@@ -31,6 +31,7 @@
       <wx-open-launch-app
         v-else
         id="launch-btn"
+        class="launch-btn"
         appid="wx4d94fab8d9952d73"
         :extinfo="extinfo"
       >
@@ -43,8 +44,6 @@
               width: 100%;
               height: 40px;
               padding: 0 15px;
-              margin-left: 10px;
-              margin-right: 10px;
               font-size: 16rem / @w;
               line-height: 40px;
               text-align: center;
@@ -98,7 +97,12 @@ export default {
       android: browser().android,
       extinfo: '{}',
       path: '',
-      weixinBtn: false
+      weixinReady: false
+    }
+  },
+  computed: {
+    weixinBtn () {
+      return this.weixin && this.weixinReady
     }
   },
   created () {
@@ -185,23 +189,23 @@ export default {
       }
       wxSignatures({ url: currentUrl }).then(res => {
         this.extinfo = JSON.stringify({ path: this.path })
-        if (res.code === 0) {
-          wxShare.getJSSDK(res.data, dataForm, (e) => {
-            if (e.type === 'ready' && e.code === 200) {
-              this.weixinBtn = true
-              console.log('ready')
-              this.$nextTick(() => {
-                const btn = document.getElementById('launch-btn')
-                btn.addEventListener('launch', function () {
-                  console.log('success')
-                })
-                btn.addEventListener('error', function (e) {
-                  console.log(e.detail)
-                })
+        wxShare.getJSSDK(res.data, dataForm, (e) => {
+          if (e.type === 'ready' && e.code === 200) {
+            this.weixinReady = true
+            console.log('ready')
+            this.$nextTick(() => {
+              const vm = this
+              const btn = document.getElementById('launch-btn')
+              btn.addEventListener('launch', function () {
+                console.log('success')
               })
-            }
-          })
-        }
+              btn.addEventListener('error', function (e) {
+                vm.onClickButton()
+                console.log(e.detail)
+              })
+            })
+          }
+        })
       })
     }
   },
@@ -263,5 +267,9 @@ export default {
     margin-right: 10px;
     height: 40px;
   }
+}
+.launch-btn {
+  width: 100%;
+  padding: 0 10px;
 }
 </style>
