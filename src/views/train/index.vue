@@ -9,7 +9,7 @@
       <div class="train-box" v-for="item in cbtCourseList" :key="item.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: item.courseId } })">
         <div class="img">
           <img :src="item.courseImage" alt="专题训练">
-          <div class="tag" v-if="Number(item.price) === 1.99">限时优惠</div>
+          <div class="tag" v-if="Number(item.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
           <div class="tag" v-if="Number(item.price) === 0">限时免费</div>
         </div>
         <div class="description">
