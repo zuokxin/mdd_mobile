@@ -60,6 +60,7 @@
       <van-button round block type="primary" v-if="psqiFinish" :disabled="!end" @click="finished">完成</van-button>
       <van-button round block type="primary" v-else :disabled="!end"  @click="next">下一题</van-button>
     </div>
+    <FadiRoleDialog ref="FadiRoleDialog" @confirm="$router.replace(routerPath)"></FadiRoleDialog>
   </div>
 </template>
 
@@ -69,8 +70,12 @@ import wxShare from '@/utils/wxShare'
 // import { findIndexByKeyValue } from '@/utils/checkFinish'
 import { mapGetters } from 'vuex'
 import { Dialog } from 'vant'
+import FadiRoleDialog from '@/components/FadiRoleDialog'
 export default {
   name: 'do-self',
+  components: {
+    FadiRoleDialog
+  },
   data () {
     return {
       loading: true, // 题目正在提交
@@ -419,9 +424,13 @@ export default {
             postTableRes(data).then(resp => {
               if (resp.code === 0) {
                 if (next) {
-                  this.thisDialog('您将进入下一个量表进行测试').then(() => {
-                    this.$router.replace(this.routerPath)
-                  })
+                  if (next.table.tableCode === 'FADI') {
+                    this.$refs.FadiRoleDialog.show = true
+                  } else {
+                    this.thisDialog('您将进入下一个量表进行测试').then(() => {
+                      this.$router.replace(this.routerPath)
+                    })
+                  }
                 } else {
                   this.$router.replace(this.routerPath)
                 }
@@ -443,9 +452,13 @@ export default {
         if (res.code === 0) {
           // this.$router.replace({ path: '/test-do-wait?s=5', query: { sessionId: this.sessionId } })
           if (next) {
-            this.thisDialog('您将进入下一个量表进行测试').then(() => {
-              this.$router.replace(this.routerPath)
-            })
+            if (next.table.tableCode === 'FADI') {
+              this.$refs.FadiRoleDialog.show = true
+            } else {
+              this.thisDialog('您将进入下一个量表进行测试').then(() => {
+                this.$router.replace(this.routerPath)
+              })
+            }
           } else {
             this.$router.replace(this.routerPath)
           }
