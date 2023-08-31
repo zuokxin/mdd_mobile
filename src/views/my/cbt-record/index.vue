@@ -26,7 +26,7 @@
     <div class="none" v-else>
       <div class="box">
         <img src="@/assets/img/my/nodata.png" alt="">
-        <p>暂无记录</p>
+        <p>暂无疏导记录</p>
       </div>
     </div>
   </div>
