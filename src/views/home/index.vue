@@ -61,7 +61,7 @@
               <div v-else></div>
               <div class="price">
                 <div class="red"><span>￥</span>{{ Number(item.price).toFixed(2) }}</div>
-                <div><img src="@/assets/img/my/hot.png" alt="已测试"><span>{{ item.evalRecordCount }}人已测试</span></div>
+                <div><img src="@/assets/img/my/hot.png" alt="已测试"><span class="completed">{{ item.evalRecordCount }}人已测试</span></div>
               </div>
             </div>
           </div>
@@ -414,6 +414,7 @@ export default {
         .name{
           color: #333;
           white-space: nowrap;
+          font-size: 14rem/@w;
           overflow: hidden;
           text-overflow: ellipsis;
           vertical-align: baseline;
@@ -442,6 +443,9 @@ export default {
             height: 14rem/@w;
             margin-right: 4rem/@w;
           }
+        }
+        .completed{
+          font-size: 12rem/@w;
         }
       }
 
