@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import store from '../store'
+import store from '../store'
 
 Vue.use(VueRouter)
 
@@ -181,9 +181,14 @@ const router = new VueRouter({
   routes
 })
 
-// let init = false
+let init = false
 router.beforeEach(async (to, from, next) => {
   document.title = to.meta.title || '云愈心理'
+  // 页面开始时的地址记录，用于拿微信签名
+  if (!init) {
+    init = true
+    store.commit('SET_INIT_URL', window.location.href)
+  }
   // 只有fadi不会自动关闭
   // if (from.path === '/test-do-fadi') {
   //   if (window.mediaStream) {

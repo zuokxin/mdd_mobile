@@ -14,7 +14,6 @@
 
 <script>
 import browser from '@/utils/browser'
-import wxShare from '@/utils/wxShare'
 export default {
   data () {
     return {
@@ -23,7 +22,9 @@ export default {
     }
   },
   mounted () {
-    wxShare.share(false)
+    this.$store.dispatch('addShare', {}, () => {
+      console.log('联系页面加载分享')
+    })
     const adress = window.location.origin.split('//')[1].split('.')[0]
     this.appSource()
     if (adress === '10' || adress.includes('localhost')) {

@@ -116,7 +116,6 @@
 <script>
 import { signInFind, signInCreate, newUserReward } from '@/api/modules/user'
 import { postLogout } from '@/api/modules/login'
-import wxShare from '@/utils/wxShare'
 import MainTabbar from '@/components/MainTabbar'
 import NewPersonGift from '@/components/newPerson'
 import { Dialog } from 'vant'
@@ -213,7 +212,9 @@ export default {
         }
       })
     }
-    wxShare.share()
+    this.$store.dispatch('addShare', {}, () => {
+      console.log('我的页面加载分享')
+    })
   },
   methods: {
     // 签到
