@@ -38,7 +38,6 @@
 <script>
 import { tableTypeList, getAllTable } from '@/api/modules/user'
 import MainTabbar from '@/components/MainTabbar'
-import wxShare from '@/utils/wxShare'
 export default {
   data () {
     return {
@@ -55,7 +54,6 @@ export default {
   },
   mounted () {
     this.getTypeList()
-    wxShare.share()
   },
   methods: {
     async getTypeList () {
