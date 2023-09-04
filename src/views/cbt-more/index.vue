@@ -48,22 +48,18 @@
     <div class="footer">
       <MainTabbar></MainTabbar>
     </div>
-    <NewPersonGift :flag="newPersonFlag" />
   </div>
 </template>
 
 <script>
 import { courseList, cbtCourseList } from '@/api/modules/user'
 import MainTabbar from '@/components/MainTabbar'
-import NewPersonGift from '@/components/newPerson'
 export default {
   components: {
-    MainTabbar,
-    NewPersonGift
+    MainTabbar
   },
   data () {
     return {
-      newPersonFlag: false,
       courseList: [],
       cbtCourseList: [],
       flag: 0,
@@ -73,14 +69,6 @@ export default {
   mounted () {
     this.getCourseList()
     this.getCbtCourseList()
-    if (localStorage.getItem('phone')) {
-      this.$store.dispatch('getInfo').then(res => {
-        if (res.data.isNewUser && !res.data.isRxNUReward) {
-          this.newPersonFlag = true
-          // 这是满足新人有礼条件
-        }
-      })
-    }
   },
   methods: {
     async getCourseList () {

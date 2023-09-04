@@ -141,7 +141,7 @@ export default {
     // if (this.continue) this.go = true
     // 量表信息
     this.tableCode = this.$route.query.tableCode
-    if (localStorage.getItem('phone')) {
+    if (this.$store.state.phone) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           this.newPersonFlag = true

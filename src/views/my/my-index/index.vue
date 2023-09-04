@@ -199,7 +199,7 @@ export default {
     }
   },
   mounted () {
-    const phone = localStorage.getItem('phone')
+    const phone = this.$store.state.phone
     if (phone) {
       this.phone = phone
       this.isLogin = true
@@ -301,7 +301,7 @@ export default {
         console.log('取消')
       }).catch(async () => {
         await postLogout()
-        localStorage.removeItem('phone')
+        this.$store.commit('SET_PHONE', '')
         this.$router.push('/login?url=/my-index')
       })
     },

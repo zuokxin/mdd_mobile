@@ -87,7 +87,6 @@ export default {
   },
   mounted () {
     this.$refs.container.style.height = window.innerHeight + 'px'
-    // const flag = this.$store.getters.isLogin(localStorage.getItem('phone'))
   },
   computed: {
     msgFlag () {

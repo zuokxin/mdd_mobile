@@ -41,20 +41,6 @@ import moment from 'moment'
 import { sexArr, educateArr, marriageArr, tasteArr, colorArr } from './dataSelect'
 import { getUserInfo, updateInfo } from '@/api/modules/user'
 export default {
-  beforeRouteEnter (to, from, next) {
-    if (localStorage.getItem('phone')) {
-      next()
-    } else {
-      next(vm => {
-        vm.$router.push({
-          path: '/login',
-          query: {
-            url: '/my-infos'
-          }
-        })
-      })
-    }
-  },
   data () {
     return {
       form: {
