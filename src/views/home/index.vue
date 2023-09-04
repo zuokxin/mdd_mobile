@@ -115,7 +115,7 @@ export default {
     this.getCbtCourseList()
     this.getCarefulSelection()
     this.getCourseList()
-    if (localStorage.getItem('phone')) {
+    if (this.$store.state.phone) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           this.newPersonFlag = true

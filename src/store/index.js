@@ -9,7 +9,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    wxReady: false
+    wxReady: false,
+    phone: ''
   },
   getters: {
     // 校验手机号码长度，因为有外国用户废弃
@@ -29,6 +30,9 @@ export default new Vuex.Store({
     // 设置初始地址
     SET_INIT_URL (state, value) {
       state.initUrl = value
+    },
+    SET_PHONE (state, value) {
+      state.phone = value
     }
   },
   actions: {
@@ -60,23 +64,25 @@ export default new Vuex.Store({
       }
     },
     // 获得token
-    getToken () {
+    getToken (context) {
       return new Promise((resolve, reject) => {
         getUserAuth().then(
           ({ data = {} }) => {
             const {
               phone
             } = data
-            localStorage.phone = phone
+            // localStorage.phone = phone
+            context.commit('SET_PHONE', phone)
             resolve(data)
           }
         ).catch(
           err => {
             reject(err)
+            context.commit('SET_PHONE', '')
             // 登录状态已过期状态下清空
-            if (err.code === 605) {
-              localStorage.removeItem('phone')
-            }
+            // if (err.code === 605) {
+            //   localStorage.removeItem('phone')
+            // }
           }
         )
       })

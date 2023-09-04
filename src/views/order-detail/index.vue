@@ -129,7 +129,7 @@ export default {
     this.batchId = this.$route.query.batchId
     this.organ = this.$route.query.organ
     this.getBatch()
-    if (localStorage.getItem('phone')) {
+    if (this.$store.state.phone) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           newUserReward()

@@ -137,7 +137,7 @@ const routes = [
   },
   {
     path: '/cbt-record',
-    name: '我的-测试记录',
+    name: '我的-cbt记录',
     meta: { needLogin: true, title: '云愈心理' },
     component: resolve => require(['../views/my/cbt-record/index.vue'], resolve)
   },
@@ -189,32 +189,28 @@ router.beforeEach(async (to, from, next) => {
     init = true
     store.commit('SET_INIT_URL', window.location.href)
   }
-  // 只有fadi不会自动关闭
-  // if (from.path === '/test-do-fadi') {
-  //   if (window.mediaStream) {
-  //     window.mediaStream.getTracks().forEach((track) => {
-  //       track.stop()
-  //     })
-  //     window.mediaStream = null
-  //   }
-  // }
-  // if (!init) {
-  //   try {
-  //     await store.dispatch('getToken')
-  //     init = true
-  //     next()
-  //   } catch (err) {
-  //     // 登录过期
-  //     if (err.code === 605) {
-  //       // init = false
-  //       next()
-  //     } else {
-  //       next()
-  //     }
-  //   }
-  // } else {
-  //   next()
-  // }
+  if (to.name === '登录') {
+    next()
+    return
+  }
+  // 判断是否登陆过
+  if (!store.state.phone) {
+    try {
+      await store.dispatch('getToken')
+    } catch (err) {
+      // 登录过期
+      console.log('登录过期')
+      // 需要登陆的页面跳转登陆
+      if (to.meta.needLogin) {
+        next({
+          path: '/login',
+          query: {
+            url: to.path
+          }
+        })
+      }
+    }
+  }
   next()
 })
 
