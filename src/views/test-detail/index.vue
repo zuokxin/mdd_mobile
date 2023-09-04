@@ -223,7 +223,7 @@ export default {
   methods: {
     onClickButton () {
       // 未登录
-      if (!localStorage.phone) {
+      if (!this.$store.state.phone) {
         this.$router.push({
           path: '/login',
           query: {

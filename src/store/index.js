@@ -71,7 +71,6 @@ export default new Vuex.Store({
             const {
               phone
             } = data
-            // localStorage.phone = phone
             context.commit('SET_PHONE', phone)
             resolve(data)
           }

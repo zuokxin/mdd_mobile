@@ -188,7 +188,7 @@ export default {
           //   newUserReward().then(resp => {
           //   })
           // }
-          localStorage.phone = res.data.phone
+          this.$store.commit('SET_PHONE', res.data.phone)
           localStorage.isNewUser = res.data.isNewUser
           localStorage.userId = res.data.userId
           if (this.$route.query.url) {
