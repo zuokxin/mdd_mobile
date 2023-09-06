@@ -96,6 +96,7 @@
       confirmButtonColor="#34B7B9"
       @close="colseFaceTips"
     ></van-dialog>
+    <FadiRoleDialog ref="FadiRoleDialog" @confirm="$router.replace(routerPath)"></FadiRoleDialog>
   </div>
 </template>
 
@@ -112,6 +113,7 @@ import errpopout from './errpopout'
 import voice from './voice'
 import { mapGetters } from 'vuex'
 import { Dialog } from 'vant'
+import FadiRoleDialog from '@/components/FadiRoleDialog'
 document.addEventListener('visibilitychange', function () {
   if (document.visibilityState === 'hidden') {
     // window.location.reload()
@@ -128,7 +130,8 @@ export default {
     errpopout,
     voice,
     miniBox,
-    DragVideo
+    DragVideo,
+    FadiRoleDialog
   },
   data () {
     return {
@@ -248,9 +251,13 @@ export default {
         }).then(res => {
           if (res.code === 0) {
             if (next) {
-              this.thisDialog('您将进入下一个量表进行测试').then(() => {
-                this.$router.replace(this.routerPath)
-              })
+              if (next.table.tableCode === 'FADI') {
+                this.$refs.FadiRoleDialog.show = true
+              } else {
+                this.thisDialog('您将进入下一个量表进行测试').then(() => {
+                  this.$router.replace(this.routerPath)
+                })
+              }
             } else {
               this.$router.replace(this.routerPath)
             }
