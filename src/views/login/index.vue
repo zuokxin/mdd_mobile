@@ -87,7 +87,6 @@ export default {
   },
   mounted () {
     this.$refs.container.style.height = window.innerHeight + 'px'
-    // const flag = this.$store.getters.isLogin(localStorage.getItem('phone'))
   },
   computed: {
     msgFlag () {
@@ -189,7 +188,7 @@ export default {
           //   newUserReward().then(resp => {
           //   })
           // }
-          localStorage.phone = res.data.phone
+          this.$store.commit('SET_PHONE', res.data.phone)
           localStorage.isNewUser = res.data.isNewUser
           localStorage.userId = res.data.userId
           if (this.$route.query.url) {

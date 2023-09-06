@@ -9,7 +9,7 @@
           </form>
         </div>
         <div class="right" v-show="keyWord" @click="clear"><img src="@/assets/img/my/clear.png" alt=""></div></div>
-      <span @click="$router.push('/test-more')">取消</span>
+      <span @click="$router.push('/home')">取消</span>
     </div>
     <div class="everyone same-style"  v-if="!searched">
       <div class="everyone-title">大家都在搜</div>

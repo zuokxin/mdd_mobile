@@ -41,20 +41,17 @@
     <div class="footer">
       <MainTabbar></MainTabbar>
     </div>
-    <NewPersonGift :flag="newPersonFlag" />
   </div>
 </template>
 
 <script>
-import { tableTypeList, getAllTable, h5ActivitylList } from '@/api/modules/user'
+import { tableTypeList, getAllTable } from '@/api/modules/user'
 import { recommendSeat } from '@/api/modules/table'
 import MainTabbar from '@/components/MainTabbar'
-import NewPersonGift from '@/components/newPerson'
-import browser from '@/utils/browser.js'
+// import browser from '@/utils/browser.js'
 export default {
   components: {
-    MainTabbar,
-    NewPersonGift
+    MainTabbar
   },
   data () {
     return {
@@ -64,24 +61,12 @@ export default {
       typeList: [],
       tableList: [],
       tableAll: [],
-      swipList: [],
-      newPersonFlag: false,
       recommendList: []
     }
   },
   mounted () {
     this.getTypeList()
-    this.geth5ActivitylList()
     this.getRecommend()
-    if (localStorage.getItem('phone')) {
-      this.$store.dispatch('getInfo').then(res => {
-        if (res.data.isNewUser && !res.data.isRxNUReward) {
-          this.newPersonFlag = true
-          // 这是满足新人有礼条件
-        }
-      })
-    }
-    console.log('browser', browser())
   },
   methods: {
     getRecommend () {
@@ -113,15 +98,6 @@ export default {
         const id = this.typeList[0].id
         this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
         this.loading = false
-      })
-    },
-    geth5ActivitylList () {
-      h5ActivitylList({ status: 2 }).then(res => {
-        if (res.code === 0) {
-          const activityBasicInfo = res.data.activityBasicInfo || []
-          this.swipList = activityBasicInfo.filter(e => e.imageLink)
-        }
-        // console.log(this.swipList)
       })
     },
     toDeatil (item) {

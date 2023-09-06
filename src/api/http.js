@@ -22,18 +22,6 @@ http.interceptors.response.use(
     // 对响应数据做点什么
     const res = response.data
     if (res.code !== 0) {
-      // if (res.code === 401) {
-      //   msgBox('当前登录信息已失效，请重新登录')
-      // } else if (res.code === 606) { // 其他设备登录
-      //   msgBox(res.message)
-      // } else if (res.code === 607) { // 注销
-      //   msgBox(res.message)
-      // } else {
-      //   // 提示错误
-      //   if (response.config.pushErrMessage) {
-      //     thisMessage(res.message)
-      //   }
-      // }
       // 提示错误
       if (response.config.pushErrMessage) {
         thisMessage(res.message)

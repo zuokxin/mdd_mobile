@@ -29,7 +29,7 @@
         <div class="train-box" v-for="item in cbtCourseList" :key="item.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: item.courseId } })">
           <div class="img">
             <img :src="item.courseImage" alt="专题训练">
-            <div class="tag" v-if="Number(item.price) === 1.99">限时优惠</div>
+            <div class="tag" v-if="Number(item.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
             <div class="tag" v-if="Number(item.price) === 0">限时免费</div>
           </div>
           <div class="description">
@@ -48,22 +48,18 @@
     <div class="footer">
       <MainTabbar></MainTabbar>
     </div>
-    <NewPersonGift :flag="newPersonFlag" />
   </div>
 </template>
 
 <script>
 import { courseList, cbtCourseList } from '@/api/modules/user'
 import MainTabbar from '@/components/MainTabbar'
-import NewPersonGift from '@/components/newPerson'
 export default {
   components: {
-    MainTabbar,
-    NewPersonGift
+    MainTabbar
   },
   data () {
     return {
-      newPersonFlag: false,
       courseList: [],
       cbtCourseList: [],
       flag: 0,
@@ -73,14 +69,6 @@ export default {
   mounted () {
     this.getCourseList()
     this.getCbtCourseList()
-    if (localStorage.getItem('phone')) {
-      this.$store.dispatch('getInfo').then(res => {
-        if (res.data.isNewUser && !res.data.isRxNUReward) {
-          this.newPersonFlag = true
-          // 这是满足新人有礼条件
-        }
-      })
-    }
   },
   methods: {
     async getCourseList () {
@@ -94,7 +82,7 @@ export default {
       this.loading = false
     },
     async getCbtCourseList () {
-      const res = await cbtCourseList({ type: 'show' })
+      const res = await cbtCourseList({ type: 'show', pageType: 'cbtHome' })
       console.log('res', res)
       if (res.code === 0) {
         this.cbtCourseList = res.data.courseList
@@ -241,6 +229,7 @@ export default {
           border-radius: 8rem/@w 0 8rem/@w 0;
           background-color: #e4a434;
           text-align: center;
+          white-space: nowrap;
           font-size: 10rem/@w;
           line-height: 20rem/@w;
           color: #fff;

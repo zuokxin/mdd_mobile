@@ -29,22 +29,20 @@
       >去App疏导吧</van-button>
       <!-- 微信内按钮 -->
       <wx-open-launch-app
-        v-else
+        v-if="weixinBtn"
         id="launch-btn"
+        class="launch-btn"
         appid="wx4d94fab8d9952d73"
         :extinfo="extinfo"
       >
         <script type="text/wxtag-template">
           <style>
             .wx-cbt-btn {
-              position: relative;
               display: inline-block;
               box-sizing: border-box;
               width: 100%;
               height: 40px;
               padding: 0 15px;
-              margin-left: 10px;
-              margin-right: 10px;
               font-size: 16rem / @w;
               line-height: 40px;
               text-align: center;
@@ -68,7 +66,7 @@
 import DetailHeader from './detail-header.vue'
 import DetailContent from './detail-content.vue'
 import { Dialog } from 'vant'
-import { getCbtCourseInfo, wxSignatures } from '@/api/index'
+import { getCbtCourseInfo } from '@/api/index'
 import wxShare from '@/utils/wxShare'
 import browser from '@/utils/browser'
 // const params = new URLSearchParams(window.location.search)
@@ -98,7 +96,12 @@ export default {
       android: browser().android,
       extinfo: '{}',
       path: '',
-      weixinBtn: false
+      weixinReady: false
+    }
+  },
+  computed: {
+    weixinBtn () {
+      return this.weixin && this.weixinReady
     }
   },
   created () {
@@ -127,7 +130,16 @@ export default {
             url: this.course.detailImageUrl
           }]
         }
-        this.share()
+        console.log(this.$store)
+        const vm = this
+        // 获取微信sdk
+        if (this.$store.state.wxReady) {
+          vm.sharePage()
+        } else {
+          this.$store.dispatch('getWxConfig').then(res => {
+            vm.sharePage()
+          })
+        }
       }
     )
   },
@@ -175,7 +187,25 @@ export default {
       }
     },
     // 微信分享详情页
-    share () {
+    sharePage () {
+      // 显示wx-open-launch-app
+      this.extinfo = JSON.stringify({ path: this.path })
+      this.weixinReady = true
+      this.$nextTick(() => {
+        const vm = this
+        const btn = document.getElementById('launch-btn')
+        btn.addEventListener('ready', function () {
+          console.log('微信按钮launch:ready')
+        })
+        btn.addEventListener('launch', function () {
+          console.log('success')
+        })
+        btn.addEventListener('error', function (e) {
+          vm.onClickButton()
+          console.log(e.detail)
+        })
+      })
+      // 设置分享信息
       const currentUrl = window.location.href
       const dataForm = {
         title: this.course.courseName,
@@ -183,26 +213,11 @@ export default {
         link: currentUrl,
         imgUrl: this.course.courseImage
       }
-      wxSignatures({ url: currentUrl }).then(res => {
-        this.extinfo = JSON.stringify({ path: this.path })
-        if (res.code === 0) {
-          wxShare.getJSSDK(res.data, dataForm, (e) => {
-            if (e.type === 'ready' && e.code === 200) {
-              this.weixinBtn = true
-              console.log('ready')
-              this.$nextTick(() => {
-                const btn = document.getElementById('launch-btn')
-                btn.addEventListener('launch', function () {
-                  console.log('success')
-                })
-                btn.addEventListener('error', function (e) {
-                  console.log(e.detail)
-                })
-              })
-            }
-          })
+      wxShare.setShare(dataForm).then(
+        res => {
+          console.log(res, '分享加载成功')
         }
-      })
+      )
     }
   },
   beforeRouteEnter (to, from, next) {
@@ -263,5 +278,10 @@ export default {
     margin-right: 10px;
     height: 40px;
   }
+}
+.launch-btn {
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
 }
 </style>

@@ -60,7 +60,6 @@ import { Dialog } from 'vant'
 import { getOrderState, postUserCode } from '@/api/index'
 import { newUserReward } from '@/api/modules/user'
 import { batchInfo, batchTables, createAndBind, userBatchInfo } from '@/api/modules/order-detail'
-// import wxShare from '@/utils/wxShare'
 import browser from '@/utils/browser'
 const params = new URLSearchParams(window.location.search)
 export default {
@@ -130,7 +129,7 @@ export default {
     this.batchId = this.$route.query.batchId
     this.organ = this.$route.query.organ
     this.getBatch()
-    if (localStorage.getItem('phone')) {
+    if (this.$store.state.phone) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           newUserReward()
@@ -240,7 +239,7 @@ export default {
     },
     onClickButton () {
       // 未登录
-      if (!localStorage.phone) {
+      if (!this.$store.state.phone) {
         this.$router.push({
           path: '/login',
           query: {
@@ -408,21 +407,6 @@ export default {
       }
       console.log(err)
     }
-    // 微信分享详情页
-    // share () {
-    //   const currentUrl = window.location.href
-    //   const dataForm = {
-    //     title: this.table.tableName,
-    //     desc: '我在云愈心理发现一份不错的量表，你也来测测看～',
-    //     link: currentUrl,
-    //     imgUrl: this.table.tableLogo
-    //   }
-    //   wxSignatures({ url: currentUrl }).then(res => {
-    //     if (res.code === 0) {
-    //       wxShare.getJSSDK(res.data, dataForm)
-    //     }
-    //   })
-    // }
   },
   beforeRouteEnter (to, from, next) {
     if (from.path === '/test-report') {

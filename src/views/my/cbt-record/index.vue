@@ -14,9 +14,9 @@
           <span class="tag" :class="getStatus(item.finishStatus).className">{{ getStatus(item.finishStatus).tag }}</span>
         </div>
         <div class="row"><span class="left">购买时间：</span><span class="right">{{DateFormat({date: item.payTime * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
-        <div class="row" v-if="item.thought">
+        <div class="row" v-if="type === 1">
           <span class="left">想法：</span>
-          <div class="right"><TextEllipsis :info="item.thought" :lineClamp="3" :hiddenBtn="true"></TextEllipsis></div>
+          <div class="right"><TextEllipsis :info="item.thought" :lineClamp="3" :hiddenBtn="true" v-if="item.finishStatus !== 1"></TextEllipsis><span v-else>当前还没有想法，赶紧来疏导吧～</span></div>
         </div>
         <div class="row tip" v-if="item.finishStatus === 1 || item.finishStatus === 2">
           <span>仅支持在App中疏导</span>
@@ -26,7 +26,7 @@
     <div class="none" v-else>
       <div class="box">
         <img src="@/assets/img/my/nodata.png" alt="">
-        <p>暂无记录</p>
+        <p>暂无疏导记录</p>
       </div>
     </div>
   </div>

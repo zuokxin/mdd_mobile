@@ -54,9 +54,8 @@ import PayAction from '@/components/PayAction.vue'
 import CameraDialog from '@/components/CameraDialog.vue'
 import NewPersonGift from '@/components/newPerson'
 import { Dialog } from 'vant'
-import { tableInfo, postUserCode, getOrderState, wxSignatures } from '@/api/index'
+import { tableInfo, postUserCode, getOrderState } from '@/api/index'
 import { postTablecoll, getTableDiscount } from '@/api/modules/table'
-import wxShare from '@/utils/wxShare'
 import browser from '@/utils/browser'
 const params = new URLSearchParams(window.location.search)
 export default {
@@ -142,7 +141,7 @@ export default {
     // if (this.continue) this.go = true
     // 量表信息
     this.tableCode = this.$route.query.tableCode
-    if (localStorage.getItem('phone')) {
+    if (this.$store.state.phone) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           this.newPersonFlag = true
@@ -224,7 +223,7 @@ export default {
   methods: {
     onClickButton () {
       // 未登录
-      if (!localStorage.phone) {
+      if (!this.$store.state.phone) {
         this.$router.push({
           path: '/login',
           query: {
@@ -397,10 +396,8 @@ export default {
         link: currentUrl,
         imgUrl: this.table.tableLogo
       }
-      wxSignatures({ url: currentUrl }).then(res => {
-        if (res.code === 0) {
-          wxShare.getJSSDK(res.data, dataForm)
-        }
+      this.$store.dispatch('addShare', dataForm, () => {
+        console.log('量表详情页加载分享')
       })
     }
   },

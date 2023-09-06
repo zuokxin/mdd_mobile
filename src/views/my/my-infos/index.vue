@@ -40,22 +40,7 @@
 import moment from 'moment'
 import { sexArr, educateArr, marriageArr, tasteArr, colorArr } from './dataSelect'
 import { getUserInfo, updateInfo } from '@/api/modules/user'
-import wxShare from '@/utils/wxShare'
 export default {
-  beforeRouteEnter (to, from, next) {
-    if (localStorage.getItem('phone')) {
-      next()
-    } else {
-      next(vm => {
-        vm.$router.push({
-          path: '/login',
-          query: {
-            url: '/my-infos'
-          }
-        })
-      })
-    }
-  },
   data () {
     return {
       form: {
@@ -98,7 +83,10 @@ export default {
     // this.minDate = new Date(minTime)
     // this.maxDate = new Date()
     this.getInfo()
-    wxShare.share(false)
+    // wxShare.share(false)
+    this.$store.dispatch('addShare', {}, () => {
+      console.log('个人信息页加载分享')
+    })
   },
   methods: {
     async getInfo () {

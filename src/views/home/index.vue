@@ -37,7 +37,7 @@
           <div class="train-box">
             <div class="train-box-content" v-for="v in cbtCourseList" :key="v.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
               <div class="tag" v-if="Number(v.price) === 0">限时免费</div>
-              <div class="tag" v-if="Number(v.price) === 1.99">限时优惠</div>
+              <div class="tag" v-if="Number(v.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
               <div class="img"><img :src="v.courseImage" alt="专题训练"></div>
               <p class="name">{{ v.courseName }}</p>
               <p class="price"><span>￥</span>{{ Number(v.price).toFixed(2) }}</p>
@@ -61,7 +61,7 @@
               <div v-else></div>
               <div class="price">
                 <div class="red"><span>￥</span>{{ Number(item.price).toFixed(2) }}</div>
-                <div><img src="@/assets/img/my/hot.png" alt="已测试"><span>{{ item.evalRecordCount }}人已测试</span></div>
+                <div><img src="@/assets/img/my/hot.png" alt="已测试"><span class="completed">{{ item.evalRecordCount }}人已测试</span></div>
               </div>
             </div>
           </div>
@@ -93,6 +93,7 @@ import { h5ActivitylList, cbtCourseList, carefulSelection, courseList } from '@/
 import MainTabbar from '@/components/MainTabbar'
 import NewPersonGift from '@/components/newPerson'
 export default {
+  name: 'home',
   components: {
     MainTabbar,
     NewPersonGift
@@ -114,7 +115,7 @@ export default {
     this.getCbtCourseList()
     this.getCarefulSelection()
     this.getCourseList()
-    if (localStorage.getItem('phone')) {
+    if (this.$store.state.phone) {
       this.$store.dispatch('getInfo').then(res => {
         if (res.data.isNewUser && !res.data.isRxNUReward) {
           this.newPersonFlag = true
@@ -231,9 +232,11 @@ export default {
   display: flex;
   justify-content: space-between;
   .search {
+    flex: 1;
     display: flex;
     align-items: center;
-    width: 240rem/@w;
+    // width: 240rem/@w;
+    margin-right: 10rem/@w;
     height: 33rem/@w;
     background: #fff;
     border-radius: 17rem/@w;
@@ -288,6 +291,7 @@ export default {
       h5{
         margin: 0;
         font-size: 16rem/@w;
+        font-weight: 500;
         line-height: 22rem/@w;
       }
       span{
@@ -376,6 +380,7 @@ export default {
       line-height: 22rem/@w;
       h5{
         font-size: 16rem/@w;
+        font-weight: 500;
         color: #333;
         margin: 0;
       }
@@ -409,6 +414,7 @@ export default {
         .name{
           color: #333;
           white-space: nowrap;
+          font-size: 14rem/@w;
           overflow: hidden;
           text-overflow: ellipsis;
           vertical-align: baseline;
@@ -437,6 +443,9 @@ export default {
             height: 14rem/@w;
             margin-right: 4rem/@w;
           }
+        }
+        .completed{
+          font-size: 12rem/@w;
         }
       }
 

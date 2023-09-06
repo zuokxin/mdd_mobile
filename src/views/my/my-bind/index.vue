@@ -83,20 +83,6 @@ import { DateFormat } from '@/utils/date'
 import { organization, cbtCourse } from '@/api/modules/user'
 import BindBatch from './bindBatch.vue'
 export default {
-  beforeRouteEnter (to, from, next) {
-    if (localStorage.getItem('phone')) {
-      next()
-    } else {
-      next(vm => {
-        vm.$router.push({
-          path: '/login',
-          query: {
-            url: '/my-bind'
-          }
-        })
-      })
-    }
-  },
   data () {
     return {
       DateFormat: DateFormat,
@@ -135,7 +121,7 @@ export default {
   },
   mounted () {
     // 路由重定向后不再执行下去
-    if (!localStorage.getItem('phone')) return
+    if (!this.$store.state.phone) return
     this.organization()
   },
   methods: {
