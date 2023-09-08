@@ -36,7 +36,7 @@
                     <div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div>
                   </div>
                   <div class="buy-infos" v-if="item.finishedAt > 0">
-                    <div class="left"><span>完成时间: {{DateFormat({date: item.finishedAt * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
+                    <div class="left"><span>完成时间: {{ dayjs(item.finishedAt * 1000).format('YYYY-MM-DD HH:mm') }}</span></div>
                   </div>
                   <div class="function-btns">
                     <div class="normal-function">
@@ -78,14 +78,14 @@
 </template>
 
 <script>
-import { DateFormat } from '@/utils/date'
+import dayjs from 'dayjs'
 
 import { organization, cbtCourse } from '@/api/modules/user'
 import BindBatch from './bindBatch.vue'
 export default {
   data () {
     return {
-      DateFormat: DateFormat,
+      dayjs: dayjs,
       batchId: '',
       userNumber: '',
       bindList: [],
