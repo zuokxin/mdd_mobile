@@ -282,7 +282,7 @@ export default {
     phoneClick (phoneNum) {
       window.location.href = 'tel:' + phoneNum
     },
-    // 联系客服
+    // 下载app
     skip () {
       this.$router.push('/my-contact')
     },
@@ -321,10 +321,9 @@ export default {
 
 <style lang="less" scoped>
 @w: 37.5;
-.main{
+.main {
   display: flex;
   flex-direction: column;
-  width: 100vw;
   min-height: 100vh;
   background: #F6F6F7;
   overflow: hidden;
@@ -332,18 +331,18 @@ export default {
   background-image:url('../../../assets/img/bg.png');
   background-repeat:no-repeat;
   background-size: contain;
-  .header{
+  .header {
     height: 2.053333rem;
     display: flex;
     padding: .266667rem  .533333rem;
     padding-right: 0px;
     margin-right: .533333rem;
     box-sizing: border-box;
-    img{
+    img {
       width: 1.6rem;
       height: 1.6rem;
     }
-    .name{
+    .name {
       margin-left: .4rem;
       height: 1.6rem;
       flex: 1;
@@ -351,23 +350,23 @@ export default {
       font-weight: 600;
       color: #333333;
       margin-bottom: .16rem;
-      .top{
+      .top {
         height: .5867rem;
         line-height: 22px;
         font-size: 16px;
         margin-bottom: .0541rem;
-        span{
+        span {
           color: #333333;
           font-weight: 500;
         }
       }
-      .center{
+      .center {
         height: .4267rem;
         display: flex;
         justify-content: space-between;
         overflow: hidden;
         margin-bottom: .16rem;
-        .center-left{
+        .center-left {
           border-radius: .3784rem;
           display: inline-block;
           background: #FFFFFF;
@@ -375,11 +374,11 @@ export default {
           box-sizing: border-box;
           display: flex;
           align-items: center;
-          img{
+          img {
             width: .32rem;
             height: .32rem;
           }
-          span{
+          span {
             font-size: 12px;
             display: inline-block;
             height: .32rem;
@@ -390,29 +389,29 @@ export default {
             padding-left: .1622rem;
           }
         }
-        .center-right{
+        .center-right {
           display: flex;
           align-items: center;
-          span{
+          span {
             color: #666666;
             margin-right: .1067rem;
             font-size: 12px;
             scale: 0.83;
           }
-          img{
+          img {
             width: .32rem;
             height: .32rem;
           }
         }
       }
-      .under{
+      .under {
         height: .3784rem;
         display: flex;
         margin-top: 2px;
-        span{
+        span {
           display: inline-block;
         }
-        .round{
+        .round {
           width: 12px;
           height: 12px;
           border-radius: 50%;
@@ -421,18 +420,18 @@ export default {
           justify-content: center;
           align-items: center;
           transform: scale(0.83);
-          span{
+          span {
             font-size: 12px;
             transform: scale(0.83);
             color: #FFFFFF;
             text-align: center;
           }
         }
-        .last{
+        .last {
           padding-left: 2px;
           position: relative;
           flex: 1;
-          span{
+          span {
             display: block;
             position: absolute;
             top: -1px;
@@ -448,11 +447,11 @@ export default {
       }
     }
   }
-  .content{
+  .content {
     padding: .48rem .533333rem;
     height: inherit;
     overflow: hidden;
-    .get-coins{
+    .get-coins {
       position: relative;
       height: 5.7027rem;
       padding: .4324rem .2703rem;
@@ -460,16 +459,16 @@ export default {
       background: #7ECECE;
       margin-bottom: .2667rem;
       box-sizing: border-box;
-      .top{
+      .top {
         font-size: 14px;
         color: #FFFFFF;
         font-weight: 500;
         margin-bottom: .2703rem;
       }
-      .center{
+      .center {
         display: flex;
         justify-content: space-around;
-        .blocks{
+        .blocks {
           width: 1.0811rem;
           height: 2.027rem;
           font-size: 10px;
@@ -478,13 +477,13 @@ export default {
           background: #FFFFFF;
           overflow: hidden;
           box-sizing: border-box;
-          .block-top{
+          .block-top {
             width: 100%;
             display: flex;
             height: .3784rem;
             justify-content: center;
             margin-bottom: .1081rem;
-            span{
+            span {
               display: inline-block;
               font-size: 20px;
               transform: scale(0.5);
@@ -492,31 +491,31 @@ export default {
               color: #666666;
             }
           }
-          .block-center{
+          .block-center {
             text-align: center;
-            img{
+            img {
               width: .8108rem;
               height: .8108rem;
             }
           }
-          .block-under{
+          .block-under {
             height: .3243rem;
             display: flex;
             justify-content: center;
             align-items: top;
-            span{
+            span {
               display: inline-block;
               color: #F19F38;
               font-size: .2703rem;
               transform: scale(0.83);
             }
-            .ed{
+            .ed {
               color: #999999;
             }
           }
         }
       }
-      .under{
+      .under {
         position: absolute;
         bottom: .4865rem;
         left: 0;
@@ -524,11 +523,11 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        .van-ed{
+        .van-ed {
           background: #D5D5D5 !important;
           color: #FFFFFF !important;
         }
-        .van-button{
+        .van-button {
           width: 8.3784rem;
           height: 1.3514rem;
           border: none;
@@ -539,12 +538,12 @@ export default {
         }
       }
     }
-    .test-records{
+    .test-records {
       display: flex;
       justify-content: space-between;
       margin-bottom: 10rem/@w;
     }
-    .to-test{
+    .to-test {
       margin-right: 11rem/@w;
       flex: 1;
       height: 75rem/@w;
@@ -555,73 +554,73 @@ export default {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      .to-test-right{
+      .to-test-right {
         width: 20rem/@w;
         height: 20rem/@w;
         font-size: 0;
-        img{
+        img {
           width: 100%;
           height: 100%;
         }
       }
-      .to-test-left{
+      .to-test-left {
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        .top{
+        .top {
           font-size: 14px;
           line-height: 20px;
           font-weight: bold;
           color: #000;
         }
-        .under{
+        .under {
           font-size: 12px;
           line-height: 17px;
           color: #999;
         }
       }
     }
-    .to-test:last-child{
+    .to-test:last-child {
       margin-right: 0;
     }
-    .cardList{
+    .cardList {
       height: 2.213333rem;
       background: #FFFFFF;
       border-radius: .266667rem;
       display: flex;
       justify-content: space-around;
       align-items: center;
-      .card{
+      .card {
         display: flex;
         flex-direction: column;
         align-items: center;
-        img{
+        img {
           width: .8rem;
           height: .8rem;
         }
-        .tip{
+        .tip {
           font-size: .32rem;
           color: #333333;
         }
       }
     }
   }
-  .time{
+  .time {
     font-size: .32rem;
     color: #666;
-    span:nth-child(2){
+    span:nth-child(2) {
       margin-left: .266667rem;
     }
   }
-  .more{
-    .moreBox{
+  .more {
+    .moreBox {
       width: 8.4rem;
       background: #FFFFFF;
       border-radius: .266667rem;
       padding: .4rem .266667rem;
       margin-bottom: .266667rem;
-      .top{
+      .top {
         font-size: .373333rem;
         color: #333333;
         position: relative;
@@ -639,7 +638,7 @@ export default {
           padding-left: .48rem;
           background: linear-gradient(to right, rgba(255, 255, 255, 0.1), #fff 45%);
         }
-        .btnMore{
+        .btnMore {
           color: #34B7B9;
           position: absolute;
           right: 0;
@@ -647,27 +646,27 @@ export default {
           background-color: #fff;
         }
       }
-      .bottom{
+      .bottom {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-top: 8px;
-        .moreTime{
+        .moreTime {
           display: flex;
           flex-direction: column;
-          span:nth-child(2){
+          span:nth-child(2) {
             margin-left:0;
           }
         }
-        .app{
+        .app {
           color: #34B7B9;
           font-size: .32rem;
         }
-        .btnBox{
+        .btnBox {
           display: flex;
           justify-content: flex-end;
           align-items: center;
-          .van-button--info{
+          .van-button--info {
             width: 72rem/@w;
             height: 28rem/@w;
             border-radius: 15rem/@w;
@@ -678,21 +677,21 @@ export default {
       }
     }
   }
-  .van-dialog{
+  .van-dialog {
     width: 7.786667rem;
     min-height: 6.48rem;
     background: #FFFFFF;
     border-radius: .533333rem;
     padding: .426667rem;
-    .close{
+    .close {
       display: flex;
       justify-content: flex-end;
-      img{
+      img {
         width: .373333rem;
         height: .373333rem;
       }
     }
-    h4{
+    h4 {
       font-size: .373333rem;
       font-weight: 500;
       color: #333333;
@@ -700,32 +699,32 @@ export default {
       margin-bottom: .266667rem;
       text-align: center;
     }
-    .wx{
+    .wx {
       display: flex;
       justify-content:center;
       margin-bottom: .2rem;
-      img{
+      img {
         width: 3.2rem;
         height: 3.2rem;
       }
     }
-    .phone{
+    .phone {
       display: flex;
       justify-content:center;
       align-items: center;
       margin-bottom: .4rem;
-      img{
+      img {
         width: .293333rem;
         height: .293333rem;
       }
-      span{
+      span {
         color: #34B7B9;
         font-size: .373333rem;
         margin-left: 5px;
       }
     }
   }
-  .popout{
+  .popout {
     z-index: 999;
     width: 100vw;
     height: 100vh;
@@ -736,25 +735,25 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    .popout_box{
+    .popout_box {
       width: 8.7568rem;
       height: 6.5676rem;
       border-radius: .5405rem;
       background-color: #FFFFFF;
       position: relative;
-      p{
+      p {
         margin-top: 1.7027rem;
         font-size: .4324rem;
         color: #000000;
         font-weight: 600;
         text-align: center;
       }
-      .btn{
+      .btn {
         position: absolute;
         bottom: 1.0811rem;
         width: 100%;
         text-align: center;
-        .van-button{
+        .van-button {
           border: none;
           background: #34B7B9;
           color: #FFFFFF;
@@ -801,15 +800,15 @@ export default {
 </style>
 
 <style lang="less">
-.ceping{
-   .van-tabs--line .van-tabs__wrap{
+.ceping {
+   .van-tabs--line .van-tabs__wrap {
       height: .8rem;
       margin-top: .48rem;
       margin-bottom: .266667rem;
-      .van-tabs__nav{
+      .van-tabs__nav {
         background: transparent;
       }
-      .van-tab{
+      .van-tab {
         font-size: .373333rem;
         font-weight: 600;
         color: #000000;
@@ -817,7 +816,7 @@ export default {
         flex: inherit;
         padding: 0;
       }
-      .van-tabs__line{
+      .van-tabs__line {
         background-color:#34B7B9;
       }
   }

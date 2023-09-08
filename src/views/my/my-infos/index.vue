@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { sexArr, educateArr, marriageArr, tasteArr, colorArr } from './dataSelect'
 import { getUserInfo, updateInfo } from '@/api/modules/user'
 export default {
@@ -147,7 +147,8 @@ export default {
     },
     onConfirm (date) {
       this.showBirth = false
-      this.form.birthday = moment(date).format('YYYY-MM-DD')
+      this.form.birthday = dayjs(date).format('YYYY-MM-DD')
+      console.log(this.form.birthday, 'this.form.birthday ')
       this.postInfo()
     },
     onClickLeft () {
