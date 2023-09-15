@@ -1,13 +1,14 @@
 <template>
   <div class="detail">
     <img
-      v-if="courseId && !(courseId === '0' || courseId === '1')"
+      v-if="isthemCourse"
       class="detail-banner"
-      :src="course.headImage || require('@/assets/img/detail-bannner.png')"
+      :src="course.headImage"
+      loading=lazy
     />
     <!-- 头部盒子 -->
     <detail-header
-      v-if="courseId && !(courseId === '0' || courseId === '1')"
+      v-if="isthemCourse"
       :name="course.courseName"
       :price="String(course.price)"
       :time="String(course.time)"
@@ -100,8 +101,13 @@ export default {
     }
   },
   computed: {
+    // 微信按钮
     weixinBtn () {
       return this.weixin && this.weixinReady
+    },
+    // 是主题课，带有头部，信息和海报
+    isthemCourse () {
+      return this.courseId && !(this.courseId === '0' || this.courseId === '1')
     }
   },
   created () {
@@ -122,6 +128,7 @@ export default {
     getCbtCourseInfo(this.courseId).then(
       res => {
         this.canGo = false
+        res.data.headImage = res.data.headImage || require('@/assets/img/detail-bannner.png')
         this.course = Object.assign(this.course, res.data)
         // 系统课结构处理
         if (this.course.courseId === '0' || this.course.courseId === '1') {
@@ -250,6 +257,7 @@ export default {
 @w: 37.5;
 .detail-banner {
   width: 100%;
+  min-height: 5.6rem;
   position: relative;
   z-index: 0;
 }
