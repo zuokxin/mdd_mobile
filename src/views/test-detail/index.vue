@@ -1,6 +1,6 @@
 <template>
   <div class="detail">
-    <img class="detail-banner" :src="table.pageHeaderImage || require('@/assets/img/detail-bannner.png')"/>
+    <img class="detail-banner" :src="table.pageHeaderImage"/>
     <!-- 头部盒子 -->
     <detail-header
       :tableName="table.tableName"
@@ -73,6 +73,7 @@ export default {
       openid: '',
       // 量表详情
       table: {
+        pageHeaderImage: '',
         tableName: '--',
         price: 0,
         detail: '--',
@@ -151,6 +152,7 @@ export default {
     }
     tableInfo(this.tableCode).then(
       res => {
+        res.data.pageHeaderImage = res.data.pageHeaderImage || require('@/assets/img/detail-bannner.png')
         this.table = Object.assign(this.table, res.data)
         this.$nextTick(async () => {
           // 微信授权
@@ -435,6 +437,7 @@ export default {
 @w: 37.5;
 .detail-banner {
   width: 100%;
+  min-height: 5.6rem;
   position: relative;
   z-index: 0;
 }

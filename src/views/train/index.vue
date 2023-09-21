@@ -3,8 +3,7 @@
     <van-loading color="#1989fa" v-if="loading"></van-loading>
     <div class="main" v-else>
       <div class="tagList">
-        <!-- <div class="tag" :class="{selected : active === 0}">全部</div> -->
-        <div class="tag" v-for="( item, index ) in tagList" :key="item" :class="{selected : active === (index)}" @click="handleSelect(item,index)">{{ item }}</div>
+        <div class="tag" v-for="( item ) in tagList" :key="item" :class="{selected : active === (item)}" @click="handleSelect(item)">{{ item }}</div>
       </div>
       <div class="train-box" v-for="item in cbtCourseList" :key="item.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: item.courseId } })">
         <div class="img">
@@ -33,46 +32,64 @@ export default {
   data () {
     return {
       loading: false,
-      type: '',
-      tempCbtCourseList: [],
+      allCbtCourseList: [],
       cbtCourseList: [],
       flag: 0,
       orderTagList: ['爱情', '情绪', '家庭', '婚姻', '自我成长', '人际关系', '职业发展'],
       tagList: [],
-      active: 0
+      active: '',
+      courseId: ''
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    if (from.path === '/cbt-detail') {
+      next(vm => {
+        vm.courseId = from.query.courseId
+      })
+    } else {
+      next()
     }
   },
   mounted () {
-    this.type = this.$route.query.type
-    console.log('this.type', this.type)
     this.getCbtCourseList()
   },
   methods: {
     async getCbtCourseList () {
       this.loading = true
-      const res = await cbtCourseList({ type: this.type })
+      const res = await cbtCourseList({ type: 'all' })
       console.log('res', res)
       if (res.code === 0) {
-        this.tempCbtCourseList = res.data.courseList
-        const tagList = Array.from(new Set(this.tempCbtCourseList.map(v => v.tag)))
+        this.allCbtCourseList = res.data.courseList
+        const tagList = Array.from(new Set(this.allCbtCourseList.map(v => v.tag)))
         this.tagList = this.orderTagList.filter(v => {
           return tagList.indexOf(v) !== -1
         })
         this.tagList.unshift('全部')
-        this.handleSelect('全部', 0)
+        this.init()
         console.log('this.tagList ', this.tagList)
         console.log('cbtCourseList', this.cbtCourseList, 'this.tagList', this.tagList)
       }
       this.loading = false
     },
-    handleSelect (tag, index) {
-      this.active = index
-      if (tag === '全部') {
-        this.cbtCourseList = this.tempCbtCourseList
+    handleSelect (tag) {
+      this.active = tag
+      if (this.active === '全部') {
+        this.cbtCourseList = this.allCbtCourseList
       } else {
-        this.cbtCourseList = this.tempCbtCourseList.filter(v => v.tag === tag)
+        this.cbtCourseList = this.allCbtCourseList.filter(v => v.tag === this.active)
       }
-      console.log('this.tempCbtCourseList', this.tempCbtCourseList, 'this.cbtCourseList', this.cbtCourseList)
+      console.log('this.allCbtCourseList', this.allCbtCourseList, 'this.cbtCourseList', this.cbtCourseList)
+    },
+    init () {
+      let tag = this.tagList[0]
+      if (this.courseId) {
+        this.allCbtCourseList.forEach(v => {
+          if (v.courseId === this.courseId) {
+            tag = v.tag
+          }
+        })
+      }
+      this.handleSelect(tag)
     }
   }
 }

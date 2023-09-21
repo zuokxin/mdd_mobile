@@ -6,9 +6,9 @@
       @click-left="onClickLeft"
       fixed
     />
-  <div class="box">
-    <iframe id="mainIframe" name="mainIframe" width="100%" :src=" `${url}/share/?type=YWJvdXQ=`" frameborder="0" scrolling="auto" ></iframe>
-  </div>
+    <div class="box">
+      <iframe id="mainIframe" name="mainIframe" width="100%" :src=" `${url}/share/?type=YWJvdXQ=`" frameborder="0" scrolling="auto" ></iframe>
+    </div>
   </div>
 </template>
 

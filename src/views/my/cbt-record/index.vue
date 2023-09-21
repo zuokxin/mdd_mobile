@@ -5,7 +5,10 @@
         <van-icon name="arrow-left" @click="$router.push('/my-index')"/>
         <span>心理疏导记录</span>
       </div>
-      <div class="toggleType"> <span :class="{active: type === 1}" @click="toggleType(1)">系统疏导</span> <span @click="toggleType(2)" :class="{active: type === 2}">专题训练</span> </div>
+      <div class="toggleType">
+        <span :class="{active: type === 1}" @click="toggleType(1)">系统疏导</span>
+        <span @click="toggleType(2)" :class="{active: type === 2}">专题训练</span>
+      </div>
     </div>
     <div class="list" v-if="tableList.length > 0">
       <div class="card" v-for="item in tableList" :key="item.payTime">
@@ -13,10 +16,16 @@
           <span class="courseName">{{ item.courseName }}</span>
           <span class="tag" :class="getStatus(item.finishStatus).className">{{ getStatus(item.finishStatus).tag }}</span>
         </div>
-        <div class="row"><span class="left">购买时间：</span><span class="right">{{DateFormat({date: item.payTime * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
+        <div class="row">
+          <span class="left">购买时间：</span>
+          <span class="right">{{ dayjs(item.payTime * 1000).format('YYYY-MM-DD HH:mm') }}</span>
+        </div>
         <div class="row" v-if="type === 1">
           <span class="left">想法：</span>
-          <div class="right"><TextEllipsis :info="item.thought" :lineClamp="3" :hiddenBtn="true" v-if="item.finishStatus !== 1"></TextEllipsis><span v-else>当前还没有想法，赶紧来疏导吧～</span></div>
+          <div class="right">
+            <TextEllipsis :info="item.thought" :lineClamp="3" :hiddenBtn="true" v-if="item.finishStatus !== 1"></TextEllipsis>
+            <span v-else>当前还没有想法，赶紧来疏导吧～</span>
+          </div>
         </div>
         <div class="row tip" v-if="item.finishStatus === 1 || item.finishStatus === 2">
           <span>仅支持在App中疏导</span>
@@ -33,7 +42,7 @@
 </template>
 
 <script>
-import { DateFormat } from '@/utils/date'
+import dayjs from 'dayjs'
 import { userThemeCourseList, userCourseList } from '@/api/modules/user'
 import TextEllipsis from '@/components/TextEllipsis.vue'
 export default {
@@ -44,7 +53,7 @@ export default {
   data () {
     return {
       type: 1,
-      DateFormat: DateFormat,
+      dayjs: dayjs,
       tableList: []
     }
   },

@@ -23,7 +23,7 @@
           <div class="reduce" v-if="(item.step === item.evalRecords.length)" @click="item.step = 3">收起<van-icon name="arrow-up" color="#4D4D4D"/></div>
         </div>
         <div class="buy-infos" v-if="type === 1">
-          <div class="left"><span>购买时间: {{DateFormat({date: item.paidAt * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
+          <div class="left"><span>购买时间: {{dayjs(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span></div>
           <div class="right">¥ {{item.price}}</div>
         </div>
         <div class="buy-infos" v-if="type === 2">
@@ -34,7 +34,7 @@
           <div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div>
         </div>
         <div class="buy-infos" v-if="type === 2 && item.finishedAt > 0">
-          <div class="left"><span>完成时间: {{DateFormat({date: item.finishedAt * 1000, format: 'yyyy-MM-dd hh:mm'})}}</span></div>
+          <div class="left"><span>完成时间: {{ dayjs(item.finishedAt * 1000).format('YYYY-MM-DD HH:mm') }}</span></div>
         </div>
         <div class="function-btns">
           <div class="normal-function">
@@ -57,14 +57,14 @@
 </template>
 
 <script>
-import { DateFormat } from '@/utils/date'
+import dayjs from 'dayjs'
 import { getIndividual, getOrganization } from '@/api/modules/user'
 
 export default {
   name: 'record',
   data () {
     return {
-      DateFormat: DateFormat,
+      dayjs: dayjs,
       type: 0,
       time: '',
       status: '', // 1未完成 2全部 9已完成

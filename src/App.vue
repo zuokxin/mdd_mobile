@@ -8,18 +8,17 @@
 
 <script>
 // 微信控制台，需要调试的时候可以开
-import Vconsole from 'vconsole'
 export default {
   name: 'App',
   mounted () {
-    // 控制Vcosole
+    // 控制Vcosole,使用cdn的方式
     const openVconsole = true
     const condition1 = window.location.hostname === 'depression.fubianmed.com'
     if (openVconsole && !condition1) {
-      const vConsole = new Vconsole()
+      const vConsole = new window.VConsole()
       console.log(vConsole)
     }
-    console.log(Vconsole)
+    console.log(window.VConsole())
   }
 }
 </script>
