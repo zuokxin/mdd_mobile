@@ -1,7 +1,10 @@
 const pages = {
   title: '云愈心理',
   cdn: {},
-  externals: {}
+  externals: {
+    'axios': 'axios',
+    'dayjs': 'dayjs'
+  }
 }
 
 exports.pagesConfig = {
