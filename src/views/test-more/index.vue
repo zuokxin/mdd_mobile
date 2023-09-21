@@ -12,8 +12,8 @@
       </div>
       <div class="typeList">
         <div class="typeItem" :style="{ maxHeight: hide ? '0.8rem' : '300px' }">
-          <div class="item" :class="{ selected: active === index }" v-for="(item, index) in typeList" :key="item.index"
-            @click="selectHandle(item.id, index)">
+          <div :class="['item',{ 'selected': active === item.id }]" v-for="(item) in typeList" :key="item.index"
+            @click="selectHandle(item.id)">
             {{ item.name }}
           </div>
         </div>
@@ -61,12 +61,23 @@ export default {
       typeList: [],
       tableList: [],
       tableAll: [],
-      recommendList: []
+      recommendList: [],
+      tableCode: ''
     }
   },
   mounted () {
+    console.log('this.$route', this.$route, 'this.tableCode', this.tableCode, this)
     this.getTypeList()
     this.getRecommend()
+  },
+  beforeRouteEnter (to, from, next) {
+    // debugger
+    if (from.path === '/test-detail') {
+      next(vm => {
+        vm.tableCode = from.query.tableCode
+      })
+    }
+    next()
   },
   methods: {
     getRecommend () {
@@ -95,10 +106,26 @@ export default {
         console.log('typeall', typeAll, 'tableall', table.data)
         this.typeList = typeAll
         this.tableAll = table.data
-        const id = this.typeList[0].id
-        this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
+        this.init()
+        this.$nextTick(() => {
+          const dom = document.getElementsByClassName('selected')[0]
+          if (dom.offsetTop !== 0) {
+            this.showAll()
+          }
+        })
         this.loading = false
       })
+    },
+    init () {
+      let id = this.typeList[0].id
+      if (this.tableCode) {
+        this.tableAll.forEach(v => {
+          if (v.tableCode === this.tableCode) {
+            id = v.selfTableType.id
+          }
+        })
+      }
+      this.selectHandle(id)
     },
     toDeatil (item) {
       this.$router.push(`/test-detail?tableCode=${item.tables[0]}&discountCode=${item.discountCode}`)
@@ -106,8 +133,8 @@ export default {
     showAll () {
       this.hide = !this.hide
     },
-    selectHandle (id, index) {
-      this.active = index
+    selectHandle (id) {
+      this.active = id
       this.tableList = this.tableAll.filter(v => v.selfTableType.id === id)
     },
     openCbt () {
@@ -180,6 +207,7 @@ export default {
     min-height: 30rem/@w;
 
     .typeItem {
+      position: relative;
       display: flex;
       flex-wrap: wrap;
       overflow: hidden;
@@ -299,5 +327,4 @@ export default {
   align-items: center;
   background: rgba(0, 0, 0, 0);
 }
-
 </style>

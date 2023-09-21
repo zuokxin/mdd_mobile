@@ -18,7 +18,7 @@
     <detail-content :detailPageImages="course.detailPageImages"></detail-content>
     <!-- 足部操作区 -->
     <div class="van-goods-action">
-      <div class="van-goods-action-icon more-cbt" @click="$router.push('/cbt-more')">更多疏导</div>
+      <div class="van-goods-action-icon more-cbt" @click="$router.push('/train')">更多疏导</div>
       <van-button
         v-if="!weixinBtn"
         class="to-cbt"
