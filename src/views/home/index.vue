@@ -13,7 +13,7 @@
       </div>
       <div class="container">
         <!-- 轮播图 -->
-        <van-swipe :autoplay="5000">
+        <van-swipe :autoplay="3000">
           <van-swipe-item>
             <img @click.stop="openCbt" src="@/assets/img/banner1.png" alt="心理疏导">
           </van-swipe-item>
@@ -28,7 +28,7 @@
         <div class="train">
           <div class="title">
             <h5>专题训练</h5>
-            <span @click="$router.push({ path: '/train', query: { type:'all' } })">
+            <span @click="$router.push({ path: '/train' })">
               查看全部
               <van-icon name="arrow" color="#666"/>
               <van-icon name="arrow" color="#666"/>
