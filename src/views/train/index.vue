@@ -177,6 +177,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow:hidden ;
     .name{
       font-size: 14rem/@w;
       line-height: 20rem/@w;
