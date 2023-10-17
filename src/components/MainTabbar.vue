@@ -45,7 +45,8 @@ export default {
           active: require('../assets/img/my/my1.png'),
           inactive: require('../assets/img/my/my.png')
         }
-      ]
+      ],
+      active: ''
     }
   },
   methods: {

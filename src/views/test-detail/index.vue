@@ -41,7 +41,7 @@
       />
     </van-goods-action>
     <CameraDialog :show.sync="otherTestDialog" @needOpenCamera="needOpenCamera"></CameraDialog>
-    <NewPersonGift :flag="newPersonFlag"/>
+    <!-- <NewPersonGift :flag="newPersonFlag"/> -->
     <Finish v-if="reportBack" />
   </div>
 </template>
@@ -52,7 +52,7 @@ import DetailContent from './detail-content.vue'
 import Finish from './finish.vue'
 import PayAction from '@/components/PayAction.vue'
 import CameraDialog from '@/components/CameraDialog.vue'
-import NewPersonGift from '@/components/newPerson'
+// import NewPersonGift from '@/components/newPerson'
 import { Dialog } from 'vant'
 import { tableInfo, postUserCode, getOrderState } from '@/api/index'
 import { postTablecoll, getTableDiscount } from '@/api/modules/table'
@@ -65,7 +65,7 @@ export default {
     DetailContent,
     PayAction,
     CameraDialog,
-    NewPersonGift,
+    // NewPersonGift,
     Finish
   },
   data () {
@@ -91,7 +91,7 @@ export default {
         tableLogo: '',
         tableType: 1
       },
-      newPersonFlag: false, // 新人有礼
+      // newPersonFlag: false, // 新人有礼
       discountAmount: 0, // 折扣价格
       showPay: false, // 付款弹窗
       code: '', // 微信code
@@ -142,14 +142,14 @@ export default {
     // if (this.continue) this.go = true
     // 量表信息
     this.tableCode = this.$route.query.tableCode
-    if (this.$store.state.phone) {
-      this.$store.dispatch('getInfo').then(res => {
-        if (res.data.isNewUser && !res.data.isRxNUReward) {
-          this.newPersonFlag = true
-          // 这是满足新人有礼条件
-        }
-      })
-    }
+    // if (this.$store.state.phone) {
+    //   this.$store.dispatch('getInfo').then(res => {
+    //     if (res.data.isNewUser && !res.data.isRxNUReward) {
+    //       this.newPersonFlag = true
+    //       // 这是满足新人有礼条件
+    //     }
+    //   })
+    // }
     tableInfo(this.tableCode).then(
       res => {
         res.data.pageHeaderImage = res.data.pageHeaderImage || require('@/assets/img/detail-bannner.png')
