@@ -18,7 +18,7 @@ const routes = [
   {
     path: '/home',
     name: '首页',
-    meta: { title: '首页' },
+    meta: { title: '首页', keepAlive: true },
     component: resolve => require(['../views/home/index.vue'], resolve)
   },
   {
@@ -30,7 +30,7 @@ const routes = [
   {
     path: '/train',
     name: '专题训练',
-    meta: { title: '专题训练' },
+    meta: { title: '专题训练', keepAlive: true },
     component: resolve => require(['../views/train/index.vue'], resolve)
   },
   {
