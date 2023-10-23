@@ -47,6 +47,10 @@ class Music {
           return false
       }
       this.source.playStatus = 2
+      const event = this.handle.played
+      if (event) {
+        event.map(v => v.call(this))
+      }
     }
   }
 

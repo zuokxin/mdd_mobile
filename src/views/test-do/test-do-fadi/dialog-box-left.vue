@@ -1,14 +1,6 @@
 <template>
+  <!-- 视频画布播放版本 -->
   <div class="dialog-box-left">
-    <!-- <video
-      v-if="!isHistory"
-      ref="curVideo"
-      class="dialog-box-left-video"
-      :src="url"
-      autoplay
-      @play="played"
-      @pause="paused"
-    ></video> -->
     <div class="main">
       <div class="boxLeft" :style="{color: '#333' }">{{textLeft}}</div>
       <div v-if="isReady" class="laba" :style="{background: !isPlay || isHistory ? '#fff':'#34B7B9' }" @click.once="pauseVideo">

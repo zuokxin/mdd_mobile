@@ -109,15 +109,15 @@
       </div>
     </div>
     </div>
-    <NewPersonGift :flag="newPersonFlag" type="main" @reloadCoins="reloadCoins" />
+    <!-- <NewPersonGift :flag="newPersonFlag" type="main" @reloadCoins="reloadCoins" /> -->
   </div>
 </template>
 
 <script>
-import { signInFind, signInCreate, newUserReward } from '@/api/modules/user'
+import { signInFind, signInCreate } from '@/api/modules/user'
 import { postLogout } from '@/api/modules/login'
 import MainTabbar from '@/components/MainTabbar'
-import NewPersonGift from '@/components/newPerson'
+// import NewPersonGift from '@/components/newPerson'
 import { Dialog } from 'vant'
 export default {
   data () {
@@ -169,13 +169,13 @@ export default {
       showCoins: false,
       reward: '',
       yunyu_coins: '',
-      userId: '',
-      newPersonFlag: false
+      userId: ''
+      // newPersonFlag: false
     }
   },
   components: {
-    MainTabbar,
-    NewPersonGift
+    MainTabbar
+    // NewPersonGift
   },
   computed: {
     // 判断多个量表中是否有已经完成的量表
@@ -207,9 +207,9 @@ export default {
       this.$store.dispatch('getInfo').then(res => {
         this.userId = res.data.userId
         this.yunyu_coins = res.data.yunyu_coins
-        if (res.data.isNewUser && !res.data.isRxNUReward) {
-          this.newPersonFlag = true
-        }
+        // if (res.data.isNewUser && !res.data.isRxNUReward) {
+        //   this.newPersonFlag = true
+        // }
       })
     }
     this.$store.dispatch('addShare', {}, () => {
@@ -226,15 +226,15 @@ export default {
       }
     },
     // 点了新人有礼刷新币
-    reloadCoins () {
-      // 刷新云愈币
-      this.newPersonFlag = false
-      newUserReward().then(res => {
-        if (res.code === 0) {
-          this.publicUse()
-        }
-      })
-    },
+    // reloadCoins () {
+    //   // 刷新云愈币
+    //   this.newPersonFlag = false
+    //   newUserReward().then(res => {
+    //     if (res.code === 0) {
+    //       this.publicUse()
+    //     }
+    //   })
+    // },
     refreshshowCoins () {
       this.showCoins = false
       this.publicUse()

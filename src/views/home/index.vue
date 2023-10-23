@@ -84,23 +84,23 @@
     <div class="footer">
       <MainTabbar></MainTabbar>
     </div>
-    <NewPersonGift :flag="newPersonFlag" />
+    <!-- <NewPersonGift :flag="newPersonFlag" /> -->
   </div>
 </template>
 
 <script>
 import { h5ActivitylList, cbtCourseList, carefulSelection, courseList } from '@/api/modules/user'
 import MainTabbar from '@/components/MainTabbar'
-import NewPersonGift from '@/components/newPerson'
+// import NewPersonGift from '@/components/newPerson'
 export default {
   name: 'home',
   components: {
-    MainTabbar,
-    NewPersonGift
+    MainTabbar
+    // NewPersonGift
   },
   data () {
     return {
-      newPersonFlag: false,
+      // newPersonFlag: false,
       swipList: [],
       cbtCourseList: [],
       courseList: [],
@@ -115,14 +115,14 @@ export default {
     this.getCbtCourseList()
     this.getCarefulSelection()
     this.getCourseList()
-    if (this.$store.state.phone) {
-      this.$store.dispatch('getInfo').then(res => {
-        if (res.data.isNewUser && !res.data.isRxNUReward) {
-          this.newPersonFlag = true
-          // 这是满足新人有礼条件
-        }
-      })
-    }
+    // if (this.$store.state.phone) {
+    //   this.$store.dispatch('getInfo').then(res => {
+    //     if (res.data.isNewUser && !res.data.isRxNUReward) {
+    //       this.newPersonFlag = true
+    //       // 这是满足新人有礼条件
+    //     }
+    //   })
+    // }
   },
   methods: {
     signIn () {
