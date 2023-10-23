@@ -30,15 +30,7 @@ module.exports = {
     open: false, // 配置自动启动浏览器
     proxy: {
       '/api': httpProxy(),
-      '/static': httpProxy(),
-      '/ttsSocket': {
-        target: 'ws://tts-api.xfyun.cn',
-        ws: true,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/ttsSocket': '/'
-        }
-      }
+      '/static': httpProxy()
     }
   },
   pages: utils.pagesConfig,
