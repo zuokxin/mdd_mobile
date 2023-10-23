@@ -2,7 +2,7 @@
   <!-- 讯飞文本合成语音版本 -->
   <div>
     <div class="main">
-      <div class="boxLeft" :style="{color: '#333' }">{{index}}{{textLeft}}</div>
+      <div class="boxLeft" :style="{color: '#333' }">{{textLeft}}</div>
       <div v-if="isReady" class="laba" :style="{background: !isPlay || isHistory ? '#fff':'#34B7B9' }" @click.once="playAudio">
         <img v-show="isPlay  && !isHistory" src="@/assets/img/test/horn.gif" width="12" height="12" alt="-">
         <img v-if="(!isPlay && !isHistory) || isHistory" src="@/assets/img/test/speaker.png" alt="speaker" style="width: 13px; height: 13px;">
@@ -63,7 +63,6 @@ export default {
     //   this.audioEle.removeEventListener('play', this.played)
     //   this.audioEle.removeEventListener('pause', this.paused)
     // })
-    console.log(typeof this.index)
     if (this.index === 0) this.$emit('openStartPrompt')
     // 有文本内容开始合成语音
     if (this.textLeft) {

@@ -1,7 +1,7 @@
 <template>
   <div class="time">
-    <span v-if="type">{{dayjs(new Date() * 1000).format('M月DD日 HH:mm')}}</span>
-    <span v-else>{{dayjs(new Date() * 1000).format('HH:mm')}}</span>
+    <span v-if="type">{{dayjs(new Date()).format('M月DD日 HH:mm')}}</span>
+    <span v-else>{{dayjs(new Date()).format('HH:mm')}}</span>
   </div>
 </template>
 
