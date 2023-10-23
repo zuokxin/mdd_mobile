@@ -94,6 +94,12 @@ const routes = [
     component: resolve => require(['../views/test-do/test-do-fadi/index.vue'], resolve)
   },
   {
+    path: '/test-do-fadi02',
+    name: '测试-他评量表-fadi-gbt',
+    meta: { title: '测试' },
+    component: resolve => require(['../views/test-do/test-do-fadi-gbt/index.vue'], resolve)
+  },
+  {
     path: '/test-report',
     name: '测试-量表报告',
     meta: { title: '云愈心理测试报告' },
