@@ -3,7 +3,9 @@ const pages = {
   cdn: {},
   externals: {
     'axios': 'axios',
-    'dayjs': 'dayjs'
+    'dayjs': 'dayjs',
+    'Base64': 'Base64',
+    'CryptoJS': 'CryptoJS'
   }
 }
 
