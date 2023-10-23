@@ -17,14 +17,6 @@ video {
   color: #333;
   font-size: 0.533333rem;
 }
-/* 弹窗样式 */
-.van-dialog {
-  border-radius: 0.5333rem;
-}
-/* 与设计稿统一按钮为16px */
-.van-goods-action-button  {
-  font-size: 0.4266667rem;
-}
 .detail-dialog .van-dialog__message {
   font-size: 0.4266667rem;
   font-weight: 700;
@@ -50,4 +42,7 @@ video {
 .dialog-confirm .van-dialog__footer {
   padding: 8px 50px 40px;
   flex-direction: row-reverse;
+}
+.van-overlay {
+  z-index: 99;
 }
