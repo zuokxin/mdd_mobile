@@ -62,7 +62,13 @@ export default {
     },
     // 题数显示
     questions () {
-      if (this.tableCode === 'hama' || this.tableCode === 'hamd' || this.tableCode === 'MINI' || this.tableCode === 'FADI') {
+      if (
+        this.tableCode === 'hama' ||
+        this.tableCode === 'hamd' ||
+        this.tableCode === 'MINI' ||
+        this.tableCode === 'FADI' ||
+        this.tableCode === 'FADI2'
+      ) {
         return '定制题数'
       } else {
         return this.questionNumber

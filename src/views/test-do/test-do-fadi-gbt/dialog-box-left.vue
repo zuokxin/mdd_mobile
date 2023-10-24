@@ -37,9 +37,21 @@ export default {
       isPlay: false, // 正在播放
       isReady: false,
       ttsWS: null,
+      // 讯飞相关
       APPID: 'f912fc43',
       API_SECRET: 'Yjk0ZDZhNTM4YjM0NzNmZDZiMzA2YmNi',
-      API_KEY: '303869817898414bde07f13261bfa29b'
+      API_KEY: '303869817898414bde07f13261bfa29b',
+      business: { // 讯飞文字转语音参数
+        aue: 'lame', // 默认raw,lame=mp3
+        // sfl: 1, // MP3形式下开启为流式返回
+        auf: 'audio/L16;rate=16000',
+        vcn: 'xiaoyan', // 发音人
+        speed: 60, // 音速
+        volume: 50, // 音量
+        pitch: 50,
+        bgs: 1,
+        tte: 'UTF8'
+      }
     }
   },
   mounted () {
@@ -156,25 +168,14 @@ export default {
       }
       this.ttsWS.onopen = (e) => {
         console.log(e, 'open')
-        const tte = 'UTF8'
         const params = {
           common: {
             app_id: this.APPID
           },
-          business: {
-            aue: 'lame', // 默认raw,lame=mp3
-            // sfl: 1, // MP3形式下开启为流式返回
-            auf: 'audio/L16;rate=16000',
-            vcn: 'xiaoyan',
-            speed: 70,
-            volume: 50,
-            pitch: 50,
-            bgs: 1,
-            tte
-          },
+          business: this.business,
           data: {
             status: 2,
-            text: this.encodeText(this.textLeft, tte)
+            text: this.encodeText(this.textLeft, this.business.tte)
           }
         }
         this.ttsWS.send(JSON.stringify(params))
