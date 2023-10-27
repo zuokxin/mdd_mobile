@@ -120,6 +120,11 @@ export default {
       }
     }
   },
+  watch: {
+    '$route' (to, from) {
+      window.location.reload()
+    }
+  },
   mounted () {
     this.sessionId = this.$route.query.sessionId
     this.tableCode = this.$route.query.tableCode
