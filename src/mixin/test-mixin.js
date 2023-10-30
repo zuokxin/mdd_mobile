@@ -18,8 +18,6 @@ export const testMiXin = {
     // 地址判断
     getFullPath (json = {}) {
       const data = Object.assign({
-        type: '',
-        tableCode: '',
         sessionId: '',
         next: null,
         skipEnv: false
@@ -32,9 +30,9 @@ export const testMiXin = {
         return path
       }
       const paramsId = `?sessionId=${data.sessionId}`
-      const paramCode = `&tableCode=${data.tableCode}`
+      const paramCode = `&tableCode=${data.next.tableCode}`
       // 自评
-      if (data.type === 1) {
+      if (data.next.table.tableType === 1) {
         path = '/test-do-self'
       } else {
         // 第一个他评
@@ -59,13 +57,10 @@ export const testMiXin = {
         tableCode: this.tableCode
       })
       const path = this.getFullPath({
-        type: next.table.tableType,
-        tableCode: next.tableCode,
         sessionId: this.sessionId,
         next,
         skipEnv // 只有自评出来去环境
       })
-      console.log(path, '自评')
       this.$router.replace(path)
     }
   }
