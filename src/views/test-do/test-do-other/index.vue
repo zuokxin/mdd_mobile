@@ -96,7 +96,7 @@
       confirmButtonColor="#34B7B9"
       @close="colseFaceTips"
     ></van-dialog>
-    <FadiRoleDialog ref="FadiRoleDialog" @confirm="$router.replace(routerPath)"></FadiRoleDialog>
+    <FadiRoleDialog ref="FadiRoleDialog" @confirm="goNext(true)"></FadiRoleDialog>
   </div>
 </template>
 
@@ -111,9 +111,10 @@ import { getTableQues, batchInfo, posTableQues, postTableRes } from '@/api/modul
 import popout from './popout'
 import errpopout from './errpopout'
 import voice from './voice'
-import { mapGetters } from 'vuex'
+// import { mapGetters } from 'vuex'
 import { Dialog } from 'vant'
 import FadiRoleDialog from '@/components/FadiRoleDialog'
+import { testMiXin } from '@/mixin/test-mixin'
 document.addEventListener('visibilitychange', function () {
   if (document.visibilityState === 'hidden') {
     // window.location.reload()
@@ -125,6 +126,7 @@ document.addEventListener('visibilitychange', function () {
 })
 export default {
   name: 'do-other',
+  mixins: [testMiXin],
   components: {
     popout,
     errpopout,
@@ -176,30 +178,30 @@ export default {
   },
   computed: {
     // 当前表名
-    thisTable () {
-      return this.$route.query.tableCode
-    },
-    ...mapGetters([
-      'nextTable'
-    ]),
-    routerPath () {
-      // 测试表未完成
-      const next = this.nextTable(this.thisTable)
-      // console.log(next, '他评')
-      if (next) {
-        if (next.table.tableType === 1) {
-          return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
-        } else {
-          if (next.table.tableCode === 'FADI') {
-            return `/test-do-fadi?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
-          } else {
-            return `/test-do-other?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
-          }
-        }
-      } else {
-        return `/test-do-wait?sessionId=${this.sessionId}`
-      }
-    }
+    // thisTable () {
+    //   return this.$route.query.tableCode
+    // },
+    // ...mapGetters([
+    //   'nextTable'
+    // ]),
+    // routerPath () {
+    //   // 测试表未完成
+    //   const next = this.nextTable(this.thisTable)
+    //   // console.log(next, '他评')
+    //   if (next) {
+    //     if (next.table.tableType === 1) {
+    //       return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+    //     } else {
+    //       if (next.table.tableCode === 'FADI') {
+    //         return `/test-do-fadi?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+    //       } else {
+    //         return `/test-do-other?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+    //       }
+    //     }
+    //   } else {
+    //     return `/test-do-wait?sessionId=${this.sessionId}`
+    //   }
+    // }
   },
   watch: {
     '$route' (to, from) {
@@ -241,7 +243,11 @@ export default {
         tableCode: this.tableCode
       }
       const res = await getTableQues(data)
-      const next = this.nextTable(this.thisTable)
+      // const next = this.nextTable(this.thisTable)
+      const { next } = await this.getCurTestRecord({
+        sessionId: this.sessionId,
+        tableCode: this.tableCode
+      })
       // console.log(res)
       if (res.data.isEnd) {
         // 获取不到题目了就去等待页
@@ -255,11 +261,13 @@ export default {
                 this.$refs.FadiRoleDialog.show = true
               } else {
                 this.thisDialog('您将进入下一个量表进行测试').then(() => {
-                  this.$router.replace(this.routerPath)
+                  this.goNext(true)
+                  // this.$router.replace(this.routerPath)
                 })
               }
             } else {
-              this.$router.replace(this.routerPath)
+              this.goNext(true)
+              // this.$router.replace(this.routerPath)
             }
           }
         })

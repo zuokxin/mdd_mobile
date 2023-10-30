@@ -60,7 +60,8 @@
       <van-button round block type="primary" v-if="psqiFinish" :disabled="!end" @click="finished">完成</van-button>
       <van-button round block type="primary" v-else :disabled="!end"  @click="next">下一题</van-button>
     </div>
-    <FadiRoleDialog ref="FadiRoleDialog" @confirm="$router.replace(routerPath)"></FadiRoleDialog>
+    <!-- <FadiRoleDialog ref="FadiRoleDialog" @confirm="$router.replace(routerPath)"></FadiRoleDialog> -->
+    <FadiRoleDialog ref="FadiRoleDialog" @confirm="goNext(false)"></FadiRoleDialog>
   </div>
 </template>
 
@@ -68,11 +69,13 @@
 import { getTableQues, postTableQues, postTableRes } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
 // import { findIndexByKeyValue } from '@/utils/checkFinish'
-import { mapGetters } from 'vuex'
+// import { mapGetters } from 'vuex'
 import { Dialog } from 'vant'
 import FadiRoleDialog from '@/components/FadiRoleDialog'
+import { testMiXin } from '@/mixin/test-mixin'
 export default {
   name: 'do-self',
+  mixins: [testMiXin],
   components: {
     FadiRoleDialog
   },
@@ -96,29 +99,25 @@ export default {
       const num = (this.allData.id + 1) / this.allData.questionTotal
       const percentNum = (num * 100).toFixed(0)
       return percentNum
-    },
-    // 当前表名
-    thisTable () {
-      return this.$route.query.tableCode
-    },
-    ...mapGetters([
-      'nextTable'
-    ]),
-    routerPath () {
-      // 测试表未完成
-      // console.log(this.thisTable, 'this.$route.query.tableCode')
-      const next = this.nextTable(this.thisTable)
-      // console.log(next, '自评')
-      if (next) {
-        if (next.table.tableType === 1) {
-          return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
-        } else {
-          return `/environment?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
-        }
-      } else {
-        return `/test-do-wait?sessionId=${this.sessionId}&s=5`
-      }
     }
+    // // 当前表名
+    // thisTable () {
+    //   return this.$route.query.tableCode
+    // }
+    // routerPath () {
+    //   // 测试表未完成
+    //   const next = this.nextTable(this.thisTable)
+    //   // console.log(next, '自评')
+    //   if (next) {
+    //     if (next.table.tableType === 1) {
+    //       return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+    //     } else {
+    //       return `/environment?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+    //     }
+    //   } else {
+    //     return `/test-do-wait?sessionId=${this.sessionId}&s=5`
+    //   }
+    // }
   },
   watch: {
     '$route' (to, from) {
@@ -408,7 +407,11 @@ export default {
     },
     // 完成
     async finished () {
-      const next = this.nextTable(this.thisTable)
+      // const next = this.nextTable(this.thisTable)
+      const { next } = await this.getCurTestRecord({
+        sessionId: this.sessionId,
+        tableCode: this.tableCode
+      })
       // 最后一题是非必填选择再加一次提交
       const error = await this.isNeedSubmit()
       if (error) return
@@ -433,11 +436,11 @@ export default {
                     this.$refs.FadiRoleDialog.show = true
                   } else {
                     this.thisDialog('您将进入下一个量表进行测试').then(() => {
-                      this.$router.replace(this.routerPath)
+                      this.goNext(false)
                     })
                   }
                 } else {
-                  this.$router.replace(this.routerPath)
+                  this.goNext(false)
                 }
                 // this.$router.replace({ path: '/test-do-wait?s=5', query: { sessionId: this.sessionId } })
               } else {
@@ -461,11 +464,11 @@ export default {
               this.$refs.FadiRoleDialog.show = true
             } else {
               this.thisDialog('您将进入下一个量表进行测试').then(() => {
-                this.$router.replace(this.routerPath)
+                this.goNext(false)
               })
             }
           } else {
-            this.$router.replace(this.routerPath)
+            this.goNext(false)
           }
         } else {
           this.$toast(res.message)
