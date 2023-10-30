@@ -111,7 +111,8 @@ import { uploader } from '@/utils/uploader'
 import { mediaErrorTypes } from '@/utils/types'
 // import { throttle } from '@/utils/throttle'
 import Recorder from '@/utils/media/recorder'
-import { mapGetters } from 'vuex'
+// import { mapGetters } from 'vuex'
+import { testMiXin } from '@/mixin/test-mixin'
 document.addEventListener('visibilitychange', function () {
   if (document.visibilityState === 'hidden') {
     // window.location.reload()
@@ -123,6 +124,7 @@ document.addEventListener('visibilitychange', function () {
 })
 export default {
   name: 'test-do-fadi',
+  mixins: [testMiXin],
   components: {
     DialogBoxLeft,
     DialogBoxRight,
@@ -182,27 +184,27 @@ export default {
     },
     btnText2 () {
       return this.loading ? '正在提交测试结果，请勿关闭或刷新页面' : '点击下方，停止说话'
-    },
-    // 当前表名
-    thisTable () {
-      return this.$route.query.tableCode
-    },
-    ...mapGetters([
-      'nextTable'
-    ]),
-    routerPath () {
-      // 测试表未完成
-      const next = this.nextTable(this.thisTable)
-      if (next) {
-        if (next.table.tableType === 1) {
-          return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
-        } else {
-          return `/test-do-other?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
-        }
-      } else {
-        return `/test-do-wait?sessionId=${this.sessionId}&s=60`
-      }
     }
+    // 当前表名
+    // thisTable () {
+    //   return this.$route.query.tableCode
+    // }
+    // ...mapGetters([
+    //   'nextTable'
+    // ]),
+    // routerPath () {
+    //   // 测试表未完成
+    //   const next = this.nextTable(this.thisTable)
+    //   if (next) {
+    //     if (next.table.tableType === 1) {
+    //       return `/test-do-self?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+    //     } else {
+    //       return `/test-do-other?sessionId=${this.sessionId}&tableCode=${next.tableCode}`
+    //     }
+    //   } else {
+    //     return `/test-do-wait?sessionId=${this.sessionId}&s=60`
+    //   }
+    // }
   },
   created () {
     console.log('IOS')
@@ -736,7 +738,8 @@ export default {
         tableCode: this.tableCode
       }).then(
         () => {
-          this.$router.replace(this.routerPath)
+          // this.$router.replace(this.routerPath)
+          this.goNext(true)
         }
       )
     },

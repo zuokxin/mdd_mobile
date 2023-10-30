@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import test from './modules/test'
+import tableRecord from './modules/table-record'
 import { getUserAuth, wxSignatures } from '@/api/index'
 import { getUserInfo } from '@/api/modules/user'
 import wxShare from '@/utils/wxShare'
@@ -97,6 +98,7 @@ export default new Vuex.Store({
     }
   },
   modules: {
-    test
+    test,
+    tableRecord
   }
 })
