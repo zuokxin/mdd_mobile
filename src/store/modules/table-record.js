@@ -25,7 +25,6 @@ export default {
             data.tableCode,
             res.data.evalRecords
           )
-          console.log(next, '123', sessionId)
           context.commit('SET_NEXT', next)
           resolve({
             records: res.data.evalRecords,
@@ -47,6 +46,5 @@ function nextTable (tableCode, records) {
   if (residueTables.length > 0) {
     return residueTables[0]
   }
-  console.log(tableCode, records, residueTables)
   return false
 }
