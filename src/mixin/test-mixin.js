@@ -23,13 +23,13 @@ export const testMiXin = {
         skipEnv: false
       }, json)
       let path = ''
+      const paramsId = `?sessionId=${data.sessionId}`
       // 无测试
       if (!data.next) {
-        path = '/test-do-wait'
+        path = '/test-do-wait' + paramsId
         if (data.skipEnv) path += '&s=60'
         return path
       }
-      const paramsId = `?sessionId=${data.sessionId}`
       const paramCode = `&tableCode=${data.next.tableCode}`
       // 自评
       if (data.next.table.tableType === 1) {

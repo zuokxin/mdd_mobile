@@ -13,12 +13,9 @@
         </div>
         <div class="description">
           <div class="name">{{ item.courseName }}</div>
-          <div class="describe">
-            <p v-for="v in item.describe" :key="v">{{ v }}</p>
-          </div>
-          <div class="price">
-            <span>￥</span>
-            {{ Number(item.price ).toFixed(2)}}
+          <div class="subTitle">{{ item.title }}</div>
+          <div class="discribe">
+            {{ item.tag }}<span> &#124; </span>共一节<span> &#124; </span>{{ cnt(item.cnt) }}人已学
           </div>
         </div>
       </div>
@@ -90,6 +87,14 @@ export default {
         })
       }
       this.handleSelect(tag)
+    },
+    cnt (value) {
+      if (value < 10000) return value
+      if ((value / 10000).toFixed(1) > 9999.9) {
+        return 9999.9 + 'w'
+      } else {
+        return (value / 10000).toFixed(1) + 'w'
+      }
     }
   }
 }
@@ -140,8 +145,8 @@ export default {
   width:100%;
   box-sizing: border-box;
   margin-bottom: 10rem/@w;
-  padding: 10rem/@w;
-  height: 121rem/@w;
+  padding: 16rem/@w 10rem/@w;
+  height: 116rem/@w;
   border-radius: 12rem/@w;
   background-color: #fff;
   display: flex;
@@ -150,12 +155,11 @@ export default {
     width: 124rem/@w;
     height: 100%;
     box-sizing: border-box;
-    padding: 9rem/@w 0 8rem/@w;
     font-size: 0;
     position: relative;
     .tag{
       position: absolute;
-      top: 5rem/@w;
+      top: -3rem/@w;
       left: -4rem/@w;
       width: 48rem / @w;
       height: 20rem / @w;
@@ -174,11 +178,10 @@ export default {
   .description{
     flex: 1;
     margin-left: 10rem/@w;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow:hidden ;
+    color: #666;
+    position: relative;
     .name{
+      margin-bottom: 4rem/@w;
       font-size: 14rem/@w;
       line-height: 20rem/@w;
       font-weight: bold;
@@ -188,23 +191,21 @@ export default {
       text-overflow: ellipsis;
       vertical-align: baseline;
     }
-    .describe{
-      p{
-        margin: 0;
-        font-size: 12rem/@w;
-        line-height: 16rem/@w;
-        color: #666;
-      }
-    }
-    .price{
+    .subTitle{
       margin: 0;
-      font-size: 16rem/@w;
-      line-height: 22rem/@w;
-      color:#f31313;
-      span{
-        font-size: 12rem/@w;
-        margin-right: 4rem/@w;
-      }
+      font-size: 12rem/@w;
+      line-height: 16rem/@w;
+      overflow: hidden;
+      -webkit-line-clamp: 2;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+    }
+    .discribe{
+      position: absolute;
+      bottom: 8rem/@w;
+      font-size: 10rem/@w;
+      line-height: 14rem/@w;
     }
   }
 }
