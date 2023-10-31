@@ -28,15 +28,15 @@
     <van-goods-action :safe-area-inset-bottom="true">
       <van-goods-action-icon to="/test-more" text="更多测评"/>
       <van-goods-action-button
-        v-if="!go"
+        v-if="go === 0"
         type="primary"
         :text="btnInfo"
-        @click="onClickButton"
+        @click="payTest"
       />
       <van-goods-action-button
-        v-else
+        v-if="go === 1"
         type="primary"
-        :text="btnGoInfo"
+        text="开始测试"
         @click="goTest"
       />
     </van-goods-action>
@@ -95,9 +95,8 @@ export default {
       discountAmount: 0, // 折扣价格
       showPay: false, // 付款弹窗
       code: '', // 微信code
-      go: false, // 是否去测试
+      go: -1, // 是否去测试,1为true，0为false
       sessionId: '', // 当前测试的sessionid
-      continue: false, // 是否为继续测试
       tableCode: '',
       otherTestDialog: false,
       aiEvalCamEnabled: false,
@@ -130,16 +129,9 @@ export default {
     // 支付按钮文案
     btnInfo () {
       return `确认支付（¥${this.discountAmountInfo}）`
-    },
-    // 去测试按钮文案
-    btnGoInfo () {
-      return this.continue ? '继续测试' : '开始测试'
     }
   },
   async mounted () {
-    // 继续测试
-    // this.continue = this.$route.query.continue
-    // if (this.continue) this.go = true
     // 量表信息
     this.tableCode = this.$route.query.tableCode
     // if (this.$store.state.phone) {
@@ -152,8 +144,7 @@ export default {
     // }
     tableInfo(this.tableCode).then(
       res => {
-        res.data.pageHeaderImage = res.data.pageHeaderImage || require('@/assets/img/detail-bannner.png')
-        this.table = Object.assign(this.table, res.data)
+        this.infoHandle(res.data)
         this.$nextTick(async () => {
           // 微信授权
           this.code = params.get('code') || ''
@@ -180,50 +171,74 @@ export default {
             }
           }
           // 支付页面回调
-          const redirect = this.$route.query.redirect
-          const orderid = this.$route.query.orderid
-          // h5支付
-          if (redirect === 'h5pay' && orderid) {
-            this.thisDialog('刚才的订单支付了吗？', '已支付', 'confirm').then(() => {
-              this.finishPay(orderid)
-            }).catch(() => {
-              this.payReplace()
-            })
-          } else if (redirect === 'alipay' && orderid) { // 支付宝支付
-            if (this.$route.query.type === 'return') {
-              this.finishPay(orderid)
-            } else {
-              // 取消支付的情况直接返回
-              this.$router.go(-1)
-            }
-          }
+          this.payHandle()
         })
         // 获取优惠码
-        this.discountCode = this.$route.query.discountCode
-        if (this.discountCode) {
-          getTableDiscount(this.tableCode, this.discountCode).then(res => {
-            this.discountAmount = res.data.price
-          }).catch(err => {
-            // 优惠码失效
-            if (err.code === 2102 || err.code === 2103) {
-              if (err.code === 2102) {
-                // 活动已结束
-                this.$toast(err.message)
-              }
-              this.discountAmount = this.table.price
-              // 更新路由
-              // const { discountCode, ...query } = this.$route.query
-              // console.log(query)
-              // this.$router.replace({ query })
-            }
-          })
-        }
+        this.getDiscountCode()
+        // 加载微信分享
         this.share()
       }
     )
   },
   methods: {
-    onClickButton () {
+    // 量表信息处理
+    infoHandle (info) {
+      info.pageHeaderImage = info.pageHeaderImage || require('@/assets/img/detail-bannner.png')
+      this.table = Object.assign(this.table, info)
+      // 判断是否有未完成的测试
+      if (info.sessionId) {
+        this.sessionId = info.sessionId
+        this.go = 1
+      } else {
+        this.go = 0
+      }
+    },
+    // 微信支付和支付宝支付回调处理
+    payHandle () {
+      // 支付页面回调
+      const redirect = this.$route.query.redirect
+      const orderid = this.$route.query.orderid
+      // h5支付
+      if (redirect === 'h5pay' && orderid) {
+        this.thisDialog('刚才的订单支付了吗？', '已支付', 'confirm').then(() => {
+          this.finishPay(orderid)
+        }).catch(() => {
+          this.payReplace()
+        })
+      } else if (redirect === 'alipay' && orderid) { // 支付宝支付
+        if (this.$route.query.type === 'return') {
+          this.finishPay(orderid)
+        } else {
+          // 取消支付的情况直接返回
+          this.$router.go(-1)
+        }
+      }
+    },
+    // 获取优惠码
+    getDiscountCode () {
+      this.discountCode = this.$route.query.discountCode
+      // 优惠码存在
+      if (this.discountCode) {
+        getTableDiscount(this.tableCode, this.discountCode).then(res => {
+          // 更新优惠价
+          this.discountAmount = res.data.price
+        }).catch(err => {
+          // 优惠码失效
+          if (err.code === 2102 || err.code === 2103) {
+            if (err.code === 2102) {
+              // 活动已结束
+              this.$toast(err.message)
+            }
+            this.discountAmount = this.table.price
+            // 更新路由
+            // const { discountCode, ...query } = this.$route.query
+            // this.$router.replace({ query })
+          }
+        })
+      }
+    },
+    // 确认支付
+    payTest () {
       // 未登录
       if (!this.$store.state.phone) {
         this.$router.push({
@@ -253,6 +268,17 @@ export default {
     },
     // 开始测试
     goTest () {
+      // 未登录
+      if (!this.$store.state.phone) {
+        this.$router.push({
+          path: '/login',
+          query: {
+            url: this.$route.path,
+            ...this.$route.query
+          }
+        })
+        return
+      }
       sessionStorage.reportDisplayEnabled = 'true'
       sessionStorage.setMark = 'gerenpay'
       sessionStorage.tables = JSON.stringify([{ table: this.table }])
@@ -268,27 +294,6 @@ export default {
       this.otherTestDialog = false
       this.showPay = true
       console.log(this.payInfo)
-    },
-    // 支付回调刷新
-    refresh (state = 0) {
-      const redirect = this.$route.query.redirect
-      // h5支付回调
-      if (redirect === 'h5pay') {
-        // 支付失败后退回支付初始页
-        if (!state) {
-          this.$router.go(-2)
-        } else {
-          this.payReplace()
-        }
-      } else if (redirect === 'alipay') {
-        // 支付后去除多余参数
-        this.payReplace()
-      } else {
-        // 其他支付，成功后关闭支付弹窗
-        if (state) {
-          this.showPay = false
-        }
-      }
     },
     // 弹窗封装
     thisDialog (message, btnText = '确定', type = 'alert') {
@@ -318,7 +323,7 @@ export default {
         res => {
           if (res.data.orderStatus === 'success') {
             this.thisDialog('您已完成支付').then(() => {
-              this.go = true
+              this.go = 1
               this.sessionId = res.data.sessionId
               this.refresh(1)
             })
@@ -340,7 +345,28 @@ export default {
         }
       )
     },
-    // 支付回调的刷新
+    // 支付回调刷新
+    refresh (state = 0) {
+      const redirect = this.$route.query.redirect
+      // h5支付回调
+      if (redirect === 'h5pay') {
+        // 支付失败后退回支付初始页
+        if (!state) {
+          this.$router.go(-2)
+        } else {
+          this.payReplace()
+        }
+      } else if (redirect === 'alipay') {
+        // 支付后去除多余参数
+        this.payReplace()
+      } else {
+        // 其他支付，成功后关闭支付弹窗
+        if (state) {
+          this.showPay = false
+        }
+      }
+    },
+    // 支付回调后地址参数的刷新
     payReplace () {
       const params = {
         path: this.$route.path,
