@@ -24,10 +24,10 @@
             <img :src="item.imageLink" @click="toDeatil(item)" />
           </van-swipe-item>
         </van-swipe>
-        <!-- 专题训练 -->
+        <!-- 专项疏导 -->
         <div class="train">
           <div class="title">
-            <h5>专题训练</h5>
+            <h5>专项疏导</h5>
             <span @click="$router.push({ path: '/train' })">
               查看全部
               <van-icon name="arrow" color="#666"/>
@@ -38,7 +38,7 @@
             <div class="train-box-content" v-for="v in cbtCourseList" :key="v.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
               <div class="tag" v-if="Number(v.price) === 0">限时免费</div>
               <div class="tag" v-if="Number(v.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
-              <div class="img"><img :src="v.courseImage" alt="专题训练"></div>
+              <div class="img"><img :src="v.courseImage" alt="专项疏导"></div>
               <p class="name">{{ v.courseName }}</p>
               <p class="price"><span>￥</span>{{ Number(v.price).toFixed(2) }}</p>
             </div>
@@ -66,14 +66,14 @@
             </div>
           </div>
         </div>
-        <!-- 系统疏导 -->
+        <!-- 综合疏导 -->
         <div class="train counseling">
           <div class="title">
-            <h5>系统疏导</h5>
+            <h5>综合疏导</h5>
           </div>
           <div class="train-box counseling-box">
             <div class="train-box-content counseling-box-content" v-for="v in courseList" :key="v.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
-              <div class="img"><img :src="v.courseImage" alt="系统疏导"></div>
+              <div class="img"><img :src="v.courseImage" alt="综合疏导"></div>
               <p class="name">{{ v.courseName }}</p>
               <p class="price"><span>￥</span>{{ Number(v.price).toFixed(2) }}</p>
             </div>

@@ -90,7 +90,7 @@ export default {
       userNumber: '',
       bindList: [],
       flagT: false,
-      loading: true,
+      loading: false,
       active: 0,
       cbtList: []
     }
@@ -133,6 +133,8 @@ export default {
     },
     // 获取机构测试记录
     organization () {
+      this.loading = true
+      console.log('this.loading', this.loading)
       organization({ page: -1, pageSize: -1 }).then(res => {
         if (res.code === 0) {
           this.bindList = []
@@ -144,12 +146,14 @@ export default {
               }
             })
           }
+          this.loading = false
+          console.log('this.loading', this.loading)
         }
       })
-      this.loading = false
     },
     // 获取CBT测试记录
     async cbtCourse () {
+      this.loading = true
       const { data } = await cbtCourse({ page: -1, pageSize: -1 })
       this.cbtList = data.courseList || []
       this.loading = false
