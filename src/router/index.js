@@ -29,8 +29,8 @@ const routes = [
   },
   {
     path: '/train',
-    name: '专题训练',
-    meta: { title: '专题训练', keepAlive: true },
+    name: '专项疏导',
+    meta: { title: '专项疏导', keepAlive: true },
     component: resolve => require(['../views/train/index.vue'], resolve)
   },
   {

@@ -7,7 +7,7 @@
       </div>
       <div class="train-box" v-for="item in cbtCourseList" :key="item.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: item.courseId } })">
         <div class="img">
-          <img :src="item.courseImage" alt="专题训练">
+          <img :src="item.courseImage" alt="专项疏导">
           <div class="tag" v-if="Number(item.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
           <div class="tag" v-if="Number(item.price) === 0">限时免费</div>
         </div>
@@ -15,7 +15,7 @@
           <div class="name">{{ item.courseName }}</div>
           <div class="subTitle">{{ item.title }}</div>
           <div class="discribe">
-            {{ item.tag }}<span> &#124; </span>共一节<span> &#124; </span>{{ cnt(item.cnt) }}人已学
+            {{ item.tag }}<span> &#124; </span>共1节<span> &#124; </span>{{ cnt(item.cnt) }}人已学
           </div>
         </div>
       </div>

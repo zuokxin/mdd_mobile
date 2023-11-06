@@ -2,25 +2,25 @@
   <div class="main">
     <van-loading color="#1989fa" v-if="loading"></van-loading>
     <div class="container" v-else>
-      <!-- 系统课程 -->
+      <!-- 综合疏导 -->
       <div class="counseling">
         <div class="title">
-          <h5>系统课程</h5>
+          <h5>综合疏导</h5>
         </div>
         <div class="counseling-box">
           <div class="counseling-box-content" v-for="v in courseList" :key="v.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
             <div class="img">
-              <img :src="v.courseImage" alt="系统课程">
+              <img :src="v.courseImage" alt="综合疏导">
             </div>
             <p class="name">{{ v.courseName }}</p>
             <p class="price"><span>￥</span>{{ Number(v.price).toFixed(2) }}</p>
           </div>
         </div>
       </div>
-      <!-- 专题训练 -->
+      <!-- 专项疏导 -->
       <div class="train">
         <div class="title">
-          <h5>专题训练</h5>
+          <h5>专项疏导</h5>
           <span @click="$router.push({ path: '/train', query: { type:'all' } })">查看全部
             <van-icon name="arrow" color="#666"/>
             <van-icon name="arrow" color="#666"/>
@@ -28,7 +28,7 @@
         </div>
         <div class="train-box" v-for="item in cbtCourseList" :key="item.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: item.courseId } })">
           <div class="img">
-            <img :src="item.courseImage" alt="专题训练">
+            <img :src="item.courseImage" alt="专项疏导">
             <div class="tag" v-if="Number(item.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
             <div class="tag" v-if="Number(item.price) === 0">限时免费</div>
           </div>
@@ -36,7 +36,7 @@
             <div class="name">{{ item.courseName }}</div>
             <div class="subTitle">{{ item.title }}</div>
             <div class="discribe">
-              {{ item.tag }}<span> &#124; </span>共一节<span> &#124; </span>{{ cnt(item.cnt) }}人已学
+              {{ item.tag }}<span> &#124; </span>共1节<span> &#124; </span>{{ cnt(item.cnt) }}人已学
             </div>
           </div>
         </div>
