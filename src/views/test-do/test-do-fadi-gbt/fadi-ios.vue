@@ -337,6 +337,7 @@ export default {
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       this.queLoading = true
+      this.recorderShow = false
       // 设置6S等待计时器
       const gbtWaitTimer = setTimeout(() => {
         this.waitTipsShow = true
@@ -356,7 +357,7 @@ export default {
           // 参数初始化
           this.canUpload = false
           this.btnShow = false
-          this.recorderShow = false
+          // this.recorderShow = false
           this.loading = false
           // 后面就不是中途返回了
           this.midwayBackBool = false
