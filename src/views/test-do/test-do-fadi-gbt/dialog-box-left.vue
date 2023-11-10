@@ -47,7 +47,7 @@ export default {
         auf: 'audio/L16;rate=16000',
         vcn: 'xiaoyan', // 发音人
         speed: 60, // 音速
-        volume: 30, // 音量
+        volume: 50, // 音量
         pitch: 50,
         bgs: 1,
         tte: 'UTF8'
