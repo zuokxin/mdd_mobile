@@ -6,36 +6,39 @@
         <span>心理疏导记录</span>
       </div>
       <div class="toggleType">
-        <span :class="{active: type === 1}" @click="toggleType(1)">系统疏导</span>
-        <span @click="toggleType(2)" :class="{active: type === 2}">专题训练</span>
+        <span :class="{active: type === 1}" @click="toggleType(1)">综合疏导</span>
+        <span @click="toggleType(2)" :class="{active: type === 2}">专项疏导</span>
       </div>
     </div>
-    <div class="list" v-if="tableList.length > 0">
-      <div class="card" v-for="item in tableList" :key="item.payTime">
-        <div class="name">
-          <span class="courseName">{{ item.courseName }}</span>
-          <span class="tag" :class="getStatus(item.finishStatus).className">{{ getStatus(item.finishStatus).tag }}</span>
-        </div>
-        <div class="row">
-          <span class="left">购买时间：</span>
-          <span class="right">{{ dayjs(item.payTime * 1000).format('YYYY-MM-DD HH:mm') }}</span>
-        </div>
-        <div class="row" v-if="type === 1">
-          <span class="left">想法：</span>
-          <div class="right">
-            <TextEllipsis :info="item.thought" :lineClamp="3" :hiddenBtn="true" v-if="item.finishStatus !== 1"></TextEllipsis>
-            <span v-else>当前还没有想法，赶紧来疏导吧～</span>
+    <!-- <van-loading color="#1989fa" v-if="isloading"></van-loading> -->
+    <div class="container" v-show="!isloading">
+      <div class="list" v-if="tableList.length > 0" :key="time">
+        <div class="card" v-for="item in tableList" :key="item.payTime">
+          <div class="name">
+            <span class="courseName">{{ item.courseName }}</span>
+            <span class="tag" :class="getStatus(item.finishStatus).className">{{ getStatus(item.finishStatus).tag }}</span>
+          </div>
+          <div class="row">
+            <span class="left">购买时间：</span>
+            <span class="right">{{ dayjs(item.payTime * 1000).format('YYYY-MM-DD HH:mm') }}</span>
+          </div>
+          <div class="row" v-if="type === 1">
+            <span class="left">想法：</span>
+            <div class="right">
+              <TextEllipsis :info="item.thought" :lineClamp="3" :hiddenBtn="true" v-if="item.finishStatus !== 1"></TextEllipsis>
+              <span v-else>当前还没有想法，赶紧来疏导吧～</span>
+            </div>
+          </div>
+          <div class="row tip" v-if="item.finishStatus === 1 || item.finishStatus === 2">
+            <span>仅支持在App中疏导</span>
           </div>
         </div>
-        <div class="row tip" v-if="item.finishStatus === 1 || item.finishStatus === 2">
-          <span>仅支持在App中疏导</span>
-        </div>
       </div>
-    </div>
-    <div class="none" v-else>
-      <div class="box">
-        <img src="@/assets/img/my/nodata.png" alt="">
-        <p>暂无疏导记录</p>
+      <div class="none" v-else>
+        <div class="box">
+          <img src="@/assets/img/my/nodata.png" alt="">
+          <p>暂无疏导记录</p>
+        </div>
       </div>
     </div>
   </div>
@@ -54,12 +57,19 @@ export default {
     return {
       type: 1,
       dayjs: dayjs,
-      tableList: []
+      tableList: [],
+      time: '',
+      isloading: false
     }
   },
   mounted () {
     this.type = Number(this.$route.query.type) || 1
     this.disponseUrl()
+    // this.listen()
+    console.log('cbtcbt')
+    console.log('windowheigth', window.height)
+    console.log('heigth', document.body.offsetHeight)
+    console.log('heigth1', document.getElementsByClassName('record')[0].clientHeight)
   },
   methods: {
     disponseUrl () {
@@ -76,21 +86,31 @@ export default {
       this.type = type
       this.disponseUrl()
     },
-    getCourseList () {
-      this.tableList = []
-      userCourseList().then(res => {
-        if (res.code === 0) {
-          this.tableList = res.data.courseList
-        }
-      })
+    async getCourseList () {
+      this.time = new Date().getTime()
+      this.isloading = true
+      const res = await userCourseList()
+      // userCourseList().then(res => {
+      if (res.code === 0) {
+        this.tableList = []
+        this.tableList = res.data.courseList
+        this.isloading = false
+      }
+      console.log('this.isloading', this.isloading, res)
+      // })
     },
-    getThemeCourseList () {
-      this.tableList = []
-      userThemeCourseList().then(res => {
-        if (res.code === 0) {
-          this.tableList = res.data.courseList
-        }
-      })
+    async getThemeCourseList () {
+      this.time = new Date().getTime()
+      this.isloading = true
+      const res = await userThemeCourseList()
+      // userThemeCourseList().then(res => {
+      if (res.code === 0) {
+        this.tableList = []
+        this.tableList = res.data.courseList
+        this.isloading = false
+      }
+      console.log('this.isloading', this.isloading, res)
+      // })
     },
     getStatus (status) {
       if (status === 1) {
@@ -107,6 +127,18 @@ export default {
 
 <style lang="less" scoped>
 @w: 37.5;
+.van-loading {
+  position: relative;
+  color: #D5D5D5;
+  font-size: 0;
+  vertical-align: middle;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0);
+}
 .record{
   height: 100vh;
   background-color: #F6F6F7;
@@ -150,94 +182,98 @@ export default {
       }
     }
   }
-  .list{
-    flex: 1;
-    width: 100%;
-    overflow-y: scroll;
-    box-sizing: border-box;
-    padding:0 20rem/@w 16rem/@w;
-    .card{
-      margin-top: 16rem/@w;
+  .container {
+    height: calc(100vh - 74rem/@w);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    .list{
+      flex: 1;
+      width: 100%;
       box-sizing: border-box;
-      padding: 16rem/@w 20rem/@w;
-      background-color: #fff;
-      border-radius: 12rem/@w;
-      .courseName{
-        font-size: 14rem/@w;
-        line-height: 20rem/@w;
-        color: #333;
-        font-weight: bold;
-        margin-right: 5rem/@w;
-      }
-      .tag{
-        display: inline-block;
-        padding: 0 4rem/@w;
-        border-radius: 5rem/@w;
-        font-size: 12rem/@w;
-        line-height: 17rem/@w;
-        color: #fff;
-      }
-      .start{
-        background-color: #b7b7b7;
-      }
-      .doing{
-        background-color: #ffc31c;
-      }
-      .completed{
-        background-color: #5ec565;
-      }
-      .row{
-        margin-top: 8rem/@w;
-        font-size: 12rem/@w;
-        line-height: 18rem/@w;
-        display: flex;
-      }
-      .left{
-        color: #333;
-      }
-      .right{
-        flex: 1;
-        color: #666;
-        position: relative;
-        // .thought{
-        //   // width: 100%;
-        //   line-height: 18rem/@w;
-        //   /* 设置为行高的整倍数，此处显示两行: 2 * 20rem/@w */
-        //   max-height: 18rem/@w;
-        // }
-      }
-      .tip{
-        flex: 1;
-        position: relative;
-        height: 20rem/@w;
-        font-size: 14rem/@w;
-        line-height: 20rem/@w;
-        color: #34B7B9;
-        span{
-          position: absolute;
-          bottom: 0;
-          right: 0;
+      padding:0 20rem/@w 16rem/@w;
+      .card{
+        margin-top: 16rem/@w;
+        box-sizing: border-box;
+        padding: 16rem/@w 20rem/@w;
+        background-color: #fff;
+        border-radius: 12rem/@w;
+        .courseName{
+          font-size: 14rem/@w;
+          line-height: 20rem/@w;
+          color: #333;
+          font-weight: bold;
+          margin-right: 5rem/@w;
+        }
+        .tag{
+          display: inline-block;
+          padding: 0 4rem/@w;
+          border-radius: 5rem/@w;
+          font-size: 12rem/@w;
+          line-height: 17rem/@w;
+          color: #fff;
+        }
+        .start{
+          background-color: #b7b7b7;
+        }
+        .doing{
+          background-color: #ffc31c;
+        }
+        .completed{
+          background-color: #5ec565;
+        }
+        .row{
+          margin-top: 8rem/@w;
+          font-size: 12rem/@w;
+          line-height: 18rem/@w;
+          display: flex;
+        }
+        .left{
+          color: #333;
+        }
+        .right{
+          flex: 1;
+          color: #666;
+          position: relative;
+          // .thought{
+          //   // width: 100%;
+          //   line-height: 18rem/@w;
+          //   /* 设置为行高的整倍数，此处显示两行: 2 * 20rem/@w */
+          //   max-height: 18rem/@w;
+          // }
+        }
+        .tip{
+          flex: 1;
+          position: relative;
+          height: 20rem/@w;
+          font-size: 14rem/@w;
+          line-height: 20rem/@w;
+          color: #34B7B9;
+          span{
+            position: absolute;
+            bottom: 0;
+            right: 0;
+          }
         }
       }
     }
-  }
-  .none{
-    display: flex;
-    justify-content: center;
-    flex: 1;
-    width: 100%;
-    .box{
-      margin-top: 140rem/@w;
-      img{
-        width: 140rem/@w;
-        height: 140rem/@w;
-      }
-      p{
-        margin: 0;
-        color: #999999;
-        font-size: 18rem/@w;
-        line-height: 25rem/@w;
-        text-align: center;
+    .none{
+      display: flex;
+      justify-content: center;
+      flex: 1;
+      width: 100%;
+      .box{
+        margin-top: 140rem/@w;
+        img{
+          width: 140rem/@w;
+          height: 140rem/@w;
+        }
+        p{
+          margin: 0;
+          color: #999999;
+          font-size: 18rem/@w;
+          line-height: 25rem/@w;
+          text-align: center;
+        }
       }
     }
   }
