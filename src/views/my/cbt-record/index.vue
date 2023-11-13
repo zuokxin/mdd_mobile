@@ -93,7 +93,7 @@ export default {
       // userCourseList().then(res => {
       if (res.code === 0) {
         this.tableList = []
-        this.tableList = res.data.courseList
+        this.tableList = res.data.courseList || []
         this.isloading = false
       }
       console.log('this.isloading', this.isloading, res)
@@ -106,7 +106,7 @@ export default {
       // userThemeCourseList().then(res => {
       if (res.code === 0) {
         this.tableList = []
-        this.tableList = res.data.courseList
+        this.tableList = res.data.courseList || []
         this.isloading = false
       }
       console.log('this.isloading', this.isloading, res)

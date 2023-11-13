@@ -99,7 +99,6 @@ export default {
           this.time = new Date().getTime()
           this.records = []
           this.loading = true
-          console.log('this.loading', this.loading)
           if (res.data.records) {
             this.records = res.data.records.map(e => {
               return {
@@ -107,8 +106,8 @@ export default {
                 step: e.evalRecords.length >= 3 ? 3 : e.evalRecords.length
               }
             })
-            this.loading = false
           }
+          this.loading = false
         }
         console.log('this.loading', this.loading, 'res', res)
       })
@@ -119,7 +118,6 @@ export default {
           this.time = new Date().getTime()
           this.records = []
           this.loading = true
-          console.log('this.loading', this.loading)
           if (res.data.records) {
             this.records = res.data.records.map(e => {
               return {
@@ -127,8 +125,8 @@ export default {
                 step: e.evalRecords.length >= 3 ? 3 : e.evalRecords.length
               }
             })
-            this.loading = false
           }
+          this.loading = false
         }
         console.log('this.loading', this.loading, 'res', res)
       })
@@ -318,7 +316,7 @@ export default {
     display: none;
   }
   .container {
-    height: 100%;
+    height: calc(100vh - 77rem/@w);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     .list{
