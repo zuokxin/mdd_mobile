@@ -10,50 +10,47 @@
       <div class="box" @click="selectStatus('1,2')" :class="{actived: status === '1,2'}"> <div class="text" >未完成</div> <div class="line"></div> </div>
       <div class="box" @click="selectStatus('9')" :class="{actived: status === '9'}"> <div class="text" >已完成</div> <div class="line"></div> </div>
     </div>
-    <van-loading color="#1989fa" v-if="loading"></van-loading>
-    <div class="container" v-else>
-      <div class="list" v-if="(records.length > 0)" :key="time">
-        <div class="card" v-for="(item,index) in records" :key="index">
-          <div class="test-id" v-if="type === 1"><div class="left"><span>测试编号:</span>{{item.sessionId}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
-          <div class="test-id" v-if="type === 2"><div class="left">{{item.organization && item.organization.orgName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
-          <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="item.evalRecords[ind].table.tableName" :class="{'block-under-line':(item.evalRecords.length <= 3 && ind + 1 === item.step)}">
-            <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
-            <div class="introduction"  v-if="item.evalRecords[ind].table.tableIntroduction"><span>{{item.evalRecords[ind].table.tableIntroduction}}</span></div>
-          </div>
-          <div class="more-list" v-if="(item.evalRecords.length > 3)">
-            <div class="add" v-if="(item.step < item.evalRecords.length)" @click="item.step = item.evalRecords.length">查看更多<van-icon name="arrow-down" color="#4D4D4D"/></div>
-            <div class="reduce" v-if="(item.step === item.evalRecords.length)" @click="item.step = 3">收起<van-icon name="arrow-up" color="#4D4D4D"/></div>
-          </div>
-          <div class="buy-infos" v-if="type === 1">
-            <div class="left"><span>购买时间: {{dayjs(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span></div>
-            <div class="right">¥ {{item.price}}</div>
-          </div>
-          <div class="buy-infos" v-if="type === 2">
-            <div class="left"><span>批次号: {{item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...': item.batchId}}</span></div>
-            <div class="right" v-if="item.payee === 'user'">¥ {{item.price.toFixed(2)}}</div>
-          </div>
-          <div class="buy-infos" v-if="type === 2">
-            <div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div>
-          </div>
-          <div class="buy-infos" v-if="type === 2 && item.finishedAt > 0">
-            <div class="left"><span>完成时间: {{ dayjs(item.finishedAt * 1000).format('YYYY-MM-DD HH:mm') }}</span></div>
-          </div>
-          <div class="function-btns">
-            <div class="normal-function">
-              <van-button v-if="(item.status === 0)" round plain type="info" @click="pay(item)">支付</van-button>
-              <van-button v-if="item.status === 1" round plain type="info" @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)">开始测试</van-button>
-              <van-button v-if="item.status === 2 " round plain type="info" @click="goOnTable(item.evalRecords, item.sessionId, item.reportDisplayEnabled)">继续测试</van-button>
-              <van-button v-if="item.status === 9 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
-              <van-button v-if="item.status === 2 && item.evalRecords[0].finishedAt > 0 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
-            </div>
+    <div class="list" v-if="(records.length > 0)" :key="time" ref="list">
+      <div class="card" v-for="(item,index) in records" :key="index">
+        <div class="test-id" v-if="type === 1"><div class="left"><span>测试编号:</span>{{item.sessionId}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
+        <div class="test-id" v-if="type === 2"><div class="left">{{item.organization && item.organization.orgName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
+        <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="item.evalRecords[ind].table.tableName" :class="{'block-under-line':(item.evalRecords.length <= 3 && ind + 1 === item.step)}">
+          <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
+          <div class="introduction"  v-if="item.evalRecords[ind].table.tableIntroduction"><span>{{item.evalRecords[ind].table.tableIntroduction}}</span></div>
+        </div>
+        <div class="more-list" v-if="(item.evalRecords.length > 3)">
+          <div class="add" v-if="(item.step < item.evalRecords.length)" @click="item.step = item.evalRecords.length">查看更多<van-icon name="arrow-down" color="#4D4D4D"/></div>
+          <div class="reduce" v-if="(item.step === item.evalRecords.length)" @click="item.step = 3">收起<van-icon name="arrow-up" color="#4D4D4D"/></div>
+        </div>
+        <div class="buy-infos" v-if="type === 1">
+          <div class="left"><span>购买时间: {{dayjs(item.paidAt * 1000).format('YYYY-MM-DD HH:mm')}}</span></div>
+          <div class="right">¥ {{item.price}}</div>
+        </div>
+        <div class="buy-infos" v-if="type === 2">
+          <div class="left"><span>批次号: {{item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...': item.batchId}}</span></div>
+          <div class="right" v-if="item.payee === 'user'">¥ {{item.price.toFixed(2)}}</div>
+        </div>
+        <div class="buy-infos" v-if="type === 2">
+          <div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div>
+        </div>
+        <div class="buy-infos" v-if="type === 2 && item.finishedAt > 0">
+          <div class="left"><span>完成时间: {{ dayjs(item.finishedAt * 1000).format('YYYY-MM-DD HH:mm') }}</span></div>
+        </div>
+        <div class="function-btns">
+          <div class="normal-function">
+            <van-button v-if="(item.status === 0)" round plain type="info" @click="pay(item)">支付</van-button>
+            <van-button v-if="item.status === 1" round plain type="info" @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)">开始测试</van-button>
+            <van-button v-if="item.status === 2 " round plain type="info" @click="goOnTable(item.evalRecords, item.sessionId, item.reportDisplayEnabled)">继续测试</van-button>
+            <van-button v-if="item.status === 9 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
+            <van-button v-if="item.status === 2 && item.evalRecords[0].finishedAt > 0 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
           </div>
         </div>
       </div>
-      <div class="none" v-else>
-        <div class="box">
-          <img src="@/assets/img/my/nodata.png" alt="">
-          <p>暂无记录</p>
-        </div>
+    </div>
+    <div class="none" v-else>
+      <div class="box">
+        <img src="@/assets/img/my/nodata.png" alt="">
+        <p>暂无记录</p>
       </div>
     </div>
   </div>
@@ -71,16 +68,12 @@ export default {
       type: 0,
       time: '',
       status: '', // 1未完成 2全部 9已完成
-      records: [],
-      loading: false
+      records: []
     }
   },
   mounted () {
     this.type = Number(this.$route.query.type) || 1
     this.disponseUrl()
-  },
-  beforeDestroy () {
-    console.log('record页面销毁之前')
   },
   methods: {
     disponseUrl () {
@@ -98,7 +91,6 @@ export default {
         if (res.code === 0) {
           this.time = new Date().getTime()
           this.records = []
-          this.loading = true
           if (res.data.records) {
             this.records = res.data.records.map(e => {
               return {
@@ -107,9 +99,7 @@ export default {
               }
             })
           }
-          this.loading = false
         }
-        console.log('this.loading', this.loading, 'res', res)
       })
     },
     getBatchList () {
@@ -117,7 +107,6 @@ export default {
         if (res.code === 0) {
           this.time = new Date().getTime()
           this.records = []
-          this.loading = true
           if (res.data.records) {
             this.records = res.data.records.map(e => {
               return {
@@ -126,9 +115,7 @@ export default {
               }
             })
           }
-          this.loading = false
         }
-        console.log('this.loading', this.loading, 'res', res)
       })
     },
     toggleType (type) {
@@ -146,6 +133,7 @@ export default {
         }
         this.getBatchList()
       }
+      this.$refs.list.scrollTop = 0
     },
     selectStatus (status) {
       this.status = status
@@ -160,6 +148,7 @@ export default {
         }
         this.getBatchList()
       }
+      this.$refs.list.scrollTop = 0
     },
     turnArray (target) {
       const arr = []
@@ -228,18 +217,6 @@ export default {
 
 <style lang="less" scoped>
 @w: 37.5;
-.van-loading {
-  position: relative;
-  color: #D5D5D5;
-  font-size: 0;
-  vertical-align: middle;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0);
-}
 .record{
   height: 100vh;
   background-color: #F6F6F7;
@@ -312,148 +289,141 @@ export default {
       }
     }
   }
-  [v-cloak] {
-    display: none;
-  }
-  .container {
-    height: calc(100vh - 77rem/@w);
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    .list{
-      padding: .2667rem .5333rem  4.2667rem .5333rem;
-      box-sizing: border-box;
-      height: 100%;
-      .card{
-        padding: .48rem .5333rem;
-        background: #FFFFFF;
-        border-radius: .2667rem;
-        margin-bottom: 10px;
-        .test-id{
-          color: #666666;
-          font-size: .32rem;
-          height: .4533rem;
-          line-height: .4533rem;
-          padding-bottom: .16rem;
-          display: flex;
-          border-bottom: 1px solid #F6F6F6;
-          margin-bottom: .2667rem;
-          .left{
-            flex: 1;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            padding-right: 2em;
-            span{
-              color: #333333;
-            }
-          }
-          .right{
-            white-space: nowrap;
+  .list{
+    padding: .2667rem .5333rem  4.2667rem .5333rem;
+    overflow-y: scroll;
+    box-sizing: border-box;
+    height: 100%;
+    .card{
+      padding: .48rem .5333rem;
+      background: #FFFFFF;
+      border-radius: .2667rem;
+      margin-bottom: 10px;
+      .test-id{
+        color: #666666;
+        font-size: .32rem;
+        height: .4533rem;
+        line-height: .4533rem;
+        padding-bottom: .16rem;
+        display: flex;
+        border-bottom: 1px solid #F6F6F6;
+        margin-bottom: .2667rem;
+        .left{
+          flex: 1;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          padding-right: 2em;
+          span{
+            color: #333333;
           }
         }
-        .blocks{
-          margin-bottom: .2667rem;
-          .name{
-            color: #333333;
+        .right{
+          white-space: nowrap;
+        }
+      }
+      .blocks{
+        margin-bottom: .2667rem;
+        .name{
+          color: #333333;
+          font-size: .3733rem;
+          line-height: .5333rem;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          font-weight: 700;
+          height: .5333rem;
+          margin-bottom: .0533rem;
+        }
+        .introduction{
+          height: .4533rem;
+          line-height: .4533rem;
+          font-size: .32rem;
+          span{
+            color: #666666;
+          }
+        }
+      }
+      .block-under-line{
+        border-bottom: 1px solid #F6F6F6 ;
+        padding-bottom: 0.2133rem;
+      }
+      .more-list{
+        padding-top: .2667rem;
+        border-top: 1px solid #F6F6F6 ;
+        color: #666666;
+        text-align: center;
+        i{
+          padding-left: .16rem;
+        }
+        .add{
+          margin-bottom: .2133rem;
+          font-size: .32rem;
+          height: 17px;
+          line-height: .4533rem;
+        }
+        .reduce{
+          margin-bottom: .2133rem;
+          font-size: .32rem;
+          height: 17px;
+          line-height: .4533rem;
+        }
+      }
+      .buy-infos{
+        display: flex;
+        justify-content: space-between;
+        color: #666666;
+        height: .4533rem;
+        font-size: .32rem;
+        line-height: .4533rem;
+        margin-bottom: .32rem;
+        .left{
+          color: #333333;
+        }
+      }
+      .function-btns{
+        .normal-function{
+          text-align: right;
+          .van-button{
+            // width: 2.1867rem;
+            height: .7733rem;
+            border: 1px solid #34B7B9;
+            margin-left: .16rem;
+          }
+          .van-button__content{
             font-size: .3733rem;
-            line-height: .5333rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            font-weight: 700;
-            height: .5333rem;
-            margin-bottom: .0533rem;
+            white-space:nowrap;
           }
-          .introduction{
-            height: .4533rem;
-            line-height: .4533rem;
-            font-size: .32rem;
-            span{
-              color: #666666;
-            }
-          }
-        }
-        .block-under-line{
-          border-bottom: 1px solid #F6F6F6 ;
-          padding-bottom: 0.2133rem;
-        }
-        .more-list{
-          padding-top: .2667rem;
-          border-top: 1px solid #F6F6F6 ;
-          color: #666666;
-          text-align: center;
-          i{
-            padding-left: .16rem;
-          }
-          .add{
-            margin-bottom: .2133rem;
-            font-size: .32rem;
-            height: 17px;
-            line-height: .4533rem;
-          }
-          .reduce{
-            margin-bottom: .2133rem;
-            font-size: .32rem;
-            height: 17px;
-            line-height: .4533rem;
-          }
-        }
-        .buy-infos{
-          display: flex;
-          justify-content: space-between;
-          color: #666666;
-          height: .4533rem;
-          font-size: .32rem;
-          line-height: .4533rem;
-          margin-bottom: .32rem;
-          .left{
+          .van-button-dark{
             color: #333333;
-          }
-        }
-        .function-btns{
-          .normal-function{
-            text-align: right;
-            .van-button{
-              // width: 2.1867rem;
-              height: .7733rem;
-              border: 1px solid #34B7B9;
-              margin-left: .16rem;
-            }
-            .van-button__content{
-              font-size: .3733rem;
-              white-space:nowrap;
-            }
-            .van-button-dark{
-              color: #333333;
-              border: 1px solid #D5D5D5;
-            }
+            border: 1px solid #D5D5D5;
           }
         }
       }
     }
-    .none{
-      display: flex;
-      padding-top: 5.8667rem;
-      justify-content: center;
-      box-sizing: border-box;
-      height: 100%;
-      .box{
-        width: 3.7333rem;
-        height: 3.7333rem;
-        position: relative;
-        img{
-          width: 100%;
-          height: 100%;
-        }
-        p{
-          position: absolute;
-          width: 100%;
-          text-align: center;
-          bottom: 0;
-          color: #999999;
-          font-size: .48rem;
-          margin: 0;
-        }
+  }
+  .none{
+    display: flex;
+    padding-top: 5.8667rem;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 100%;
+    .box{
+      width: 3.7333rem;
+      height: 3.7333rem;
+      position: relative;
+      img{
+        width: 100%;
+        height: 100%;
+      }
+      p{
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        bottom: 0;
+        color: #999999;
+        font-size: .48rem;
+        margin: 0;
       }
     }
   }
