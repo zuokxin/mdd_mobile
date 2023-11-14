@@ -402,7 +402,7 @@ export default {
   }
 }
 .list{
-  padding: .2667rem .0rem  4.2667rem;
+  padding-top: .2667rem;
   overflow-y: auto;
   box-sizing: border-box;
   height: 100%;
