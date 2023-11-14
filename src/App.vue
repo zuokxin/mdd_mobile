@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" ref="app">
     <keep-alive>
       <router-view :key="$route.fullPath" v-if="$route.meta.keepAlive"></router-view>
     </keep-alive>
@@ -20,6 +20,7 @@ export default {
       console.log(vConsole)
     }
     console.log(window.VConsole())
+    console.log(this.$refs.app, '100vh', this.$refs.app.clientHeight, '可视高度', innerHeight)
   }
 }
 </script>
