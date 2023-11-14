@@ -1,14 +1,16 @@
 <template>
   <div class="record">
-    <div class="type">
-      <van-icon name="arrow-left" @click="$router.push('/my-index')"/>
-      <div class="toggleType"> <span :class="{active: type === 2}" @click="toggleType(1)">个人测试</span> <span @click="toggleType(2)" :class="{active: type === 1}">机构测试</span> </div>
-    </div>
-    <div class="statusList">
-      <div class="box" @click="selectStatus('1,2,9')" v-if="type === 1" :class="{actived: status === '1,2,9'}"> <div class="text">全部</div> <div class="line"></div> </div>
-      <div class="box" @click="selectStatus('0,1,2,9')" v-if="type === 2" :class="{actived: status === '0,1,2,9'}"> <div class="text">全部</div> <div class="line"></div> </div>
-      <div class="box" @click="selectStatus('1,2')" :class="{actived: status === '1,2'}"> <div class="text" >未完成</div> <div class="line"></div> </div>
-      <div class="box" @click="selectStatus('9')" :class="{actived: status === '9'}"> <div class="text" >已完成</div> <div class="line"></div> </div>
+    <div class="top">
+      <div class="type">
+        <van-icon name="arrow-left" @click="$router.push('/my-index')"/>
+        <div class="toggleType"> <span :class="{active: type === 2}" @click="toggleType(1)">个人测试</span> <span @click="toggleType(2)" :class="{active: type === 1}">机构测试</span> </div>
+      </div>
+      <div class="statusList">
+        <div class="box" @click="selectStatus('1,2,9')" v-if="type === 1" :class="{actived: status === '1,2,9'}"> <div class="text">全部</div> <div class="line"></div> </div>
+        <div class="box" @click="selectStatus('0,1,2,9')" v-if="type === 2" :class="{actived: status === '0,1,2,9'}"> <div class="text">全部</div> <div class="line"></div> </div>
+        <div class="box" @click="selectStatus('1,2')" :class="{actived: status === '1,2'}"> <div class="text" >未完成</div> <div class="line"></div> </div>
+        <div class="box" @click="selectStatus('9')" :class="{actived: status === '9'}"> <div class="text" >已完成</div> <div class="line"></div> </div>
+      </div>
     </div>
     <div class="list" v-if="(records.length > 0)" :key="time" ref="list">
       <div class="card" v-for="(item,index) in records" :key="index">
@@ -218,9 +220,15 @@ export default {
 <style lang="less" scoped>
 @w: 37.5;
 .record{
-  height: 100vh;
+  min-height: 100vh;
   background-color: #F6F6F7;
-  overflow: hidden;
+  .top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 111;
+    width: 100vw;
+  }
   .type{
     height: 1.0667rem;
     padding: .2133rem 0;
@@ -290,10 +298,9 @@ export default {
     }
   }
   .list{
-    padding: .2667rem .5333rem  4.2667rem .5333rem;
-    overflow-y: scroll;
+    margin-top: 87rem/@w;
+    padding: 0 .5333rem  50rem/@w .5333rem;
     box-sizing: border-box;
-    height: 100%;
     .card{
       padding: .48rem .5333rem;
       background: #FFFFFF;

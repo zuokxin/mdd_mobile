@@ -132,13 +132,17 @@ export default {
 }
 .record{
   background-color: #F6F6F7;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   .type{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
     height:74rem/@w;
     background-color: #FFFFFF;
     box-sizing: border-box;
     padding: 0 20rem/@w;
+    z-index: 111;
     .title{
       position: relative;
       padding: 10rem/@w 0 16rem/@w ;
@@ -172,10 +176,9 @@ export default {
     }
   }
   .container {
-    height: 100%;
     box-sizing: border-box;
-    padding:0 20rem/@w 160rem/@w;
-    overflow: auto;
+    padding:0 20rem/@w 50rem/@w;
+    margin-top: 87rem/@w;
     -webkit-overflow-scrolling: touch;
   }
   .list{
