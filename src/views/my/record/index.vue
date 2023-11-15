@@ -11,7 +11,7 @@
       <div class="box" @click="selectStatus('9')" :class="{actived: status === '9'}"> <div class="text" >已完成</div> <div class="line"></div> </div>
     </div>
     <van-loading color="#1989fa" v-if="loading"></van-loading>
-    <div class="container" v-else>
+    <div class="container" v-else ref="container">
       <div class="list" v-if="(records.length > 0)" :key="time">
         <div class="card" v-for="(item,index) in records" :key="index">
           <div class="test-id" v-if="type === 1"><div class="left"><span>测试编号:</span>{{item.sessionId}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
@@ -78,6 +78,7 @@ export default {
   mounted () {
     this.type = Number(this.$route.query.type) || 1
     this.disponseUrl()
+    console.log('getComputedStyle(document.documentElement).getPropertyValue("--vh")', 1, getComputedStyle(document.documentElement).getPropertyValue('--vh'), 2)
   },
   beforeDestroy () {
     console.log('record页面销毁之前')
@@ -107,10 +108,13 @@ export default {
                 step: e.evalRecords.length >= 3 ? 3 : e.evalRecords.length
               }
             })
-            this.loading = false
           }
+          this.loading = false
         }
-        console.log('this.loading', this.loading, 'res', res)
+        this.$nextTick(() => {
+          this.$refs.container.scrollTop = 0
+          console.log('container的height', this.$refs.container.clientHeight, 'this.$refs.container.scrollTop')
+        })
       })
     },
     getBatchList () {
@@ -127,10 +131,13 @@ export default {
                 step: e.evalRecords.length >= 3 ? 3 : e.evalRecords.length
               }
             })
-            this.loading = false
           }
+          this.loading = false
         }
-        console.log('this.loading', this.loading, 'res', res)
+        this.$nextTick(() => {
+          this.$refs.container.scrollTop = 0
+          console.log('container的height', this.$refs.container.clientHeight, 'this.$refs.container.scrollTop', this.$refs.container.scrollTop)
+        })
       })
     },
     toggleType (type) {
@@ -236,14 +243,14 @@ export default {
   font-size: 0;
   vertical-align: middle;
   width: 100%;
-  height: 100vh;
+  height: calc(100  * var(--vh));
   display: flex;
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0);
 }
 .record{
-  height: 100vh;
+  height: calc(100  * var(--vh));
   background-color: #F6F6F7;
   overflow: hidden;
   .type{
@@ -318,13 +325,12 @@ export default {
     display: none;
   }
   .container {
-    height: 100%;
+    height: calc(100*var(--vh) - 77rem/@w);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     .list{
       padding: .2667rem .5333rem  4.2667rem .5333rem;
       box-sizing: border-box;
-      height: 100%;
       .card{
         padding: .48rem .5333rem;
         background: #FFFFFF;

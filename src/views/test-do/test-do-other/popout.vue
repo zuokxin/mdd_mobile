@@ -1,13 +1,13 @@
 <template>
   <div class="popout" v-if="popoutShow">
-    <div class="popout_box"  v-if="step1">
+    <div class="popout_box" v-if="step1">
       <div class="popout_body">
         <img src="@/assets/img/start-prompt.gif" alt="">
-        <div class="text"> <span>{{countTime}}</span> 秒后即将播报语音 </div>
+        <div class="text"> <span>{{ countTime }}</span> 秒后即将播报语音 </div>
         <div class="text">注意调整到合适的音量</div>
       </div>
     </div>
-    <div class="popout_box2"  v-if="step2">
+    <div class="popout_box2" v-if="step2">
       <div class="popout_title"><img src="@/assets/img/close.png" @click="close" alt=""></div>
       <div class="popout_text"></div>
       <div class="popout_body">
@@ -16,7 +16,7 @@
       </div>
       <div class="progress">
         <!-- <audio  ref="video" src="../../../assets/guide-audio.mp3"  webkit-playsinline="true" playsinline="true" id="audio"></audio> -->
-        <van-progress :percentage="percentage" stroke-width="5px" color="#34B7B9"  :show-pivot="false" />
+        <van-progress :percentage="percentage" stroke-width="5px" color="#34B7B9" :show-pivot="false" />
       </div>
     </div>
   </div>
@@ -104,11 +104,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.popout{
+.popout {
   z-index: 100;
   width: 100vw;
   font-size: 16px;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   background-color: rgba(0, 0, 0, 0.4);
   position: fixed;
   left: 0;
@@ -117,25 +117,30 @@ export default {
   overflow: hidden;
   justify-content: center;
   align-items: center;
-  .popout_box{
+
+  .popout_box {
     border-radius: 20px;
     width: calc(100% - 1.3514rem);
     height: calc(100% - 4.8919rem);
     background-color: #FFFFFF;
     overflow: hidden;
-    .popout_body{
+
+    .popout_body {
       text-align: center;
-      img{
+
+      img {
         width: 4.0541rem;
         height: 4.0541rem;
-        margin: 2.4865rem  0px  1.8649rem;
+        margin: 2.4865rem 0px 1.8649rem;
       }
-      .text{
+
+      .text {
         font-size: 14px;
         text-align: center;
         color: #333333;
         font-weight: 500;
-        span{
+
+        span {
           display: inline-block;
           width: .5405rem;
           font-size: 30px;
@@ -144,24 +149,28 @@ export default {
       }
     }
   }
-  .popout_box2{
+
+  .popout_box2 {
     border-radius: 20px;
     width: calc(100% - 1.3514rem);
     height: calc(100% - 4.8919rem);
     background-color: #FFFFFF;
     overflow: hidden;
-    .popout_title{
+
+    .popout_title {
       margin-top: .6486rem;
       margin-bottom: .4054rem;
       padding-right: .7838rem;
       text-align: right;
-      img{
+
+      img {
         width: .8108rem;
         height: .8108rem;
         cursor: pointer;
       }
     }
-    .popout_text{
+
+    .popout_text {
       height: 20px;
       width: 100%;
       line-height: 20px;
@@ -169,14 +178,17 @@ export default {
       text-align: center;
       font-weight: 600;
     }
-    .popout_body{
+
+    .popout_body {
       text-align: center;
-      img{
+
+      img {
         width: 4.0541rem;
         height: 4.0541rem;
-        margin: .1622rem 0  .8649rem;
+        margin: .1622rem 0 .8649rem;
       }
-      .text{
+
+      .text {
         font-size: 14px;
         padding: 0 1.2162rem;
         text-align: center;
@@ -184,10 +196,10 @@ export default {
         font-weight: 500;
       }
     }
-    .progress{
+
+    .progress {
       padding: 0 1.2162rem;
       margin-top: .8108rem;
     }
   }
-}
-</style>
+}</style>

@@ -1,51 +1,65 @@
 <template>
   <div class="main">
-    <van-nav-bar
-      title="机构绑定"
-      left-arrow
-      @click-left="onClickLeft"
-    />
+    <van-nav-bar title="机构绑定" left-arrow @click-left="onClickLeft" />
     <BindBatch :id="batchId" :number="userNumber" @bindSuccess="bindSuccess"></BindBatch>
     <div class="myBind">
       <h3> <img src="@/assets/img/my/titlepng.png" alt=""> 我的绑定</h3>
       <van-tabs type="card" v-model="active" @click="changeTab">
         <van-tab title="量表">
-          <van-loading color="#1989fa" v-if="loading"/>
+          <van-loading color="#1989fa" v-if="loading" />
           <div class="bindist" v-else>
             <div class="noLogin" v-if="bindList.length === 0">
               <img src="@/assets/img/my/nodata.png" alt="login">
               <span>暂无绑定</span>
             </div>
             <div v-else>
-              <div class="list"  :key="new Date().getTime()">
-                <div class="card" v-for="(item,index) in bindList" :key="index">
-                  <div class="test-id"><div class="left">{{item.organization.orgName}}</div><div class="right">共{{item.evalRecords.length}}件</div></div>
-                  <div class="blocks" v-for="(it,ind) in turnArray(item.step)" :key="ind" :class="{'block-under-line':(item.evalRecords.length <= 3 && ind + 1 === item.step)}">
-                    <div class="name">{{item.evalRecords[ind].table.tableName}}</div>
-                    <div class="introduction" v-if="item.evalRecords[ind].table.tableIntroduction"><span >{{item.evalRecords[ind].table.tableIntroduction}}</span></div>
+              <div class="list" :key="new Date().getTime()">
+                <div class="card" v-for="(item, index) in bindList" :key="index">
+                  <div class="test-id">
+                    <div class="left">{{ item.organization.orgName }}</div>
+                    <div class="right">共{{ item.evalRecords.length }}件</div>
+                  </div>
+                  <div class="blocks" v-for="(it, ind) in turnArray(item.step)" :key="ind"
+                    :class="{ 'block-under-line': (item.evalRecords.length <= 3 && ind + 1 === item.step) }">
+                    <div class="name">{{ item.evalRecords[ind].table.tableName }}</div>
+                    <div class="introduction" v-if="item.evalRecords[ind].table.tableIntroduction">
+                      <span>{{ item.evalRecords[ind].table.tableIntroduction }}</span></div>
                   </div>
                   <div class="more-list" v-if="(item.evalRecords.length > 3)">
-                    <div class="add" v-if="(item.step < item.evalRecords.length)" @click="select = 'close',item.step = item.evalRecords.length">查看更多<van-icon name="arrow-down" color="#4D4D4D"/></div>
-                    <div class="reduce" v-if="(item.step === item.evalRecords.length)" @click="select = 'close',item.step = 3">收起<van-icon name="arrow-up" color="#4D4D4D"/></div>
+                    <div class="add" v-if="(item.step < item.evalRecords.length)"
+                      @click="select = 'close', item.step = item.evalRecords.length">查看更多<van-icon name="arrow-down"
+                        color="#4D4D4D" /></div>
+                    <div class="reduce" v-if="(item.step === item.evalRecords.length)"
+                      @click="select = 'close', item.step = 3">收起<van-icon name="arrow-up" color="#4D4D4D" /></div>
                   </div>
                   <div class="buy-infos">
-                    <div class="left"><span>批次号: {{item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...': item.batchId}}</span></div>
-                    <div class="right" v-if="item.payee === 'user'">¥ {{item.price.toFixed(2)}}</div>
+                    <div class="left"><span>批次号: {{ item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...' :
+                      item.batchId }}</span></div>
+                    <div class="right" v-if="item.payee === 'user'">¥ {{ item.price.toFixed(2) }}</div>
                   </div>
                   <div class="buy-infos">
-                    <div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div>
+                    <div class="left"><span>用户编号: {{ item.userNumber.length > 15 ? item.userNumber.substring(0, 15) +
+                      '...' : item.userNumber }}</span></div>
                   </div>
                   <div class="buy-infos" v-if="item.finishedAt > 0">
-                    <div class="left"><span>完成时间: {{ dayjs(item.finishedAt * 1000).format('YYYY-MM-DD HH:mm') }}</span></div>
+                    <div class="left"><span>完成时间: {{ dayjs(item.finishedAt * 1000).format('YYYY-MM-DD HH:mm') }}</span>
+                    </div>
                   </div>
                   <div class="function-btns">
                     <div class="normal-function">
                       <van-button v-if="(item.status === 0)" round plain type="info" @click="pay(item)">支付</van-button>
-                      <van-button v-if="item.status === 1" round plain type="info" @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)">开始测试</van-button>
+                      <van-button v-if="item.status === 1" round plain type="info"
+                        @click="startTest(item.sessionId, item.evalRecords, item.status, item.reportDisplayEnabled)">开始测试</van-button>
                       <!-- <van-button v-else-if="item.status === 2" round plain type="info" @click="goOnTable(item.evalRecords[0].table.tableType, item.sessionId, item.evalRecords[0].table.tableCode)">继续测试</van-button> -->
-                      <van-button v-if="item.status === 2" round plain type="info" @click="goOnTable(item.evalRecords, item.sessionId, item.reportDisplayEnabled)">继续测试</van-button>
-                      <van-button v-if="item.status === 9 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
-                      <van-button v-if="item.status === 2 && item.evalRecords[0].finishedAt > 0 && item.reportDisplayEnabled" round class="van-button-dark" plain type="info" @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
+                      <van-button v-if="item.status === 2" round plain type="info"
+                        @click="goOnTable(item.evalRecords, item.sessionId, item.reportDisplayEnabled)">继续测试</van-button>
+                      <van-button v-if="item.status === 9 && item.reportDisplayEnabled" round class="van-button-dark"
+                        plain type="info"
+                        @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
+                      <van-button
+                        v-if="item.status === 2 && item.evalRecords[0].finishedAt > 0 && item.reportDisplayEnabled" round
+                        class="van-button-dark" plain type="info"
+                        @click="readReport(item.sessionId, item.evalRecords[0].table.tableType)">查看报告</van-button>
                     </div>
                   </div>
                 </div>
@@ -54,20 +68,33 @@
           </div>
         </van-tab>
         <van-tab title="心理疏导">
-          <van-loading color="#1989fa" v-if="loading"/>
+          <van-loading color="#1989fa" v-if="loading" />
           <div class="bindist bindist-cbt" v-else>
             <div class="noLogin" v-if="cbtList.length === 0">
               <img src="@/assets/img/my/nodata.png" alt="login">
               <span>暂无绑定</span>
             </div>
             <div v-else>
-              <div class="card" v-for="(item,index) in cbtList" :key="index">
-                  <div class="test-id"><div class="left">{{item.orgName.length > 15 ? item.orgName.substring(0, 15) + '...': item.orgName}}</div><div class="right">共1件</div></div>
-                  <div class="blocks"><div class="name">{{item.courseName}}</div>
-                  <div class="buy-infos"><div class="left"><span>批次号: {{item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...': item.batchId}}</span></div></div>
-                  <div class="buy-infos"><div class="left"><span>用户编号: {{item.userNumber.length > 15 ? item.userNumber.substring(0, 15) + '...': item.userNumber}}</span></div></div>
-                  <div class="function-btns"><div class="psqi">仅支持在App中测试</div></div>
-              </div>
+              <div class="card" v-for="(item, index) in cbtList" :key="index">
+                <div class="test-id">
+                  <div class="left">{{ item.orgName.length > 15 ? item.orgName.substring(0, 15) + '...' : item.orgName }}
+                  </div>
+                  <div class="right">共1件</div>
+                </div>
+                <div class="blocks">
+                  <div class="name">{{ item.courseName }}</div>
+                  <div class="buy-infos">
+                    <div class="left"><span>批次号: {{ item.batchId.length > 15 ? item.batchId.substring(0, 15) + '...' :
+                      item.batchId }}</span></div>
+                  </div>
+                  <div class="buy-infos">
+                    <div class="left"><span>用户编号: {{ item.userNumber.length > 15 ? item.userNumber.substring(0, 15) +
+                      '...' : item.userNumber }}</span></div>
+                  </div>
+                  <div class="function-btns">
+                    <div class="psqi">仅支持在App中测试</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -233,11 +260,13 @@ export default {
 
 <style lang="less" scoped>
 @w: 37.5;
-.main{
+
+.main {
   background: #F6F6F6;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh));
   width: 100%;
-  h3{
+
+  h3 {
     height: 20rem / @w;
     display: flex;
     align-items: center;
@@ -246,7 +275,8 @@ export default {
     color: #333333;
     margin: 0;
     margin-bottom: 14rem/@w;
-    img{
+
+    img {
       position: relative;
       top: -3rem /@w;
       width: 3rem /@w;
@@ -254,32 +284,38 @@ export default {
       margin-right: 5rem/@w;
     }
   }
-  .myBind{
-    padding: 5rem/@w 20rem/@w  18rem/@w;
-    .noLogin{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 4.266667rem !important;
-        img{
-          width: 3.733333rem;
-          height: 3.733333rem;
-        }
-        span{
-          font-size: .48rem;
-          color: #999999;
-          margin-top: -.533333rem;
-        }
+
+  .myBind {
+    padding: 5rem/@w 20rem/@w 18rem/@w;
+
+    .noLogin {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 4.266667rem !important;
+
+      img {
+        width: 3.733333rem;
+        height: 3.733333rem;
       }
+
+      span {
+        font-size: .48rem;
+        color: #999999;
+        margin-top: -.533333rem;
+      }
+    }
   }
 }
-.card{
+
+.card {
   padding: .48rem .5333rem;
   background: #FFFFFF;
   border-radius: .2667rem;
   margin-bottom: 10px;
-  .test-id{
+
+  .test-id {
     color: #666666;
     font-size: .32rem;
     height: .4533rem;
@@ -288,27 +324,33 @@ export default {
     display: flex;
     border-bottom: 1px solid #F6F6F6;
     margin-bottom: .2667rem;
-    .left{
+
+    .left {
       flex: 1;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
       padding-right: 2em;
-      span{
+
+      span {
         color: #333333;
       }
     }
-    .right{
+
+    .right {
       white-space: nowrap;
     }
   }
-  .line{
+
+  .line {
     padding-bottom: .2667rem;
-    border-bottom: 1px solid #F6F6F6 ;
+    border-bottom: 1px solid #F6F6F6;
   }
-  .blocks{
+
+  .blocks {
     margin-bottom: .2667rem;
-    .name{
+
+    .name {
       color: #333333;
       font-size: .3733rem;
       line-height: .5333rem;
@@ -319,44 +361,52 @@ export default {
       text-overflow: ellipsis;
       overflow: hidden;
     }
-    .introduction{
+
+    .introduction {
       height: .4533rem;
       line-height: .4533rem;
       font-size: .32rem;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      span{
+
+      span {
         color: #666666;
       }
     }
   }
-  .block-under-line{
-    border-bottom: 1px solid #F6F6F6 ;
+
+  .block-under-line {
+    border-bottom: 1px solid #F6F6F6;
     padding-bottom: 0.2133rem;
   }
-  .more-list{
+
+  .more-list {
     padding-top: .2667rem;
-    border-top: 1px solid #F6F6F6 ;
+    border-top: 1px solid #F6F6F6;
     color: #666666;
     text-align: center;
-    i{
+
+    i {
       padding-left: .16rem;
     }
-    .add{
+
+    .add {
       margin-bottom: .2133rem;
       font-size: .32rem;
       height: 17px;
       line-height: .4533rem;
     }
-    .reduce{
+
+    .reduce {
       margin-bottom: .2133rem;
       font-size: .32rem;
       height: 17px;
       line-height: .4533rem;
     }
   }
-  .buy-infos{
+
+  .buy-infos {
     display: flex;
     justify-content: space-between;
     color: #666666;
@@ -364,49 +414,58 @@ export default {
     font-size: .32rem;
     line-height: .4533rem;
     margin-bottom: .32rem;
-    .left{
+
+    .left {
       color: #333333;
     }
   }
-  .function-btns{
-    .psqi{
+
+  .function-btns {
+    .psqi {
       text-align: right;
       color: #34B7B8;
     }
-    .normal-function{
+
+    .normal-function {
       text-align: right;
-      .van-button{
+
+      .van-button {
         width: 2.1867rem;
         height: .7733rem;
         border: 1px solid #34B7B9;
         margin-left: .16rem;
       }
-      .van-button__content{
+
+      .van-button__content {
         font-size: .3733rem;
         white-space: nowrap;
       }
-      .van-button-dark{
+
+      .van-button-dark {
         color: #333333;
         border: 1px solid #D5D5D5;
       }
     }
   }
 }
-.bindist-cbt{
-  .blocks{
-    .name{
+
+.bindist-cbt {
+  .blocks {
+    .name {
       padding-bottom: .2667rem;
       margin-bottom: .2667rem;
       border-bottom: 1px solid #F6F6F6;
     }
   }
 }
-.list{
-  padding: .2667rem .0rem  4.2667rem;
+
+.list {
+  padding-top: .2667rem;
   overflow-y: auto;
   box-sizing: border-box;
   height: 100%;
 }
+
 .van-loading {
   position: relative;
   color: #D5D5D5;
@@ -415,18 +474,21 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0,0,0,0);
+  background: rgba(0, 0, 0, 0);
 }
-/deep/.van-tabs__wrap{
+
+/deep/.van-tabs__wrap {
   height: 28px;
-  margin: 10px  0;
-  .van-tabs__nav--card{
+  margin: 10px 0;
+
+  .van-tabs__nav--card {
     border: 0;
     height: 28px;
     border-radius: 0;
-    margin:0;
+    margin: 0;
     background: transparent;
-    .van-tab{
+
+    .van-tab {
       width: 72px;
       height: 28px;
       border: 0;
@@ -435,7 +497,8 @@ export default {
       font-weight: normal;
       flex: inherit;
     }
-    .van-tab--active{
+
+    .van-tab--active {
       width: 72px;
       height: 28px;
       background: #34B7B9;
@@ -443,5 +506,4 @@ export default {
       color: #fff;
     }
   }
-}
-</style>
+}</style>

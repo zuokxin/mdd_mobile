@@ -4,28 +4,31 @@
       <div class="img"><img src="@/assets/login.png" alt="yunyu"></div>
       <h5>登录/注册</h5>
       <div class="complex-line">
-        <div class="left" @click="choiceArea"><van-field class="dis-van-field" :value="`+${countryCode}`" readonly right-icon="play" /></div>
+        <div class="left" @click="choiceArea"><van-field class="dis-van-field" :value="`+${countryCode}`" readonly
+            right-icon="play" /></div>
         <van-field v-model="username" type="number" placeholder="请输入手机号（新号自动注册）" @blur="checkUsername" />
       </div>
-      <van-field class="line" v-model="smsCode" type="number" maxlength="6"  placeholder="请输入验证码">
+      <van-field class="line" v-model="smsCode" type="number" maxlength="6" placeholder="请输入验证码">
         <template #button>
-          <van-button class="timeBtn" size="small"  @click="getMsgCode" round type="primary" :disabled="msgFlag || timeFlag">{{getmsg}}</van-button>
+          <van-button class="timeBtn" size="small" @click="getMsgCode" round type="primary"
+            :disabled="msgFlag || timeFlag">{{ getmsg }}</van-button>
         </template>
       </van-field>
       <div class="login">
         <van-button round block type="primary" @click="login" :disabled="allCompleteFlag">登录</van-button>
       </div>
-      <p>登录注册即代表同意 <span @click="skip('agreements')">《服务协议》</span > 及 <span @click="skip('policy')">《隐私政策》</span> </p>
+      <p>登录注册即代表同意 <span @click="skip('agreements')">《服务协议》</span> 及 <span @click="skip('policy')">《隐私政策》</span> </p>
     </div>
     <div class="area" v-show="find">
       <div class="area-top" ref="areatop">
-        <van-nav-bar title="选择国家和地区" :border="false" left-arrow @click-left="find = false"/>
+        <van-nav-bar title="选择国家和地区" :border="false" left-arrow @click-left="find = false" />
         <div class="cover-box">
           <div class="search-line">
             <img src="@/assets/img/my/dark-search.png" alt="" class="left">
             <div class="center">
               <form action="javascript:void 0">
-                <input @input="search()" @blur="searchFinished = false, show = false " @focus="show = true" ref="myInput" type="search" v-model="keyWord" placeholder="搜索" />
+                <input @input="search()" @blur="searchFinished = false, show = false" @focus="show = true" ref="myInput"
+                  type="search" v-model="keyWord" placeholder="搜索" />
               </form>
             </div>
             <img src="@/assets/img/my/clear.png" @click="clear()" v-show="keyWord !== ''" alt="" class="right">
@@ -38,23 +41,29 @@
         <van-overlay :show="show && keyWord === ''"></van-overlay>
         <!-- panel -->
         <!-- <van-index-bar ref="bar" v-show="!searchFinished && searchList.length === 0 " :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top"> -->
-        <van-index-bar ref="bar" class="van-index-bar-empty" v-show="keyWord === ''" :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']" :sticky-offset-top="top">
+        <van-index-bar ref="bar" class="van-index-bar-empty" v-show="keyWord === ''"
+          :index-list="['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'W', 'X', 'Y', 'Z']"
+          :sticky-offset-top="top">
           <div v-for="item in areas" :key="item.type">
             <van-index-anchor :index="item.type" />
-            <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="it in item.list" :key="it.chinese_name" @click="backLogin(it.phone_code, it.chinese_name)">
-              <div class="number">+{{it.phone_code}}</div>
+            <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="it in item.list" :key="it.chinese_name"
+              @click="backLogin(it.phone_code, it.chinese_name)">
+              <div class="number">+{{ it.phone_code }}</div>
             </van-cell>
           </div>
         </van-index-bar>
         <!-- -------------------- -->
         <van-index-bar v-if="searchList.length > 0" :index-list="[]" :sticky-offset-top="top" :key="new Date().getTime()">
-            <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="(it,index) in searchList" :key="index + index" @click="backLogin(it.phone_code, it.chinese_name)" >
-              <div class="number">+{{it.phone_code}}</div>
-            </van-cell>
+          <van-cell :title="`${it.chinese_name}(${it.english_name})`" v-for="(it, index) in searchList"
+            :key="index + index" @click="backLogin(it.phone_code, it.chinese_name)">
+            <div class="number">+{{ it.phone_code }}</div>
+          </van-cell>
         </van-index-bar>
         <!-- -------------------- -->
         <div class="noneData" v-if="searchList.length === 0 && keyWord !== ''">
-          <div class="none-list" ><img src="../../assets/img/my/none-list.png" alt=""> <div class="text">无内容</div></div>
+          <div class="none-list"><img src="../../assets/img/my/none-list.png" alt="">
+            <div class="text">无内容</div>
+          </div>
         </div>
       </div>
     </div>
@@ -238,9 +247,9 @@ export default {
       // chinese_name chinese_pinyin？english_name phone_code
       if (this.keyWord === '') {
         this.show = true
-      // this.$refs.myInput.blur()
-      // this.show = false
-      } else if (this.keyWord !== '' && this.keyWord != '')  {
+        // this.$refs.myInput.blur()
+        // this.show = false
+      } else if (this.keyWord !== '' && this.keyWord != '') {
         // console.log(this.searchList)
         // this.$refs.myInput.blur()
         this.show = false
@@ -290,111 +299,133 @@ export default {
 
 <style lang="less" vars="{top}" scoped>
 @import '../../assets/style/reset-vant.less';
-.login-box{
-  .container{
-  padding-left: 1.28rem;
-  position: absolute;
-  width: 100%;
-  padding-right: 1.28rem;
-  padding-top: 1.6rem;
-  box-sizing: border-box;
-  background: #FFFFFF;
-  height: 100%;
-  overflow: hidden;
-  .img{
-    text-align: center;
-    img{
-      width: 2.133333rem;
-      height: 1.626667rem;
-      margin: 0 auto;
-    }
-    margin-bottom: 1.093333rem;
-  }
-  h5{
-    font-size: .533333rem;
-    font-weight: 600;
-    color: #000000;
-    height: .746667rem;
-    line-height: .746667rem;
-    margin-bottom: 1.066667rem;
-  }
-  .complex-line{
-    display: flex;
-    flex-wrap: nowrap;
-    .left{
-      width: 2.5rem;
-      margin-right: 0.2667rem;
-      display: flex;
-      /deep/.van-field__right-icon{
-        padding: 0;
-        margin-right: 0px;
-        color: #000000;
-        transform: rotate(90deg);
-      }
-    }
-    /deep/.dis-van-field{
-      .van-field__control{
-        text-align: center;
-      }
-    }
-    /deep/.van-field__control{
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-    /deep/.van-field__control{
-      color: #000000;
-    }
-  }
-  .login{
-    margin-top: 1.066667rem;
-  }
-  .timeBtn{
-    width: 2.133333rem;
-    padding: 0;
-  }
-  .van-button{
-    background-color: @green;
-    border: 1px solid @green;
-  }
-  .van-button--disabled{
-    background-color: @gray-5;
-    border: 1px solid @gray-5;
-  }
-  .van-cell{
-    padding-left: 0;
-    height: 1.573333rem;
-    padding-top: .4rem;
-    padding-right: 0;
-    border-bottom: 1px solid #DEDEDE;
-  }
-  .van-cell::after{
-    display: none;
-  }
-  p{
+
+.login-box {
+  .container {
+    padding-left: 1.28rem;
     position: absolute;
-    bottom: 20px;
-    left: 50%;
-    font-size: .32rem;
-    text-align: center;
     width: 100%;
-    transform: translateX(-50%);
-    word-break: keep-all;
-    span{
-      color: @green;
+    padding-right: 1.28rem;
+    padding-top: 1.6rem;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    height: 100%;
+    overflow: hidden;
+
+    .img {
+      text-align: center;
+
+      img {
+        width: 2.133333rem;
+        height: 1.626667rem;
+        margin: 0 auto;
+      }
+
+      margin-bottom: 1.093333rem;
+    }
+
+    h5 {
+      font-size: .533333rem;
+      font-weight: 600;
+      color: #000000;
+      height: .746667rem;
+      line-height: .746667rem;
+      margin-bottom: 1.066667rem;
+    }
+
+    .complex-line {
+      display: flex;
+      flex-wrap: nowrap;
+
+      .left {
+        width: 2.5rem;
+        margin-right: 0.2667rem;
+        display: flex;
+
+        /deep/.van-field__right-icon {
+          padding: 0;
+          margin-right: 0px;
+          color: #000000;
+          transform: rotate(90deg);
+        }
+      }
+
+      /deep/.dis-van-field {
+        .van-field__control {
+          text-align: center;
+        }
+      }
+
+      /deep/.van-field__control {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      /deep/.van-field__control {
+        color: #000000;
+      }
+    }
+
+    .login {
+      margin-top: 1.066667rem;
+    }
+
+    .timeBtn {
+      width: 2.133333rem;
+      padding: 0;
+    }
+
+    .van-button {
+      background-color: @green;
+      border: 1px solid @green;
+    }
+
+    .van-button--disabled {
+      background-color: @gray-5;
+      border: 1px solid @gray-5;
+    }
+
+    .van-cell {
+      padding-left: 0;
+      height: 1.573333rem;
+      padding-top: .4rem;
+      padding-right: 0;
+      border-bottom: 1px solid #DEDEDE;
+    }
+
+    .van-cell::after {
+      display: none;
+    }
+
+    p {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      font-size: .32rem;
+      text-align: center;
+      width: 100%;
+      transform: translateX(-50%);
+      word-break: keep-all;
+
+      span {
+        color: @green;
+      }
     }
   }
-  }
-  .area{
-    .area-top{
+
+  .area {
+    .area-top {
       width: 100%;
       z-index: 3000;
       position: fixed;
       background: #FFFFFF;
       height: 2.6667rem;
-      .cover-box{
+
+      .cover-box {
         display: flex;
-        .cancel{
+
+        .cancel {
           font-size: 0.3733rem;
           color: #333333;
           width: 1.2267rem;
@@ -403,7 +434,8 @@ export default {
           margin: 0.2667rem 0rem .4267rem;
         }
       }
-      .search-line{
+
+      .search-line {
         flex: 1;
         padding: 0 .4267rem;
         height: .88rem;
@@ -413,71 +445,86 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        img{
+
+        img {
           width: .4267rem;
           height: .4267rem;
         }
-        .center{
+
+        .center {
           flex: 1;
-          form{
+
+          form {
             padding: 0 0.5em;
-            input{
+
+            input {
               width: 100%;
               border: none;
               background-color: #F6F6F6;
-             -webkit-appearance: none;
+              -webkit-appearance: none;
             }
-            input[type=search]::-webkit-search-cancel-button{
-             -webkit-appearance: none;
+
+            input[type=search]::-webkit-search-cancel-button {
+              -webkit-appearance: none;
             }
           }
         }
       }
     }
+
     .area-list::-webkit-scrollbar {
       display: none;
     }
-    .area-list{
+
+    .area-list {
       z-index: 2999;
       width: 100%;
       top: 2.6667rem;
-      height: calc( 100vh - 2.6667rem);
+      height: calc(100 * var(--vh) - 2.6667rem);
       position: fixed;
       overflow-y: scroll;
-      .van-cell{
+
+      .van-cell {
         padding-top: 11px;
       }
-      .van-index-bar-empty{
+
+      .van-index-bar-empty {
         padding-bottom: 2rem;
       }
-      .van-cell__value{
+
+      .van-cell__value {
         min-width: 1.3333rem;
         max-width: 1.3333rem;
         padding: 0 0.5em;
         color: #999999;
         float: right;
       }
-      .van-cell__title{
+
+      .van-cell__title {
         color: #333333;
       }
-      /deep/.van-index-anchor{
-        background-color:  #F6F6F6;
+
+      /deep/.van-index-anchor {
+        background-color: #F6F6F6;
         color: #333333;
       }
-      /deep/.van-index-bar__index{
+
+      /deep/.van-index-bar__index {
         padding: 0;
       }
+
       // /deep/.van-index-anchor--sticky{
       //   background-color: pink !important;
       // }
-      /deep/.van-cell__title{
+      /deep/.van-cell__title {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
       }
-      /deep/.myred{
-        .van-index-bar__sidebar{
-          :first-child{
+
+      /deep/.myred {
+        .van-index-bar__sidebar {
+          :first-child {
             color: #FFFFFF;
             width: .32rem;
             height: .32rem;
@@ -486,32 +533,35 @@ export default {
           }
         }
       }
-      /deep/.van-index-bar__index--active{
+
+      /deep/.van-index-bar__index--active {
         color: #FFFFFF;
         width: .32rem;
         height: .32rem;
         border-radius: 50%;
         background-color: #34B7B9;
       }
-      .van-overlay{
+
+      .van-overlay {
         // position: absolute;
         z-index: 999;
         background-color: rgba(0, 0, 0, 0.4);
       }
-      .noneData{
+
+      .noneData {
         text-align: center;
         padding-top: 5.4133rem;
-        img{
+
+        img {
           width: 3.7333rem;
           height: 3.7333rem;
         }
-        .text{
-          color: #999999 ;
+
+        .text {
+          color: #999999;
           font-size: 0.48rem;
         }
       }
     }
   }
-}
-
-</style>
+}</style>

@@ -10,9 +10,9 @@
         <span @click="toggleType(2)" :class="{active: type === 2}">专项疏导</span>
       </div>
     </div>
-    <!-- <van-loading color="#1989fa" v-if="isloading"></van-loading> -->
-    <div class="container" v-show="!isloading">
-      <div class="list" v-if="tableList.length > 0" :key="time">
+    <van-loading color="#1989fa" v-if="isloading"></van-loading>
+    <div class="container" v-else ref="container">
+      <div class="list" v-if="tableList.length > 0" :key="time" ref="list">
         <div class="card" v-for="item in tableList" :key="item.payTime">
           <div class="name">
             <span class="courseName">{{ item.courseName }}</span>
@@ -70,6 +70,7 @@ export default {
     console.log('windowheigth', window.height)
     console.log('heigth', document.body.offsetHeight)
     console.log('heigth1', document.getElementsByClassName('record')[0].clientHeight)
+    console.log('getComputedStyle(document.documentElement).getPropertyValue("--vh")', 1, getComputedStyle(document.documentElement).getPropertyValue('--vh'), 2)
   },
   methods: {
     disponseUrl () {
@@ -90,27 +91,30 @@ export default {
       this.time = new Date().getTime()
       this.isloading = true
       const res = await userCourseList()
-      // userCourseList().then(res => {
       if (res.code === 0) {
         this.tableList = []
-        this.tableList = res.data.courseList
+        this.tableList = res.data.courseList || []
         this.isloading = false
       }
-      console.log('this.isloading', this.isloading, res)
-      // })
+      console.log('this.loading', this.loading, 'res', res)
+      this.$nextTick(() => {
+        this.$refs.container.scrollTop = 0
+        console.log('container的height', this.$refs.container.clientHeight, 'this.$refs.container.scrollTop', this.$refs.container.scrollTop)
+      })
     },
     async getThemeCourseList () {
       this.time = new Date().getTime()
       this.isloading = true
       const res = await userThemeCourseList()
-      // userThemeCourseList().then(res => {
       if (res.code === 0) {
         this.tableList = []
-        this.tableList = res.data.courseList
+        this.tableList = res.data.courseList || []
         this.isloading = false
       }
-      console.log('this.isloading', this.isloading, res)
-      // })
+      this.$nextTick(() => {
+        this.$refs.container.scrollTop = 0
+        console.log('container的height', this.$refs.container.clientHeight, 'this.$refs.container.scrollTop', this.$refs.container.scrollTop)
+      })
     },
     getStatus (status) {
       if (status === 1) {
@@ -133,17 +137,16 @@ export default {
   font-size: 0;
   vertical-align: middle;
   width: 100%;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: flex;
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0);
 }
 .record{
-  height: 100vh;
+  height: calc(100 * var(--vh));
   background-color: #F6F6F7;
   overflow: hidden;
-  display: flex;
   flex-direction: column;
   .type{
     height:74rem/@w;
@@ -183,11 +186,10 @@ export default {
     }
   }
   .container {
-    height: calc(100vh - 74rem/@w);
+    height: calc(100 * var(--vh) - 77rem/@w);
     overflow: auto;
     -webkit-overflow-scrolling: touch;
     .list{
-      flex: 1;
       width: 100%;
       box-sizing: border-box;
       padding:0 20rem/@w 16rem/@w;

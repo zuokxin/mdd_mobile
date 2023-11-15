@@ -1,18 +1,21 @@
 <template>
   <div class="test-do-other">
     <div class="in-set" v-if="timeOver">
-    <!-- 进度条 -->
+      <!-- 进度条 -->
       <div class="progress-bar">
-        <div class="title">测试进度：{{questionData.proDisplay}}</div>
+        <div class="title">测试进度：{{ questionData.proDisplay }}</div>
         <!-- <van-progress :percentage="questionData.progress + 20" stroke-width="5px" color="#34B7B9"  :show-pivot="false" /> -->
-        <van-progress :percentage="toPoint(questionData.proDisplay , tableCode === 'MINI'? 'MINI' : '')" stroke-width="5px" color="#34B7B9"  :show-pivot="false" />
+        <van-progress :percentage="toPoint(questionData.proDisplay, tableCode === 'MINI' ? 'MINI' : '')"
+          stroke-width="5px" color="#34B7B9" :show-pivot="false" />
       </div>
       <!-- 题目这块 -->
-      <div class="question-box-update" v-if= "tableCode === 'MINI' && questionData.miniQInfo.type !== 'audioYN' && questionData.miniQInfo.type !== 'audio'">
+      <div class="question-box-update"
+        v-if="tableCode === 'MINI' && questionData.miniQInfo.type !== 'audioYN' && questionData.miniQInfo.type !== 'audio'">
         <div class="top">
-          <div class="question-topic">{{questionData.topic}}</div>
-          <div class="question-text question-mini">{{questionData.title}}</div>
-          <miniBox ref="minibox" v-if="tableCode === 'MINI'" @sendFalse="sendFalse" @sendData="sendData" :miniQInfo="questionData.miniQInfo"  :mid="questionData.id"></miniBox>
+          <div class="question-topic">{{ questionData.topic }}</div>
+          <div class="question-text question-mini">{{ questionData.title }}</div>
+          <miniBox ref="minibox" v-if="tableCode === 'MINI'" @sendFalse="sendFalse" @sendData="sendData"
+            :miniQInfo="questionData.miniQInfo" :mid="questionData.id"></miniBox>
         </div>
         <div class="under">
           <van-button round block type="primary" :disabled="miniNextFlag" @click="postAnswer">下一题</van-button>
@@ -21,10 +24,12 @@
       </div>
       <!-- 题目这块 -->
       <div class="question-box" v-else>
-        <div class="question-topic" v-if= "tableCode === 'MINI'">{{questionData.topic}}</div>
-        <div class="question-text" :class="{'question-mini': tableCode === 'MINI'}">{{questionData.title}}</div>
-        <div class="question-textyn" v-if= "tableCode === 'MINI' && questionData.miniQInfo.type === 'audioYN'">(请回答 "是" 或 "不是")</div>
-        <p class="question-intro" v-if="tableCode === 'MINI' && questionData.miniQInfo.intro">{{questionData.miniQInfo.intro}}</p>
+        <div class="question-topic" v-if="tableCode === 'MINI'">{{ questionData.topic }}</div>
+        <div class="question-text" :class="{ 'question-mini': tableCode === 'MINI' }">{{ questionData.title }}</div>
+        <div class="question-textyn" v-if="tableCode === 'MINI' && questionData.miniQInfo.type === 'audioYN'">(请回答 "是" 或
+          "不是")</div>
+        <p class="question-intro" v-if="tableCode === 'MINI' && questionData.miniQInfo.intro">
+          {{ questionData.miniQInfo.intro }}</p>
         <!-- 底部提交按钮 -->
         <div class="under-btn">
           <div class="line"></div>
@@ -35,35 +40,30 @@
           <van-button type="primary" @click="testpost" v-if="false">stop</van-button>
           <div class="btns">
             <div class="left same">
-              <span v-for="(it, index) in voice" :key="it" :class="{active: left_Voice[index]}"></span>
+              <span v-for="(it, index) in voice" :key="it" :class="{ active: left_Voice[index] }"></span>
             </div>
             <div class="center same">
               <img @click="postAnswer" v-show="!textFlag && btnShow" src="@/assets/img/stop.png" alt="stop">
               <img @click="postAnswer" v-show="textFlag || !btnShow" src="@/assets/img/wait.png" alt="wait">
             </div>
             <div class="right same">
-              <span v-for="(it, index) in voice" :key="it" :class="{active: right_Voice[index]}"></span>
+              <span v-for="(it, index) in voice" :key="it" :class="{ active: right_Voice[index] }"></span>
             </div>
           </div>
         </div>
       </div>
     </div>
     <!-- 人脸 -->
-    <DragVideo
-      v-if="aiEvalCamEnabled"
-      ref="dragVideo"
-      @getFace="getFace"
-      :style="{ opacity: timeOver && readOver ? 1 : 0 }"
-      :location="{ right: 10, bottom: 210 }"
-    >
+    <DragVideo v-if="aiEvalCamEnabled" ref="dragVideo" @getFace="getFace"
+      :style="{ opacity: timeOver && readOver ? 1 : 0 }" :location="{ right: 10, bottom: 210 }">
     </DragVideo>
     <!-- 一开始播报弹窗 -->
     <popout :countTime="countTime" :popoutShow="popoutShow" @close="close"></popout>
     <!-- 每一题的语音播报弹窗 -->
     <voice :voicePopout="voicePopout" @voiceClose="voiceClose" ref="voice">
-    <template slot="text">
-      <div class="text">{{questionData.title}}</div>
-    </template>
+      <template slot="text">
+        <div class="text">{{ questionData.title }}</div>
+      </template>
     </voice>
     <!-- 错误提示的弹窗 -->
     <errpopout class="errpopout" :errPopout="errPopout">
@@ -86,16 +86,8 @@
     </errpopout>
     <!-- 无人脸 -->
     <!-- 弹窗提示 -->
-    <van-dialog
-      v-if="aiEvalCamEnabled"
-      v-model="noFace"
-      message="未识别到全部人脸，请重做本题"
-      theme="round-button"
-      className="detail-dialog"
-      confirmButtonText="确定"
-      confirmButtonColor="#34B7B9"
-      @close="colseFaceTips"
-    ></van-dialog>
+    <van-dialog v-if="aiEvalCamEnabled" v-model="noFace" message="未识别到全部人脸，请重做本题" theme="round-button"
+      className="detail-dialog" confirmButtonText="确定" confirmButtonColor="#34B7B9" @close="colseFaceTips"></van-dialog>
     <FadiRoleDialog ref="FadiRoleDialog" @confirm="goNext(true)"></FadiRoleDialog>
   </div>
 </template>
@@ -590,7 +582,7 @@ export default {
         if (!this.sessionId || !this.tableCode) return
         // audio.url = 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav'
         posTableQues(this.postFormat({ video: video.url, audio: audio.url })).then(re => {
-        // posTableQues(this.postFormat({ video: video.url, audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
+          // posTableQues(this.postFormat({ video: video.url, audio: 'https://s302.fanhantech.com/depression/1463445405206319104/MINI/FhSqHLeTaA3dQqnnzq6Cw10FzgY7.wav' })).then(re => {
           this.init()
           this.clearSendData()
         }).catch(err => {
@@ -850,23 +842,26 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.test-do-other{
+.test-do-other {
   width: 100%;
   z-index: 1;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   position: relative;
   overflow: hidden;
   background: #F4F4F4;
-  .in-set{
+
+  .in-set {
     margin: 0 .5405rem;
     box-sizing: border-box;
     // height: calc(100% - 0.8rem);
     overflow: hidden;
-    .progress-bar{
+
+    .progress-bar {
       height: 1.6757rem;
       padding: .4324rem .3243rem 0;
       box-sizing: border-box;
-      .title{
+
+      .title {
         text-align: center;
         font-size: 12px;
         height: 12px;
@@ -875,79 +870,93 @@ export default {
       }
     }
   }
+
   // 正常的
-  .question-box{
+  .question-box {
     position: relative;
     overflow: hidden;
-    height: calc(100vh - 2.5rem);
+    height: calc(100 * var(--vh) - 2.5rem);
     border-radius: 10px;
     background: #FFFFFF;
-    .question-text{
+
+    .question-text {
       font-size: .4267rem;
       padding: .4324rem .3243rem;
       color: #333333;
       font-weight: 500;
       line-height: 28px;
     }
-    .question-intro{
+
+    .question-intro {
       font-size: 13px;
       padding: 0 .3243rem;
       color: #999999;
       line-height: 28px;
     }
-    .question-topic{
+
+    .question-topic {
       font-size: .3467rem;
       padding: .4324rem .3243rem 0rem;
       color: #333333;
       font-weight: 500;
       line-height: 28px;
     }
-    .question-mini{
+
+    .question-mini {
       padding-top: .2703rem;
     }
-    .question-textyn{
+
+    .question-textyn {
       color: #FFB56B;
       font-size: .4267rem;
       line-height: 14px;
-      padding: 0rem .3243rem ;
+      padding: 0rem .3243rem;
     }
-    .under-btn{
+
+    .under-btn {
       background: #FFFFFF;
       width: calc(100% - 1.07rem);
       height: 170px;
       position: fixed;
       bottom: 0.8rem;
       border-radius: 10px;
-      .line{
-        margin:  0 .2703rem;
+
+      .line {
+        margin: 0 .2703rem;
         height: 2px;
         background: #D5D5D5;
       }
-      .answer-title{
+
+      .answer-title {
         text-align: center;
         font-weight: bold;
         font-size: 14px;
         color: #000000;
         margin: .4324rem 0;
       }
-      .answer-tip{
+
+      .answer-tip {
         text-align: center;
         height: 16px;
         font-size: 12px;
         font-weight: 500;
         color: #BBBBBB;
       }
-      .btns{
+
+      .btns {
         display: flex;
         align-items: center;
         justify-content: center;
         flex-wrap: nowrap;
-        .same{
+
+        .same {
           display: flex;
-          .active{
+
+          .active {
             background: #34B7B9;
           }
-          span{
+
+          span {
             width: .1081rem;
             height: 24px;
             background: #EBEBED;
@@ -955,8 +964,9 @@ export default {
             margin: 0 2px;
           }
         }
-        .center{
-          img{
+
+        .center {
+          img {
             width: 2.1622rem;
             height: 2.1622rem;
           }
@@ -964,37 +974,43 @@ export default {
       }
     }
   }
+
   // 不正常的
-  .question-box-update{
-    height: calc(100vh - 1.6757rem);
+  .question-box-update {
+    height: calc(100 * var(--vh) - 1.6757rem);
     position: relative;
     padding-bottom: 2.7027rem;
     box-sizing: border-box;
-    .top{
+
+    .top {
       background: #FFFFFF;
       border-radius: .2703rem;
       box-sizing: border-box;
       overflow-y: auto;
       height: 100%;
-      .question-text{
+
+      .question-text {
         font-size: .4267rem;
         padding: .4324rem .3243rem;
         color: #333333;
         font-weight: 500;
         line-height: 28px;
       }
-      .question-topic{
+
+      .question-topic {
         font-size: .3467rem;
         padding: .4324rem .3243rem 0rem;
         color: #333333;
         font-weight: 500;
         line-height: 28px;
       }
-      .question-mini{
+
+      .question-mini {
         padding-top: .2703rem;
       }
     }
-    .under{
+
+    .under {
       height: 2.7027rem;
       position: absolute;
       overflow: hidden;
@@ -1003,15 +1019,18 @@ export default {
       bottom: 0;
       left: 0;
       width: 100%;
-      .van-button{
+
+      .van-button {
         margin-top: .4324rem;
       }
-      .van-button--disabled{
+
+      .van-button--disabled {
         background: #D5D5D5;
         border-color: #D5D5D5;
       }
     }
   }
+
   // .face-box{
   //   position: absolute;
   //   z-index: 10;
@@ -1026,24 +1045,27 @@ export default {
   //   }
   // }
   // lots of errors (popout)
-  .errpopout{
-    /deep/.popout_box{
+  .errpopout {
+    /deep/.popout_box {
       padding: 0 1rem;
       margin: 0 0.7027rem;
       text-align: center;
-      .text{
+
+      .text {
         color: #000000;
         margin-top: 1.7027rem;
         font-size: 16px;
         font-weight: 600;
       }
-      .yellow-text{
+
+      .yellow-text {
         color: #FFB56B;
         margin-top: .3243rem;
         font-size: 16px;
         font-weight: 600;
       }
-      .sure-btn{
+
+      .sure-btn {
         background: #34B7B9;
         width: 2.3243rem;
         height: 1.0811rem;
@@ -1055,5 +1077,4 @@ export default {
       }
     }
   }
-}
-</style>
+}</style>

@@ -3,9 +3,11 @@
     <van-loading color="#1989fa" v-if="loading"></van-loading>
     <div class="main" v-else>
       <div class="tagList">
-        <div class="tag" v-for="( item ) in tagList" :key="item" :class="{selected : active === (item)}" @click="handleSelect(item)">{{ item }}</div>
+        <div class="tag" v-for="( item ) in tagList" :key="item" :class="{ selected: active === (item) }"
+          @click="handleSelect(item)">{{ item }}</div>
       </div>
-      <div class="train-box" v-for="item in cbtCourseList" :key="item.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: item.courseId } })">
+      <div class="train-box" v-for="item in cbtCourseList" :key="item.courseImage"
+        @click="$router.push({ path: '/cbt-detail', query: { courseId: item.courseId } })">
         <div class="img">
           <img :src="item.courseImage" alt="专项疏导">
           <div class="tag" v-if="Number(item.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
@@ -102,30 +104,35 @@ export default {
 
 <style lang="less" scoped>
 @w: 37.5;
+
 .van-loading {
   position: relative;
   color: #D5D5D5;
   font-size: 0;
   vertical-align: middle;
   width: 100%;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: flex;
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0);
 }
-.wrap{
-  height: 100vh;
+
+.wrap {
+  height: calc(100 * var(--vh));
   overflow-y: scroll;
 }
-.main{
-  min-height: calc(100vh - 28rem/@w);
+
+.main {
+  min-height: calc(100 * var(--vh) - 28rem/@w);
   background-color: #f4f4f4;
   padding: 18rem/@w 20rem/@w 10rem/@w;
 }
-.tagList{
-  margin-bottom:6rem/@w;
-  .tag{
+
+.tagList {
+  margin-bottom: 6rem/@w;
+
+  .tag {
     display: inline-block;
     border-radius: 10rem/@w;
     padding: 2rem/@w 10rem/@w;
@@ -133,16 +140,17 @@ export default {
     font-size: 14rem/@w;
     line-height: 20rem/@w;
     color: #000;
-    margin:0 16rem/@w 12rem/@w 0;
-    &.selected{
+    margin: 0 16rem/@w 12rem/@w 0;
+
+    &.selected {
       color: #34b7b9;
     }
   }
 
 }
 
-.train-box{
-  width:100%;
+.train-box {
+  width: 100%;
   box-sizing: border-box;
   margin-bottom: 10rem/@w;
   padding: 16rem/@w 10rem/@w;
@@ -151,13 +159,15 @@ export default {
   background-color: #fff;
   display: flex;
   justify-content: space-between;
-  .img{
+
+  .img {
     width: 124rem/@w;
     height: 100%;
     box-sizing: border-box;
     font-size: 0;
     position: relative;
-    .tag{
+
+    .tag {
       position: absolute;
       top: -3rem/@w;
       left: -4rem/@w;
@@ -170,17 +180,20 @@ export default {
       line-height: 20rem/@w;
       color: #fff;
     }
-    img{
+
+    img {
       width: 100%;
       height: 100%;
     }
   }
-  .description{
+
+  .description {
     flex: 1;
     margin-left: 10rem/@w;
     color: #666;
     position: relative;
-    .name{
+
+    .name {
       margin-bottom: 4rem/@w;
       font-size: 14rem/@w;
       line-height: 20rem/@w;
@@ -191,7 +204,8 @@ export default {
       text-overflow: ellipsis;
       vertical-align: baseline;
     }
-    .subTitle{
+
+    .subTitle {
       margin: 0;
       font-size: 12rem/@w;
       line-height: 16rem/@w;
@@ -201,7 +215,8 @@ export default {
       display: -webkit-box;
       -webkit-box-orient: vertical;
     }
-    .discribe{
+
+    .discribe {
       position: absolute;
       bottom: 8rem/@w;
       font-size: 10rem/@w;
@@ -209,7 +224,7 @@ export default {
     }
   }
 }
-.train-box:last-child{
+
+.train-box:last-child {
   margin-bottom: 0;
-}
-</style>
+}</style>
