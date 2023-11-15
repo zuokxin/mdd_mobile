@@ -14,19 +14,13 @@
             :height="18"
           ></icon-font>
         </p> -->
-        <video-box
-          ref="thisVideo"
-          class="d-inline-block"
-          :faceDetection="true"
-          @getFace="getFace"
-          size="150px"
-        >
+        <video-box ref="thisVideo" class="d-inline-block" :faceDetection="true" @getFace="getFace" size="150px">
         </video-box>
         <!-- <p v-if="!faceSuccess && !face" class="subtitle test-error">未识别到人脸，可能是光线较暗或人脸不在图像框内</p>
         <p v-else class="font-weight-bold test-success">{{ faceIndex }}s</p>
-        <p class="subtitle" style="max-width: 33vh;">请在接下来的答题过程中也保持人脸在图像框内，否则需要重新答题</p> -->
+        <p class="subtitle" style="max-width: 33 * var(--vh);">请在接下来的答题过程中也保持人脸在图像框内，否则需要重新答题</p> -->
       </div>
-      <p class="title" style="margin-top: 5vh">
+      <p class="title" :style="{marginTop: 'calc(5 * var(--vh))'}">
         语音测试
       </p>
       <!-- <p class="subtitle" :class="{'test-success': !volumeWarn}">
@@ -43,7 +37,7 @@
         <span class="ml-2">分贝</span>
       </p>
       <!-- <p class="subtitle test-error" :class="{ 'hidden': !volumeWarn || db <= 40 }">当前噪音过大！</p> -->
-      <p v-if="mediaError">信息：{{mediaError}}</p>
+      <p v-if="mediaError">信息：{{ mediaError }}</p>
       <van-button v-show="status && init" type="primary" @click="close">暂停</van-button>
       <van-button v-show="!status && init" type="primary" @click="start">开始</van-button>
       <div v-show="href">下载视频:<a :href="href">open</a></div>
@@ -354,51 +348,60 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .test {
+.test {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .icon {
+    color: #DDD;
+  }
+
+  .title {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    .icon {
-      color: #DDD;
-    }
-    .title {
-      display: flex;
-      justify-content: space-between;
-      font-size: 18px;
-      font-weight: 700;
-      color: #666;
-    }
-    .subtitle {
-      margin-bottom: 1.5vh;
-      font-size: 14px;
-      text-align: left;
-    }
-    .tips {
-      color: #BBB;
-      b {
-        display: inline-block;
-        // width: 1.5em;
-        height: 36px;
-        line-height: 1;
-        text-align: right;
-        font-size: 36px;
-      }
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 700;
+    color: #666;
+  }
+
+  .subtitle {
+    margin-bottom: calc(1.5 * var(--vh));
+    font-size: 14px;
+    text-align: left;
+  }
+
+  .tips {
+    color: #BBB;
+
+    b {
+      display: inline-block;
+      // width: 1.5em;
+      height: 36px;
+      line-height: 1;
+      text-align: right;
+      font-size: 36px;
     }
   }
-  .hidden {
-    visibility: hidden;
-  }
-  .test-error {
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.test-error {
+  color: #FF0000;
+
+  .icon {
     color: #FF0000;
-    .icon {
-      color: #FF0000;
-    }
   }
-  .test-success {
-    color:#00CE00;
-    .icon {
-      color: #00CE00;
-    }
+}
+
+.test-success {
+  color: #00CE00;
+
+  .icon {
+    color: #00CE00;
   }
-</style>
+}</style>

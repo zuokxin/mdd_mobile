@@ -3,7 +3,7 @@
     <keep-alive>
       <router-view :key="$route.fullPath" v-if="$route.meta.keepAlive"></router-view>
     </keep-alive>
-    <router-view v-if="!$route.meta.keepAlive"/>
+    <router-view v-if="!$route.meta.keepAlive" />
   </div>
 </template>
 
@@ -21,6 +21,19 @@ export default {
     }
     console.log(window.VConsole())
     console.log(this.$refs.app, '100vh', this.$refs.app.clientHeight, '可视高度', innerHeight)
+    this.vhCheck()
+    window.addEventListener('resize', this.vhCheck)
+    this.$once('hook:beforeDestroy', () => {
+      window.removeEventListener('resize', this.vhCheck)
+    })
+  },
+  methods: {
+    vhCheck () {
+      // 模拟 vh
+      const vh = window.innerHeight * 0.01
+      // 设置 css 自定义属性
+      document.documentElement.style.setProperty('--vh', `${vh}px`)
+    }
   }
 }
 </script>
@@ -29,9 +42,10 @@ export default {
 *:focus-visible {
   outline: none;
 }
+
 #app {
   margin: 0 auto;
   max-width: 750px;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh));
 }
 </style>

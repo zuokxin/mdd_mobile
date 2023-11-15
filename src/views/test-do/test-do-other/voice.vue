@@ -1,7 +1,7 @@
 <template>
   <div class="popout" v-if="voicePopout">
     <div class="popout_box">
-      <div class="popout_title"><img src="@/assets/img/close.png"  @click="voiceClose" alt=""></div>
+      <div class="popout_title"><img src="@/assets/img/close.png" @click="voiceClose" alt=""></div>
       <div class="popout_body">
         <img src="@/assets/img/Virtual-Doctor.gif" alt="">
         <slot name="text"></slot>
@@ -95,11 +95,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.popout{
+.popout {
   z-index: 100;
   width: 100vw;
   font-size: 16px;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   background-color: rgba(0, 0, 0, 0.4);
   position: fixed;
   left: 0;
@@ -108,43 +108,49 @@ export default {
   overflow: hidden;
   justify-content: center;
   align-items: center;
-   .popout_box{
-      border-radius: 20px;
-      width: calc(100% - 1.3514rem);
-      // height: calc(100% - 4.8919rem);
-      height: 14.7838rem;
-      background-color: #FFFFFF;
-      overflow: hidden;
-    .popout_title{
+
+  .popout_box {
+    border-radius: 20px;
+    width: calc(100% - 1.3514rem);
+    // height: calc(100% - 4.8919rem);
+    height: 14.7838rem;
+    background-color: #FFFFFF;
+    overflow: hidden;
+
+    .popout_title {
       padding-top: .6486rem;
       height: .7297rem;
       padding-right: .7838rem;
       text-align: right;
-      img{
+
+      img {
         width: .7297rem;
         height: .7297rem;
         cursor: pointer;
       }
     }
-    .popout_body{
+
+    .popout_body {
       text-align: center;
       height: 12rem;
       overflow: hidden;
-      img{
+
+      img {
         width: 4.0541rem;
         height: 4.0541rem;
       }
-      .text{
-        padding:  0 1.2162rem;
+
+      .text {
+        padding: 0 1.2162rem;
         font-size: 14px;
         text-align: center;
         color: #333333;
         font-weight: 500;
       }
     }
-    .progress{
+
+    .progress {
       padding: 0 .8649rem;
     }
   }
-}
-</style>
+}</style>

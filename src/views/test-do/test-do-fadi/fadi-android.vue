@@ -9,23 +9,15 @@
         <div class="main-in">
           <div v-if="historRecods.length > 0">
             <div v-for="item in historRecods" :key="item.index">
-              <DialogBoxLeft
-                :textLeft="item.title"
-                :isHistory="true"
-              ></DialogBoxLeft>
+              <DialogBoxLeft :textLeft="item.title" :isHistory="true"></DialogBoxLeft>
               <DialogBoxRight :textRight="item.audioDuration"></DialogBoxRight>
             </div>
           </div>
           <div v-for="(record, index) in chatRecords" :key="record + index">
             <!-- :needAnswer="record.needAnswer" -->
-            <DialogBoxLeft
-              :ref="'DialogBoxLeft' + index"
-              v-if="record.component === 'left' && record.status === false"
-              :url="record.url"
-              :textLeft="record.text"
-              @playVideo="e => playVideo(e, index)"
-              @openStartPrompt="openStartPrompt"
-            ></DialogBoxLeft>
+            <DialogBoxLeft :ref="'DialogBoxLeft' + index" v-if="record.component === 'left' && record.status === false"
+              :url="record.url" :textLeft="record.text" @playVideo="e => playVideo(e, index)"
+              @openStartPrompt="openStartPrompt"></DialogBoxLeft>
             <DialogBoxRight v-if="record.component === 'right'" :textRight="record.audioDuration"></DialogBoxRight>
           </div>
           <div v-show="queLoading" style="margin-left: 26px;">
@@ -33,49 +25,30 @@
           </div>
         </div>
       </div>
-      <div v-show="recorderShow" class="bottom" :class="{'isEnd': isEnd}">
+      <div v-show="recorderShow" class="bottom" :class="{ 'isEnd': isEnd }">
         <div v-if="!isEnd" class="bot_box">
           <p class="tips-01">{{ btnText }}</p>
           <p class="tips-02">{{ btnText2 }}</p>
           <div class="submit-btn">
-            <VolumeIcon class="mr-3" v-show="!loading" :value="volumeVal" style="transform: rotateZ(180deg);"></VolumeIcon>
+            <VolumeIcon class="mr-3" v-show="!loading" :value="volumeVal" style="transform: rotateZ(180deg);">
+            </VolumeIcon>
             <XyButton :disabled="loading || !btnShow" @click.native="toNext()"></XyButton>
             <VolumeIcon class="ml-3" v-show="!loading" :value="volumeVal" style="margin-bottom: -5px;"></VolumeIcon>
           </div>
         </div>
-        <van-button
-          v-if="isEnd"
-          class="main-btn-dark mx-auto my-5"
-          type="primary"
-          size="large"
-          round
-          block
-          :disabled="finishBtnDisable"
-          @click="submit"
-          style="width: 76.8%;"
-        >
+        <van-button v-if="isEnd" class="main-btn-dark mx-auto my-5" type="primary" size="large" round block
+          :disabled="finishBtnDisable" @click="submit" style="width: 76.8%;">
           完成
         </van-button>
       </div>
       <!-- <div v-show="!recorderShow" class="bottom" style="background-color: #F4F4F4;"></div> -->
     </div>
     <!-- 人脸 -->
-    <DragVideo
-      v-if="aiEvalCamEnabled"
-      ref="dragVideo"
-      @getFace="getFace"
-      :location="{ right: 10, top: 50 }"
-    >
+    <DragVideo v-if="aiEvalCamEnabled" ref="dragVideo" @getFace="getFace" :location="{ right: 10, top: 50 }">
     </DragVideo>
     <!-- 开始提示 -->
-    <van-dialog
-      v-model="startShow"
-      theme="round-button"
-      className="detail-dialog"
-      confirmButtonText="好的"
-      confirmButtonColor="#34B7B9"
-      @close="colseStartTips"
-    >
+    <van-dialog v-model="startShow" theme="round-button" className="detail-dialog" confirmButtonText="好的"
+      confirmButtonColor="#34B7B9" @close="colseStartTips">
       <div class="fadi-start-box">
         <p class="title">测试即将开始</p>
         <p class="content">
@@ -85,16 +58,8 @@
       </div>
     </van-dialog>
     <!-- 弹窗提示 -->
-    <van-dialog
-      v-if="aiEvalCamEnabled"
-      v-model="faceShow"
-      message="未识别到全部人脸，请重做本题"
-      theme="round-button"
-      className="detail-dialog"
-      confirmButtonText="确定"
-      confirmButtonColor="#34B7B9"
-      @close="colseFaceTips"
-    ></van-dialog>
+    <van-dialog v-if="aiEvalCamEnabled" v-model="faceShow" message="未识别到全部人脸，请重做本题" theme="round-button"
+      className="detail-dialog" confirmButtonText="确定" confirmButtonColor="#34B7B9" @close="colseFaceTips"></van-dialog>
   </div>
 </template>
 
@@ -760,108 +725,122 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .ques-counselling {
+.ques-counselling {
+  width: 100%;
+  height: calc(100 * var(--vh));
+  box-sizing: border-box;
+  background-color: #D1CDCD;
+
+  .top {
+    padding: 0 16px;
+    height: 34px;
+    line-height: 34px;
+    color: #fff;
+    background: linear-gradient(90deg, rgba(0, 203, 255, 0.21) 0%, rgba(0, 203, 255, 0.1) 51%, rgba(0, 203, 255, 0.01) 100%);
+    z-index: 2;
+
+    img {
+      width: 18px;
+      height: 18px;
+      vertical-align: text-bottom;
+      margin-right: 6px;
+    }
+  }
+
+  .tips {
+    margin-top: calc(5 * var(--vh));
+    font-size: 14px;
+    color: #999;
+  }
+
+  .ques-counselling-wrap {
+    position: relative;
     width: 100%;
-    height: 100vh;
-    box-sizing: border-box;
-    background-color: #D1CDCD;
-    .top {
-      padding: 0 16px;
-      height: 34px;
-      line-height: 34px;
-      color: #fff;
-      background: linear-gradient(90deg, rgba(0, 203, 255, 0.21) 0%, rgba(0,203,255,0.1) 51%, rgba(0,203,255,0.01) 100%);
-      z-index: 2;
-      img{
-        width: 18px;
-        height: 18px;
-        vertical-align: text-bottom;
-        margin-right: 6px;
-      }
-    }
-    .tips {
-      margin-top: 5vh;
-      font-size: 14px;
-      color: #999;
-    }
-    .ques-counselling-wrap {
-      position: relative;
+    height: 100%;
+    margin: 0 auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .main {
+      position: fixed;
+      bottom: 15px;
       width: 100%;
-      height: 100%;
-      margin: 0 auto 0 auto;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      .main {
-        position: fixed;
-        bottom: 15px;
-        width: 100%;
-        height: 40vh;
-        // margin-top: 16px;
-        padding-bottom: 15px;
-        overflow-x: hidden;
-        overflow-y: scroll;
-        z-index: 2;
-        .main-in {
-          // position: absolute;
-          // width: 100%;
-          min-height: 100%;
-          // left: 0;
-          // bottom: 0;
-          // height: 100%;
-          // overflow-y: auto;
-          // padding-bottom: 30px;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-end;
-        }
+      height: calc(40 * var(--vh));
+      // margin-top: 16px;
+      padding-bottom: 15px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      z-index: 2;
+
+      .main-in {
+        // position: absolute;
+        // width: 100%;
+        min-height: 100%;
+        // left: 0;
+        // bottom: 0;
+        // height: 100%;
+        // overflow-y: auto;
+        // padding-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
       }
-      .bottom {
-        height: 150px;
-        padding-top: 16px;
+    }
+
+    .bottom {
+      height: 150px;
+      padding-top: 16px;
+      display: flex;
+      justify-content: center;
+      background-color: #fff;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      z-index: 3;
+
+      &.isEnd {
+        height: auto;
+        padding: 10px 0;
+        align-items: flex-end;
+        background-color: rgba(255, 255, 255, .8);
+      }
+
+      .bot_box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .tips-01 {
+        line-height: 1;
+        font-size: 14px;
+        font-weight: 600;
+        color: #000000;
+        margin-bottom: 0;
+      }
+
+      .tips-02 {
+        margin: 10px 0;
+        font-size: 12px;
+        color: #313131;
+      }
+
+      .submit-btn {
         display: flex;
         justify-content: center;
-        background-color: #fff;
-        position: fixed;
-        width: 100%;
-        bottom: 0;
-        z-index: 3;
-        &.isEnd {
-          height: auto;
-          padding: 10px 0;
-          align-items: flex-end;
-          background-color: rgba(255, 255, 255, .8);
-        }
-        .bot_box{
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .tips-01 {
-          line-height: 1;
-          font-size: 14px;
-          font-weight: 600;
-          color: #000000;
-          margin-bottom: 0;
-        }
-        .tips-02 {
-          margin: 10px 0;
-          font-size: 12px;
-          color: #313131;
-        }
-        .submit-btn {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
+        align-items: center;
       }
     }
   }
+}
+
 .main-in::-webkit-scrollbar {
   /*滚动条整体样式*/
   width: 0;
   height: 0;
 }
+
 // .main-in::-webkit-scrollbar-thumb {
 //   /*滚动条里面小方块*/
 //   border-radius: 12px;
@@ -877,21 +856,24 @@ export default {
 // }
 </style>
 <style lang="less">
-.messageBox{
+.messageBox {
   width: 360px;
   height: 246px;
   border-radius: 8px;
-  .el-message-box__content{
+
+  .el-message-box__content {
     padding: 0;
     margin-top: 60px;
     font-size: 20px;
     color: #666;
     text-align: center;
   }
-  .el-message-box__btns{
+
+  .el-message-box__btns {
     text-align: center;
     margin-top: 50px;
   }
+
   .other-message {
     width: 78px;
     height: 32px;
@@ -901,16 +883,20 @@ export default {
     background: #34B7B9;
   }
 }
+
 .el-dialog {
   border-radius: 20px;
 }
+
 .el-dialog.is-fullscreen {
   border-radius: 0;
 }
+
 .el-dialog.is-fullscreen.other-dialg {
-  height: calc(100vh - 50px);
+  height: calc(100 * var(--vh) - 50px);
   margin-top: 50px;
 }
+
 .fadi-start-box {
   .title {
     margin: 1.68rem 0 0 0;
@@ -918,6 +904,7 @@ export default {
     color: #000000;
     text-align: center;
   }
+
   .content {
     padding: 0 1rem;
     margin-top: 2px;

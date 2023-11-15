@@ -2,7 +2,7 @@
   <div class="container">
     <div class="img-box">
       <img src="@/assets/trans.png">
-      <div class="text">{{num}} <span>秒</span> </div>
+      <div class="text">{{ num }} <span>秒</span> </div>
     </div>
     <p>测试结束，请等待生成结果</p>
   </div>
@@ -118,46 +118,60 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.container{
+.container {
   background: #FFFFFF;
-  min-height: 100vh;
-  max-height: 100vh;
-  .img-box{
+  min-height: calc(100 * var(--vh));
+  max-height: calc(100 * var(--vh));
+
+  .img-box {
     position: relative;
     width: 6.053333rem;
     height: 6.053333rem;
     margin: 3.2rem 1.973333rem 2.133333rem;
     border-radius: 50%;
+
     // border: 1px solid #34b7b9;
-    img{
+    img {
       width: 100%;
       height: 100%;
-      animation:changeright 3s linear infinite;
+      animation: changeright 3s linear infinite;
     }
-    .text{
+
+    .text {
       z-index: 999;
       position: absolute;
       color: #34b7b9;
       font-size: .8rem;
       font-weight: bold;
-      span{
+
+      span {
         font-size: .4rem;
         color: #BBBBBB;
       }
+
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
     }
   }
-  p{
+
+  p {
     color: #999999;
     font-size: .32rem;
     text-align: center;
   }
 }
-@keyframes changeright{
-  0%{-webkit-transform:rotate(0deg);}
-  50%{-webkit-transform:rotate(180deg);}
-  100%{-webkit-transform:rotate(360deg);}
-}
-</style>
+
+@keyframes changeright {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+
+  50% {
+    -webkit-transform: rotate(180deg);
+  }
+
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}</style>

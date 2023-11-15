@@ -1,13 +1,9 @@
 <template>
   <div class="main">
-    <van-nav-bar
-      title="下载App"
-      left-arrow
-      @click-left="onClickLeft"
-      fixed
-    />
+    <van-nav-bar title="下载App" left-arrow @click-left="onClickLeft" fixed />
     <div class="box">
-      <iframe id="mainIframe" name="mainIframe" width="100%" :src=" `${url}/share/?type=YWJvdXQ=`" frameborder="0" scrolling="auto" ></iframe>
+      <iframe id="mainIframe" name="mainIframe" width="100%" :src="`${url}/share/?type=YWJvdXQ=`" frameborder="0"
+        scrolling="auto"></iframe>
     </div>
   </div>
 </template>
@@ -64,26 +60,28 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.main{
+.main {
   width: 100%;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   overflow: hidden;
   position: relative;
 }
 
 .main::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
-.box{
+
+.box {
   position: absolute;
   left: 0;
   top: 1.226667rem;
   width: 102%;
-  height: calc(100vh - 1.126667rem);
+  height: calc(100 * var(--vh) - 1.126667rem);
   -webkit-overflow-scrolling: touch;
   overflow-y: scroll;
   overflow-x: hidden;
 }
+
 #mainIframe {
   overflow-x: hidden;
 }

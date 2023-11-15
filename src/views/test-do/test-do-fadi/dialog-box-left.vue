@@ -2,12 +2,14 @@
   <!-- 视频画布播放版本 -->
   <div class="dialog-box-left">
     <div class="main">
-      <div class="boxLeft" :style="{color: '#333' }">{{textLeft}}</div>
-      <div v-if="isReady" class="laba" :style="{background: !isPlay || isHistory ? '#fff':'#34B7B9' }" @click.once="pauseVideo">
-        <img v-show="isPlay  && !isHistory" src="@/assets/img/test/horn.gif" width="12" height="12" alt="-">
-        <img v-if="(!isPlay && !isHistory) || isHistory" src="@/assets/img/test/speaker.png" alt="speaker" style="width: 13px; height: 13px;">
+      <div class="boxLeft" :style="{ color: '#333' }">{{ textLeft }}</div>
+      <div v-if="isReady" class="laba" :style="{ background: !isPlay || isHistory ? '#fff' : '#34B7B9' }"
+        @click.once="pauseVideo">
+        <img v-show="isPlay && !isHistory" src="@/assets/img/test/horn.gif" width="12" height="12" alt="-">
+        <img v-if="(!isPlay && !isHistory) || isHistory" src="@/assets/img/test/speaker.png" alt="speaker"
+          style="width: 13px; height: 13px;">
       </div>
-      <div v-else class="laba run" :style="{background: '#fff' }">
+      <div v-else class="laba run" :style="{ background: '#fff' }">
         <icon-font name="#mdd-loading-01" color="#999"></icon-font>
       </div>
     </div>
@@ -233,12 +235,12 @@ export default {
 .dialog-box-left-video {
   position: fixed;
   width: 100vw;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   top: 0;
   left: 0;
   z-index: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   object-fit: cover;
   transform: scaleX(1);
 }
@@ -249,6 +251,7 @@ export default {
   align-items: flex-end;
   padding: 10px 0;
 }
+
 .boxLeft {
   min-width: 40px;
   max-width: 70%;
@@ -264,6 +267,7 @@ export default {
   font-size: 14px;
   color: #000;
 }
+
 .boxLeft:after {
   content: '';
   position: absolute;
@@ -281,6 +285,7 @@ export default {
   color: rgba(255, 255, 255, .8);
   transform: rotateX(180deg) rotateZ(-115deg);
 }
+
 .laba {
   width: 22px;
   height: 22px;
@@ -291,16 +296,18 @@ export default {
   justify-content: center;
   align-items: center;
   opacity: .8;
+
   &.run {
     animation: run .5s infinite;
   }
 }
+
 @keyframes run {
   0% {
     transform: rotateZ(360deg);
   }
+
   100% {
     transform: rotateZ(0deg);
   }
-}
-</style>
+}</style>

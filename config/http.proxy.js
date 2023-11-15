@@ -5,7 +5,8 @@ function httpproxy () {
 
   var port = '9020'
   return {
-    target: 'http://' + ip + ':' + port,
+    // target: 'http://' + ip + ':' + port,
+    target: 'https://depression.test.fubianmed.com',
     changeOrigin: true
   }
 }

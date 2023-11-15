@@ -3,13 +3,13 @@
     <van-loading color="#1989fa" v-if="loading"></van-loading>
     <div v-else class="wrap">
       <div class="header">
-      <!-- 搜索 -->
-      <div class="search" @click="$router.push('/search')">
-        <img src="@/assets/img/test/search.png" alt="search">
-        <span>请输入您要找的量表名</span>
-      </div>
-      <div class="sign-in" @click="signIn">
-      </div>
+        <!-- 搜索 -->
+        <div class="search" @click="$router.push('/search')">
+          <img src="@/assets/img/test/search.png" alt="search">
+          <span>请输入您要找的量表名</span>
+        </div>
+        <div class="sign-in" @click="signIn">
+        </div>
       </div>
       <div class="container">
         <!-- 轮播图 -->
@@ -30,12 +30,13 @@
             <h5>专项疏导</h5>
             <span @click="$router.push({ path: '/train' })">
               查看全部
-              <van-icon name="arrow" color="#666"/>
-              <van-icon name="arrow" color="#666"/>
+              <van-icon name="arrow" color="#666" />
+              <van-icon name="arrow" color="#666" />
             </span>
           </div>
           <div class="train-box">
-            <div class="train-box-content" v-for="v in cbtCourseList" :key="v.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
+            <div class="train-box-content" v-for="v in cbtCourseList" :key="v.courseImage"
+              @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
               <div class="tag" v-if="Number(v.price) === 0">限时免费</div>
               <div class="tag" v-if="Number(v.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
               <div class="img"><img :src="v.courseImage" alt="专项疏导"></div>
@@ -50,18 +51,20 @@
             <h5>小愈精选</h5>
             <span @click="change()">
               换一换
-              <van-icon name="replay" color="#666"/>
+              <van-icon name="replay" color="#666" />
             </span>
           </div>
-          <div class="careful-select-box" v-for="item in carefulSelection" :key="item.tableLogo" @click="$router.push({ path: '/test-detail', query: { tableCode: item.tableCode } })">
-            <img :src="item.tableLogo" alt="小愈精选" >
+          <div class="careful-select-box" v-for="item in carefulSelection" :key="item.tableLogo"
+            @click="$router.push({ path: '/test-detail', query: { tableCode: item.tableCode } })">
+            <img :src="item.tableLogo" alt="小愈精选">
             <div class="description">
               <div class="name">{{ item.tableName }}</div>
               <div class="introduction" v-if="item.tableIntroduction">{{ item.tableIntroduction }}</div>
               <div v-else></div>
               <div class="price">
                 <div class="red"><span>￥</span>{{ Number(item.price).toFixed(2) }}</div>
-                <div><img src="@/assets/img/my/hot.png" alt="已测试"><span class="completed">{{ item.evalRecordCount }}人已测试</span></div>
+                <div><img src="@/assets/img/my/hot.png" alt="已测试"><span class="completed">{{ item.evalRecordCount
+                }}人已测试</span></div>
               </div>
             </div>
           </div>
@@ -72,7 +75,8 @@
             <h5>综合疏导</h5>
           </div>
           <div class="train-box counseling-box">
-            <div class="train-box-content counseling-box-content" v-for="v in courseList" :key="v.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
+            <div class="train-box-content counseling-box-content" v-for="v in courseList" :key="v.courseImage"
+              @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
               <div class="img"><img :src="v.courseImage" alt="综合疏导"></div>
               <p class="name">{{ v.courseName }}</p>
               <p class="price"><span>￥</span>{{ Number(v.price).toFixed(2) }}</p>
@@ -203,34 +207,39 @@ export default {
 
 <style lang="less" scoped>
 @w: 37.5;
+
 .van-loading {
   position: relative;
   color: #D5D5D5;
   font-size: 0;
   vertical-align: middle;
   width: 100%;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: flex;
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0);
 }
+
 .main {
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: flex;
   flex-direction: column
 }
-.wrap{
-  height: 100vh;
+
+.wrap {
+  height: calc(100 * var(--vh));
   display: flex;
   flex-direction: column
 }
-.header{
+
+.header {
   padding: 10rem/@w 20rem/@w;
   background-color: #f4f4f4;
   height: 33rem/@w;
   display: flex;
   justify-content: space-between;
+
   .search {
     flex: 1;
     display: flex;
@@ -253,21 +262,24 @@ export default {
       margin-left: 10rem/@w;
     }
   }
-  .sign-in{
+
+  .sign-in {
     width: 65rem/@w;
     height: 33rem/@w;
-    background: url('~@/assets/img/my/signin.png')  top left / cover no-repeat;
+    background: url('~@/assets/img/my/signin.png') top left / cover no-repeat;
   }
 
 }
-.container{
+
+.container {
   flex: 1;
   overflow-y: scroll;
   background-color: #f4f4f4;
   padding: 0 20rem/@w 10rem/@w;
   margin-bottom: 50rem/@w;
+
   .van-swipe {
-    margin:0 0 10rem/@w 0 ;
+    margin: 0 0 10rem/@w 0;
     width: 100%;
 
     .van-swipe-item {
@@ -277,51 +289,60 @@ export default {
       }
     }
   }
-  .train{
+
+  .train {
     box-sizing: border-box;
     background-color: #fff;
     border-radius: 12rem/@w;
     padding: 16rem/@w 10rem/@w;
     color: #333;
     margin-bottom: 10rem/@w;
-    .title{
+
+    .title {
       display: flex;
       justify-content: space-between;
       margin-bottom: 10rem/@w;
-      h5{
+
+      h5 {
         margin: 0;
         font-size: 16rem/@w;
         font-weight: 500;
         line-height: 22rem/@w;
       }
-      span{
+
+      span {
         font-size: 12rem/@w;
         line-height: 22rem/@w;
         color: #666;
-        .van-icon-arrow{
+
+        .van-icon-arrow {
           margin-left: -3rem/@w;
         }
       }
     }
-    .train-box{
-      width:100%;
+
+    .train-box {
+      width: 100%;
       overflow-x: scroll;
-      -webkit-overflow-scrolling:touch;
+      -webkit-overflow-scrolling: touch;
       display: -webkit-box;
       white-space: nowrap;
+
       &::-webkit-scrollbar {
-        display:none
+        display: none
       }
+
       padding-top: 4rem/@w;
       font-size: 0;
-      .train-box-content{
-        display:inline-block;
+
+      .train-box-content {
+        display: inline-block;
         width: 124rem/@w;
         padding-left: 4rem/@w;
         margin-right: 6rem/@w;
         position: relative;
 
-        .tag{
+        .tag {
           position: absolute;
           top: -4rem/@w;
           left: 0;
@@ -334,19 +355,22 @@ export default {
           line-height: 20rem/@w;
           color: #fff;
         }
-        .img{
+
+        .img {
           width: 100%;
           height: 84rem/@w;
           border-radius: 12rem/@w;
           margin-bottom: 4rem/@w;
           overflow: hidden;
           font-size: 0;
-          img{
+
+          img {
             width: 100%;
             height: 100%;
           }
         }
-        .name{
+
+        .name {
           font-size: 14rem/@w;
           line-height: 20rem/@w;
           margin: 0 0 3rem/@w;
@@ -355,12 +379,14 @@ export default {
           text-overflow: ellipsis;
           vertical-align: baseline;
         }
-        .price{
+
+        .price {
           margin: 0;
           font-size: 16rem/@w;
           line-height: 22rem/@w;
-          color:#f31313;
-          span{
+          color: #f31313;
+
+          span {
             font-size: 12rem/@w;
             margin-right: 4rem/@w;
           }
@@ -368,41 +394,49 @@ export default {
       }
     }
   }
-  .careful-select{
+
+  .careful-select {
     padding: 16rem/@w 10rem/@w;
     background-color: #fff;
     border-radius: 12rem/@w;
     margin-bottom: 10rem/@w;
-    .title{
+
+    .title {
       width: 100%;
       display: flex;
       justify-content: space-between;
       line-height: 22rem/@w;
-      h5{
+
+      h5 {
         font-size: 16rem/@w;
         font-weight: 500;
         color: #333;
         margin: 0;
       }
-      span{
+
+      span {
         font-size: 12rem/@w;
-        color:#666;
-        .van-icon-replay{
+        color: #666;
+
+        .van-icon-replay {
           margin-left: 6rem/@w;
         }
       }
     }
-    .careful-select-box{
+
+    .careful-select-box {
       padding: 10rem/@w 0;
       width: 100%;
       display: flex;
-      img{
+
+      img {
         width: 68rem / @w;
         height: 68rem / @w;
         border-radius: 4rem/@w;
         margin-right: 10rem/@w;
       }
-      .description{
+
+      .description {
         height: 68rem/@w;
         display: flex;
         flex: 1;
@@ -411,7 +445,8 @@ export default {
         font-size: 16rem/@w;
         color: #666;
         overflow: hidden;
-        .name{
+
+        .name {
           color: #333;
           white-space: nowrap;
           font-size: 14rem/@w;
@@ -419,73 +454,86 @@ export default {
           text-overflow: ellipsis;
           vertical-align: baseline;
         }
-        .introduction{
+
+        .introduction {
           font-size: 12rem/@w;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
           vertical-align: baseline;
         }
-        .price{
+
+        .price {
           display: flex;
           justify-content: space-between;
           line-height: 22rem/@w;
-          .red{
+
+          .red {
             font-size: 16rem/@w;
             color: #f31313;
-            span{
+
+            span {
               font-size: 12rem/@w;
               margin-right: 4rem/@w;
             }
           }
-          img{
+
+          img {
             width: 11rem/@w;
             height: 14rem/@w;
             margin-right: 4rem/@w;
           }
         }
-        .completed{
+
+        .completed {
           font-size: 12rem/@w;
         }
       }
 
     }
-    .careful-select-box:last-child{
+
+    .careful-select-box:last-child {
       padding-bottom: 0;
     }
   }
-  .counseling{
-      // height: 220rem / @w;
-      margin-bottom: 0;
-      .counseling-box{
-        // height: 156rem/@w;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        .counseling-box-content{
-          // width: 153rem/@w;
-          flex: 1;
-          margin-right: 10rem/@w;
-          height: 100%;
-          padding: 0;
-          .img{
-            height: 104rem/@w;
-          }
-          .name{
-            margin-bottom: 5rem/@w;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            vertical-align: baseline;
-          }
+
+  .counseling {
+    // height: 220rem / @w;
+    margin-bottom: 0;
+
+    .counseling-box {
+      // height: 156rem/@w;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      .counseling-box-content {
+        // width: 153rem/@w;
+        flex: 1;
+        margin-right: 10rem/@w;
+        height: 100%;
+        padding: 0;
+
+        .img {
+          height: 104rem/@w;
         }
-        .counseling-box-content:last-child{
-          margin-right: 0;
+
+        .name {
+          margin-bottom: 5rem/@w;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          vertical-align: baseline;
         }
       }
+
+      .counseling-box-content:last-child {
+        margin-right: 0;
+      }
     }
+  }
 }
+
 .footer {
   height: 50rem/@w;
-}
-</style>
+}</style>

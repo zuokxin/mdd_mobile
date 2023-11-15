@@ -8,7 +8,8 @@
           <h5>综合疏导</h5>
         </div>
         <div class="counseling-box">
-          <div class="counseling-box-content" v-for="v in courseList" :key="v.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
+          <div class="counseling-box-content" v-for="v in courseList" :key="v.courseImage"
+            @click="$router.push({ path: '/cbt-detail', query: { courseId: v.courseId } })">
             <div class="img">
               <img :src="v.courseImage" alt="综合疏导">
             </div>
@@ -21,12 +22,13 @@
       <div class="train">
         <div class="title">
           <h5>专项疏导</h5>
-          <span @click="$router.push({ path: '/train', query: { type:'all' } })">查看全部
-            <van-icon name="arrow" color="#666"/>
-            <van-icon name="arrow" color="#666"/>
+          <span @click="$router.push({ path: '/train', query: { type: 'all' } })">查看全部
+            <van-icon name="arrow" color="#666" />
+            <van-icon name="arrow" color="#666" />
           </span>
         </div>
-        <div class="train-box" v-for="item in cbtCourseList" :key="item.courseImage" @click="$router.push({ path: '/cbt-detail', query: { courseId: item.courseId } })">
+        <div class="train-box" v-for="item in cbtCourseList" :key="item.courseImage"
+          @click="$router.push({ path: '/cbt-detail', query: { courseId: item.courseId } })">
           <div class="img">
             <img :src="item.courseImage" alt="专项疏导">
             <div class="tag" v-if="Number(item.price) === 1.99" style="background-color: #9E6BF5;">限时优惠</div>
@@ -100,49 +102,56 @@ export default {
 
 <style lang="less" scoped>
 @w: 37.5;
+
 .van-loading {
   position: relative;
   color: #D5D5D5;
   font-size: 0;
   vertical-align: middle;
   width: 100%;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: flex;
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0);
 }
+
 .main {
-  height: 100vh;
+  height: calc(100 * var(--vh));
   // display: flex;
   background-color: #f4f4f4;
   // flex-direction: column
 }
-.container{
+
+.container {
   // flex: 1;
-  height: calc(100vh - 50rem/@w);
+  height: calc(100 * var(--vh)- 50rem/@w);
   padding: 0 20rem/@w;
   overflow-y: scroll;
-  .counseling{
+
+  .counseling {
     // width: 335rem/@w;
     height: 217rem/@w;
     border-radius: 12rem/@w;
     color: #333;
-    .title{
-      h5{
+
+    .title {
+      h5 {
         padding: 16rem/@w 0 10rem/@w 0;
         margin: 0;
         font-size: 18rem/@w;
         line-height: 25rem/@w;
       }
     }
-    .counseling-box{
+
+    .counseling-box {
       white-space: nowrap;
       font-size: 0;
       display: flex;
       justify-content: space-between;
       width: 100%;
-      .counseling-box-content{
+
+      .counseling-box-content {
         flex: 1;
         // width: 163rem/@w;
         border-radius: 12rem/@w;
@@ -150,66 +159,78 @@ export default {
         padding: 0;
         background-color: #fff;
         overflow: hidden;
-        display:inline-block;
+        display: inline-block;
         margin-right: 10rem/@w;
-        .img{
+
+        .img {
           height: 104rem/@w;
           width: 100%;
           margin-bottom: 4rem/@w;
           font-size: 0;
-          img{
+
+          img {
             width: 100%;
             height: 100%;
           }
         }
-        .name{
+
+        .name {
           font-size: 14rem/@w;
           line-height: 20rem/@w;
-          margin:0 10rem/@w 5rem/@w;
+          margin: 0 10rem/@w 5rem/@w;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
           vertical-align: baseline;
         }
-        .price{
+
+        .price {
           margin: 0 10rem/@w 10rem/@w;
           font-size: 16rem/@w;
           line-height: 22rem/@w;
-          color:#f31313;
-          span{
+          color: #f31313;
+
+          span {
             font-size: 12rem/@w;
             margin-right: 4rem/@w;
           }
         }
       }
-      .counseling-box-content:last-child{
+
+      .counseling-box-content:last-child {
         margin-right: 0;
       }
     }
   }
-  .train{
+
+  .train {
     // width: 335rem/@w;
     color: #333;
-    .title{
+
+    .title {
       display: flex;
       justify-content: space-between;
       margin: 16rem/@w 0 10rem/@w;
-      h5{
+
+      h5 {
         margin: 0;
         font-size: 18rem/@w;
         line-height: 25rem/@w;
       }
-      span{
+
+      span {
         font-size: 14rem/@w;
         line-height: 25rem/@w;
         color: #666;
-        .van-icon-arrow{
+
+        .van-icon-arrow {
           margin-left: -3rem/@w;
         }
       }
     }
-    .train-box{
-      width:100%;
+
+    .train-box {
+      width: 100%;
       box-sizing: border-box;
       margin-bottom: 10rem/@w;
       padding: 16rem/@w 10rem/@w;
@@ -218,13 +239,15 @@ export default {
       background-color: #fff;
       display: flex;
       justify-content: space-between;
-      .img{
+
+      .img {
         width: 124rem/@w;
         height: 100%;
         box-sizing: border-box;
         font-size: 0;
         position: relative;
-        .tag{
+
+        .tag {
           position: absolute;
           top: -3rem/@w;
           left: -4rem/@w;
@@ -237,17 +260,20 @@ export default {
           line-height: 20rem/@w;
           color: #fff;
         }
-        img{
+
+        img {
           width: 100%;
           height: 100%;
         }
       }
-      .description{
+
+      .description {
         flex: 1;
         margin-left: 10rem/@w;
         color: #666;
         position: relative;
-        .name{
+
+        .name {
           margin-bottom: 4rem/@w;
           font-size: 14rem/@w;
           line-height: 20rem/@w;
@@ -258,7 +284,8 @@ export default {
           text-overflow: ellipsis;
           vertical-align: baseline;
         }
-        .subTitle{
+
+        .subTitle {
           margin: 0;
           font-size: 12rem/@w;
           line-height: 16rem/@w;
@@ -268,7 +295,8 @@ export default {
           display: -webkit-box;
           -webkit-box-orient: vertical;
         }
-        .discribe{
+
+        .discribe {
           position: absolute;
           bottom: 8rem/@w;
           font-size: 10rem/@w;
@@ -276,12 +304,13 @@ export default {
         }
       }
     }
+
     // .train-box:last-child{
     //   margin-bottom: 0;
     // }
   }
 }
+
 .footer {
   height: 50rem/@w;
-}
-</style>
+}</style>
