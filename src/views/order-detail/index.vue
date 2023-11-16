@@ -298,7 +298,7 @@ export default {
       // console.log(this.tables)
       // console.log(this.userSelect[0])
       sessionStorage.setMark = 'jigoupay'
-      if (this.tables.length > this.userSelect.length) {
+      if (this.status === 2) {
         this.$router.push(`/test-do-start?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
       } else {
         this.$router.push(`/test-do-infos?sessionId=${this.sessionId}&tableCode=${this.userSelect[0].table.tableCode}&tableType=${this.userSelect[0].table.tableType}`)
