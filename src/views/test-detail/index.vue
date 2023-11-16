@@ -144,6 +144,8 @@ export default {
     // }
     tableInfo(this.tableCode).then(
       res => {
+        // 页头取量表中文名
+        document.title = res.data.tableName.split('(')[0]
         this.infoHandle(res.data)
         this.$nextTick(async () => {
           // 微信授权
@@ -293,7 +295,6 @@ export default {
       this.aiEvalCamEnabled = isOpen
       this.otherTestDialog = false
       this.showPay = true
-      console.log(this.payInfo)
     },
     // 弹窗封装
     thisDialog (message, btnText = '确定', type = 'alert') {

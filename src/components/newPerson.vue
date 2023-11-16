@@ -43,10 +43,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.popout{
+.popout {
   z-index: 9999;
   width: 100vw;
-  height: 100vh;
+  height: 100 * var(--vh);
   background-color: rgba(0, 0, 0, 0.5);
   position: fixed;
   left: 0;
@@ -54,10 +54,12 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  .popout_box{
+
+  .popout_box {
     width: 8.1081rem;
     height: 8.4324rem;
-    img{
+
+    img {
       width: 100%;
       height: 100%;
     }

@@ -10,7 +10,8 @@
         <span @click="toggleType(2)" :class="{active: type === 2}">专项疏导</span>
       </div>
     </div>
-    <div class="container" v-show="!isloading" ref="container">
+    <van-loading color="#1989fa" v-if="isloading"></van-loading>
+    <div class="container" v-else ref="container">
       <div class="list" v-if="tableList.length > 0" :key="time" ref="list">
         <div class="card" v-for="item in tableList" :key="item.payTime">
           <div class="name">
@@ -64,6 +65,12 @@ export default {
   mounted () {
     this.type = Number(this.$route.query.type) || 1
     this.disponseUrl()
+    // this.listen()
+    console.log('cbtcbt')
+    console.log('windowheigth', window.height)
+    console.log('heigth', document.body.offsetHeight)
+    console.log('heigth1', document.getElementsByClassName('record')[0].clientHeight)
+    console.log('getComputedStyle(document.documentElement).getPropertyValue("--vh")', 1, getComputedStyle(document.documentElement).getPropertyValue('--vh'), 2)
   },
   methods: {
     disponseUrl () {
@@ -79,7 +86,6 @@ export default {
       if (type === this.type) return
       this.type = type
       this.disponseUrl()
-      this.$refs.container.scrollTop = 0
     },
     async getCourseList () {
       this.time = new Date().getTime()
@@ -90,7 +96,11 @@ export default {
         this.tableList = res.data.courseList || []
         this.isloading = false
       }
-      console.log('this.isloading', this.isloading, res)
+      console.log('this.loading', this.loading, 'res', res)
+      this.$nextTick(() => {
+        this.$refs.container.scrollTop = 0
+        console.log('container的height', this.$refs.container.clientHeight, 'this.$refs.container.scrollTop', this.$refs.container.scrollTop)
+      })
     },
     async getThemeCourseList () {
       this.time = new Date().getTime()
@@ -101,7 +111,10 @@ export default {
         this.tableList = res.data.courseList || []
         this.isloading = false
       }
-      console.log('this.isloading', this.isloading, res)
+      this.$nextTick(() => {
+        this.$refs.container.scrollTop = 0
+        console.log('container的height', this.$refs.container.clientHeight, 'this.$refs.container.scrollTop', this.$refs.container.scrollTop)
+      })
     },
     getStatus (status) {
       if (status === 1) {
@@ -124,25 +137,22 @@ export default {
   font-size: 0;
   vertical-align: middle;
   width: 100%;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: flex;
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0);
 }
 .record{
+  height: calc(100 * var(--vh));
   background-color: #F6F6F7;
-  min-height: 100vh;
+  overflow: hidden;
+  flex-direction: column;
   .type{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
     height:74rem/@w;
     background-color: #FFFFFF;
     box-sizing: border-box;
     padding: 0 20rem/@w;
-    z-index: 111;
     .title{
       position: relative;
       padding: 10rem/@w 0 16rem/@w ;
@@ -176,94 +186,96 @@ export default {
     }
   }
   .container {
-    box-sizing: border-box;
-    padding:0 20rem/@w 50rem/@w;
-    margin-top: 87rem/@w;
+    height: calc(100 * var(--vh) - 77rem/@w);
+    overflow: auto;
     -webkit-overflow-scrolling: touch;
-  }
-  .list{
-    .card{
-      margin-top: 16rem/@w;
+    .list{
+      width: 100%;
       box-sizing: border-box;
-      padding: 16rem/@w 20rem/@w;
-      background-color: #fff;
-      border-radius: 12rem/@w;
-      .courseName{
-        font-size: 14rem/@w;
-        line-height: 20rem/@w;
-        color: #333;
-        font-weight: bold;
-        margin-right: 5rem/@w;
-      }
-      .tag{
-        display: inline-block;
-        padding: 0 4rem/@w;
-        border-radius: 5rem/@w;
-        font-size: 12rem/@w;
-        line-height: 17rem/@w;
-        color: #fff;
-      }
-      .start{
-        background-color: #b7b7b7;
-      }
-      .doing{
-        background-color: #ffc31c;
-      }
-      .completed{
-        background-color: #5ec565;
-      }
-      .row{
-        margin-top: 8rem/@w;
-        font-size: 12rem/@w;
-        line-height: 18rem/@w;
-        display: flex;
-      }
-      .left{
-        color: #333;
-      }
-      .right{
-        flex: 1;
-        color: #666;
-        position: relative;
-        // .thought{
-        //   // width: 100%;
-        //   line-height: 18rem/@w;
-        //   /* 设置为行高的整倍数，此处显示两行: 2 * 20rem/@w */
-        //   max-height: 18rem/@w;
-        // }
-      }
-      .tip{
-        flex: 1;
-        position: relative;
-        height: 20rem/@w;
-        font-size: 14rem/@w;
-        line-height: 20rem/@w;
-        color: #34B7B9;
-        span{
-          position: absolute;
-          bottom: 0;
-          right: 0;
+      padding:0 20rem/@w 16rem/@w;
+      .card{
+        margin-top: 16rem/@w;
+        box-sizing: border-box;
+        padding: 16rem/@w 20rem/@w;
+        background-color: #fff;
+        border-radius: 12rem/@w;
+        .courseName{
+          font-size: 14rem/@w;
+          line-height: 20rem/@w;
+          color: #333;
+          font-weight: bold;
+          margin-right: 5rem/@w;
+        }
+        .tag{
+          display: inline-block;
+          padding: 0 4rem/@w;
+          border-radius: 5rem/@w;
+          font-size: 12rem/@w;
+          line-height: 17rem/@w;
+          color: #fff;
+        }
+        .start{
+          background-color: #b7b7b7;
+        }
+        .doing{
+          background-color: #ffc31c;
+        }
+        .completed{
+          background-color: #5ec565;
+        }
+        .row{
+          margin-top: 8rem/@w;
+          font-size: 12rem/@w;
+          line-height: 18rem/@w;
+          display: flex;
+        }
+        .left{
+          color: #333;
+        }
+        .right{
+          flex: 1;
+          color: #666;
+          position: relative;
+          // .thought{
+          //   // width: 100%;
+          //   line-height: 18rem/@w;
+          //   /* 设置为行高的整倍数，此处显示两行: 2 * 20rem/@w */
+          //   max-height: 18rem/@w;
+          // }
+        }
+        .tip{
+          flex: 1;
+          position: relative;
+          height: 20rem/@w;
+          font-size: 14rem/@w;
+          line-height: 20rem/@w;
+          color: #34B7B9;
+          span{
+            position: absolute;
+            bottom: 0;
+            right: 0;
+          }
         }
       }
     }
-  }
-  .none{
-    display: flex;
-    justify-content: center;
-    flex: 1;
-    width: 100%;
-    .box{
-      margin-top: 140rem/@w;
-      img{
-        width: 140rem/@w;
-        height: 140rem/@w;
-      }
-      p{
-        margin: 0;
-        color: #999999;
-        font-size: 18rem/@w;
-        line-height: 25rem/@w;
-        text-align: center;
+    .none{
+      display: flex;
+      justify-content: center;
+      flex: 1;
+      width: 100%;
+      .box{
+        margin-top: 140rem/@w;
+        img{
+          width: 140rem/@w;
+          height: 140rem/@w;
+        }
+        p{
+          margin: 0;
+          color: #999999;
+          font-size: 18rem/@w;
+          line-height: 25rem/@w;
+          text-align: center;
+        }
       }
     }
   }

@@ -1,15 +1,16 @@
 <template>
   <div class="star">
-    <van-nav-bar title="我的收藏" left-arrow @click-left="$router.back()"/>
+    <van-nav-bar title="我的收藏" left-arrow @click-left="$router.back()" />
     <div class="list" v-if="(list.length > 0)">
-      <div class="blocks" v-for="(item, index) in list" :key="index" @click="$router.push({ path: '/test-detail', query:{ tableCode: item.tableCode } })">
+      <div class="blocks" v-for="(item, index) in list" :key="index"
+        @click="$router.push({ path: '/test-detail', query: { tableCode: item.tableCode } })">
         <div class="left">
           <img v-if="item.tableLogo" :src="item.tableLogo" alt="">
         </div>
         <div class="right">
-          <div class="tableName">{{item.tableCnName}}({{item.tableEnName}})</div>
-          <div class="tip">{{item.tableIntroduction}}</div>
-          <div class="price">￥{{item.price}}</div>
+          <div class="tableName">{{ item.tableCnName }}({{ item.tableEnName }})</div>
+          <div class="tip">{{ item.tableIntroduction }}</div>
+          <div class="price">￥{{ item.price }}</div>
         </div>
       </div>
     </div>
@@ -49,12 +50,15 @@ export default {
 
 <style lang="less" scoped>
 @w: 37.5;
-.star{
+
+.star {
   background: #F6F6F7;
-  height: 100vh;
-  .list{
+  height: calc(100 * var(--vh));
+
+  .list {
     padding: .2667rem;
-    .blocks{
+
+    .blocks {
       width: 100%;
       height: 2.3467rem;
       background: #FFFFFF;
@@ -63,35 +67,41 @@ export default {
       padding: .2667rem;
       box-sizing: border-box;
       display: flex;
-      .left{
+
+      .left {
         min-width: 1.8133rem;
         max-width: 1.8133rem;
         height: 1.8133rem;
-        img{
+
+        img {
           width: 100%;
         }
       }
-      .right{
+
+      .right {
         padding-left: .2667rem;
         flex: 1;
-        .tableName{
+
+        .tableName {
           height: .6667rem;
           line-height: .6667rem;
           width: 6.32rem;
           font-size: .3733rem;
-          color: #333333 ;
+          color: #333333;
           white-space: nowrap;
           text-overflow: ellipsis;
           overflow: hidden;
         }
-        .tip{
+
+        .tip {
           color: #666666;
           height: .5067rem;
           line-height: .4267rem;
           font-size: .32rem;
-          margin:  .08rem 0;
+          margin: .08rem 0;
         }
-        .price{
+
+        .price {
           color: #666666;
           height: .5067rem;
           line-height: .4267rem;
@@ -100,20 +110,24 @@ export default {
       }
     }
   }
-  .none{
+
+  .none {
     display: flex;
     padding-top: 5.8667rem;
     justify-content: center;
     height: 100%;
-    .box{
+
+    .box {
       width: 3.7333rem;
       height: 3.7333rem;
       position: relative;
-      img{
+
+      img {
         width: 100%;
         height: 100%;
       }
-      p{
+
+      p {
         position: absolute;
         margin: 0;
         width: 100%;
@@ -124,5 +138,4 @@ export default {
       }
     }
   }
-}
-</style>
+}</style>

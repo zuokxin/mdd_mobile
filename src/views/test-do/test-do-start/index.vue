@@ -10,25 +10,17 @@
         <div class="title">请您选择小愈虚拟形象后开始答题</div>
         <van-row type="flex" justify="center" gutter="20">
           <van-col span="11">
-            <van-image
-              :class="{ 'select' : gender === 'woman' }"
-              fit="contain"
-              :src="img1"
-              @click="selectGender('woman')"
-            />
+            <van-image :class="{ 'select': gender === 'woman' }" fit="contain" :src="img1"
+              @click="selectGender('woman')" />
           </van-col>
           <van-col span="11">
-            <van-image
-              :class="{ 'select' : gender === 'man' }"
-              fit="contain"
-              :src="img2"
-              @click="selectGender('man')"
-            />
+            <van-image :class="{ 'select': gender === 'man' }" fit="contain" :src="img2" @click="selectGender('man')" />
           </van-col>
         </van-row>
       </div>
     </div>
-    <van-button round type="primary" @click="go" style="display: block; width: 80%; margin: 20px auto 0;">开始答题</van-button>
+    <van-button round type="primary" @click="go"
+      style="display: block; width: 80%; margin: 20px auto 0;">开始答题</van-button>
   </div>
 </template>
 
@@ -95,26 +87,30 @@ export default {
 
 <style lang="less" scoped>
 @w: 37.5;
+
 .test {
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh));
   background-color: #F6F6F6;
   padding: 16px 20px;
   font-size: 14rem / @w;
   font-weight: 400;
   color: #333333;
   box-sizing: border-box;
+
   p {
     margin-top: 0;
     margin-bottom: 10rem / @w;
     line-height: 1.5;
   }
+
   .test-wrap {
     background-color: #fff;
-    height: calc(100vh - 3rem);
+    height: calc(100 * var(--vh) - 3rem);
     border-radius: 10px;
     padding: 16px 12px;
     box-sizing: border-box;
   }
+
   .fadi-select {
     .title {
       margin-top: 50rem / @w;
@@ -124,9 +120,11 @@ export default {
       text-align: center;
       color: #333333;
     }
+
     .van-image {
       border: 1px solid #666;
     }
+
     .select {
       border: 2px solid #34B7B9;
     }

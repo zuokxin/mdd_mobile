@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Music from '@/utils/music'
+// import Music from '@/utils/music'
 import CryptoJS from 'CryptoJS'
 import Base64 from 'Base64'
 // import io from 'socket.io'
@@ -55,19 +55,6 @@ export default {
     }
   },
   mounted () {
-    // 音频初始化
-    // this.audioEle = document.getElementById('audioEle')
-    // if (!this.audioEle) {
-    //   this.audioEle = document.createElement('audio')
-    //   this.audioEle.id = 'audioEle'
-    //   this.audioEle.crossOrigin = 'anonymous'
-    //   this.audioEle.preload = 'auto'
-    //   this.audioEle.style = 'display:none'
-    //   document.getElementById('tableFadi').appendChild(this.audioEle)
-    //   this.$emit('openStartPrompt')
-    // } else {
-    //   this.audioEle.autoplay = true
-    // }
     // // 插入fadi页面中，后退可一起销毁
     // this.audioEle.addEventListener('play', this.played)
     // this.audioEle.addEventListener('pause', this.paused)
@@ -75,7 +62,6 @@ export default {
     //   this.audioEle.removeEventListener('play', this.played)
     //   this.audioEle.removeEventListener('pause', this.paused)
     // })
-    if (this.index === 0) this.$emit('openStartPrompt')
     // 有文本内容开始合成语音
     if (this.textLeft) {
       this.connectWebSocket()
@@ -83,7 +69,7 @@ export default {
   },
   beforeDestroy () {
     if (this.audioEle) {
-      this.audioEle.stop()
+      this.audioEle.paused()
       this.audioEle = null
     }
   },
@@ -95,26 +81,38 @@ export default {
     // 手动暂停
     playAudio () {
       if (!this.isPlay) return
-      this.audioEle.stop()
+      this.audioEle.pause()
+      this.played()
+    },
+    playing () {
+      this.isPlay = true
+      this.audioEle.removeEventListener('playing', this.playing)
     },
     // 监听开始
     played () {
-      this.isPlay = true
-      console.log('played')
-      const interval = setInterval(() => {
-        if (this.audioEle.source.playStatus !== 2) {
-          clearInterval(interval)
-          this.isPlay = false
-          this.audioEle = null
-          this.$emit('palyAudio', true)
-          console.log('end')
-        }
-      }, 0)
+      // this.isPlay = true
+      this.isPlay = false
+      this.audioEle = null
+      this.$emit('palyAudio', true)
+      // const interval = setInterval(() => {
+      //   if (this.audioEle.source.playStatus !== 2) {
+      //     clearInterval(interval)
+      //     this.isPlay = false
+      //     this.audioEle = null
+      //     this.$emit('palyAudio', true)
+      //     console.log('end')
+      //   }
+      // }, 0)
+      // this.audioEle.src = ''
+      this.audioEle.removeEventListener('ended', this.played)
     },
     loaded () {
-      console.log('load')
-      console.log(this.audioEle)
-      if (this.index !== 0) this.audioEle.play()
+      if (this.index === 0) {
+        this.$emit('openStartPrompt')
+      } else {
+        this.audioEle.play()
+      }
+      this.audioEle.removeEventListener('canplaythrough', this.loaded)
     },
     // 监听关闭
     paused () {
@@ -187,10 +185,28 @@ export default {
         if (jsonData.data.status === 2) {
           this.isReady = true
           // this.audioEle = new Music(this.url)
-          this.audioEle = new Music(this.base64ToUrl(jsonData.data.audio, 'mp3'))
-          this.audioEle.addEventListener('load', this.loaded)
-          this.audioEle.addEventListener('played', this.played)
-          // this.audioEle.src = this.base64ToUrl(jsonData.data.audio, 'mp3')
+          const src = 'data:audio/mp3;base64,' + jsonData.data.audio
+          if (this.index === 0) {
+            this.audioEle = document.createElement('audio')
+            this.audioEle.id = 'gbtAudio'
+            this.audioEle.controls = true
+            this.audioEle.crossOrigin = 'anonymous'
+            this.audioEle.preload = 'auto'
+            this.audioEle.src = src
+            document.body.appendChild(this.audioEle)
+          } else {
+            this.audioEle = document.getElementById('gbtAudio')
+            this.audioEle.src = src
+          }
+          // this.audioEle = new Music(this.base64ToUrl(jsonData.data.audio, 'mp3'))
+          this.audioEle.addEventListener('canplaythrough', this.loaded)
+          this.audioEle.addEventListener('playing', this.playing)
+          this.audioEle.addEventListener('ended', this.played)
+          this.$once('hook:beforeDestroy', () => {
+            this.audioEle.removeEventListener('canplaythrough', this.loaded)
+            this.audioEle.removeEventListener('playing', this.playing)
+            this.audioEle.removeEventListener('ended', this.played)
+          })
           // console.log(this.audioEle.src)
           this.ttsWS.close()
         }

@@ -12,7 +12,7 @@
       </div>
       <div class="typeList">
         <div class="typeItem" :style="{ maxHeight: hide ? '0.8rem' : '300px' }">
-          <div :class="['item',{ 'selected': active === item.id }]" v-for="(item) in typeList" :key="item.index"
+          <div :class="['item', { 'selected': active === item.id }]" v-for="(item) in typeList" :key="item.index"
             @click="selectHandle(item.id)">
             {{ item.name }}
           </div>
@@ -159,7 +159,7 @@ export default {
 @w: 37.5;
 
 .main {
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: flex;
   flex-direction: column
 }
@@ -170,16 +170,19 @@ export default {
   background: #F4F4F4;
   padding: 16rem/@w 20rem/@w 10rem/@w;
   overflow: hidden;
-  .recommend{
+
+  .recommend {
     height: 97rem/@w;
     margin-bottom: 6rem/@w;
     font-size: 0;
-    img{
+
+    img {
       width: 100%;
       height: 100%;
       overflow: hidden;
     }
   }
+
   .testTitle {
     display: flex;
     justify-content: center;
@@ -321,10 +324,9 @@ export default {
   font-size: 0;
   vertical-align: middle;
   width: 100%;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: flex;
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0);
-}
-</style>
+}</style>

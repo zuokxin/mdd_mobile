@@ -1,8 +1,8 @@
 <template>
   <div class="popout" v-if="errPopout">
     <div class="popout_box">
-        <slot name="text"></slot>
-        <slot name="btn"></slot>
+      <slot name="text"></slot>
+      <slot name="btn"></slot>
     </div>
   </div>
 </template>
@@ -17,11 +17,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.popout{
+.popout {
   z-index: 99999;
   width: 100vw;
   font-size: 16px;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   background-color: rgba(0, 0, 0, 0.4);
   position: fixed;
   left: 0;
@@ -30,7 +30,8 @@ export default {
   overflow: hidden;
   justify-content: center;
   align-items: center;
-  .popout_box{
+
+  .popout_box {
     position: relative;
     border-radius: 20px;
     width: 80%;

@@ -4,61 +4,67 @@
     <div class="test">
       <div class="psqi-padding" v-if="tableCode === 'psqi'"></div>
       <div class="progress" v-if="tableCode !== 'psqi'">
-        <div class="text" v-if="allData.showProgress">测试进度: {{allData.id + 1}} / {{allData.questionTotal}}</div>
-        <van-progress :percentage="process" stroke-width="5px" color="#34B7B9" v-if="allData.showProgress" :show-pivot="false" />
+        <div class="text" v-if="allData.showProgress">测试进度: {{ allData.id + 1 }} / {{ allData.questionTotal }}</div>
+        <van-progress :percentage="process" stroke-width="5px" color="#34B7B9" v-if="allData.showProgress"
+          :show-pivot="false" />
       </div>
-      <div class="question-box" v-if="tableCode === 'psqi'" :class="{'question-box-psqi': tableCode === 'psqi'}">
+      <div class="question-box" v-if="tableCode === 'psqi'" :class="{ 'question-box-psqi': tableCode === 'psqi' }">
         <!-- {{end}}{{allData.id}} -->
-        <div class="question">{{(allData.id + 1)? (allData.id + 1): ''}}.{{allData.title}}</div>
+        <div class="question">{{ (allData.id + 1) ? (allData.id + 1) : '' }}.{{ allData.title }}</div>
         <div class="psqi" v-if="options.style === 'psqi-1'">
-          <div class="items" v-for="(item,myindex) in options.formItems" :key="myindex">
-            <div class="plaintext" v-if="item.type === 'plaintext'">{{ item.plaintext}}</div>
-            <div class="select" v-if="item.type === 'select'" @click="popoutTrue(myindex, item.options)">{{ getChecked(item) }}</div>
+          <div class="items" v-for="(item, myindex) in options.formItems" :key="myindex">
+            <div class="plaintext" v-if="item.type === 'plaintext'">{{ item.plaintext }}</div>
+            <div class="select" v-if="item.type === 'select'" @click="popoutTrue(myindex, item.options)">{{
+              getChecked(item) }}</div>
             <div class="suffix" v-if="item.type === 'select'">{{ item.suffix }}</div>
-            <van-action-sheet v-model="tempValue" close-on-click-action cancel-text="取消" :actions="sheetOptions" @select="onSelect"/>
+            <van-action-sheet v-model="tempValue" close-on-click-action cancel-text="取消" :actions="sheetOptions"
+              @select="onSelect" />
           </div>
         </div>
-        <div  v-if="options.style === 'radio-column-1'">
-          <div v-for="(it,index) in options.formItems[0].options" :key="index">
-            <div class="each-choice" :class="{'each-choice-active':it.checked}" @click="psqiDispose(index)">
-              <span class="left-title">{{it.name}}</span>
+        <div v-if="options.style === 'radio-column-1'">
+          <div v-for="(it, index) in options.formItems[0].options" :key="index">
+            <div class="each-choice" :class="{ 'each-choice-active': it.checked }" @click="psqiDispose(index)">
+              <span class="left-title">{{ it.name }}</span>
               <span class="right-choice">
-                <img class="uncheck" v-if="!it.checked"  src="@/assets/uncheck.png">
+                <img class="uncheck" v-if="!it.checked" src="@/assets/uncheck.png">
                 <img class="check" v-else src="@/assets/checked.png">
               </span>
             </div>
             <div v-if="it.checked && it.commentIsNecessary">
-              <span class="commentHint">{{it.commentHint}}</span>
-              <van-field class="each-comment" v-model.trim="it.comment" @input="psqiDisposeComment(index)" type="textarea" maxlength="100"/>
+              <span class="commentHint">{{ it.commentHint }}</span>
+              <van-field class="each-comment" v-model.trim="it.comment" @input="psqiDisposeComment(index)" type="textarea"
+                maxlength="100" />
             </div>
           </div>
         </div>
       </div>
-      <div class="question-box" :class="{'question-box-psqi': tableCode === 'psqi'}" v-else>
-        <div class="question">{{(allData.id + 1)? (allData.id + 1): ''}}.{{allData.title}}</div>
-        <div v-for="(it,index) in options" :key="index">
+      <div class="question-box" :class="{ 'question-box-psqi': tableCode === 'psqi' }" v-else>
+        <div class="question">{{ (allData.id + 1) ? (allData.id + 1) : '' }}.{{ allData.title }}</div>
+        <div v-for="(it, index) in options" :key="index">
           <div class="each-choice" @click="dispose(index)">
-            <span class="left-title">{{it.name}}</span>
+            <span class="left-title">{{ it.name }}</span>
             <span class="right-choice">
-              <img class="uncheck" v-if="!it.checked"  src="@/assets/uncheck.png">
+              <img class="uncheck" v-if="!it.checked" src="@/assets/uncheck.png">
               <img class="check" v-else src="@/assets/checked.png">
             </span>
           </div>
-          <span v-if="it.commentHint && it.requiredComment && it.checked" class="commentHint">{{it.commentHint}}</span>
-          <van-field v-if="it.requiredComment && it.checked" class="each-comment" v-model="it.comment" @input="theInput(it.requiredComment)" type="textarea" maxlength="100"/>
+          <span v-if="it.commentHint && it.requiredComment && it.checked" class="commentHint">{{ it.commentHint }}</span>
+          <van-field v-if="it.requiredComment && it.checked" class="each-comment" v-model="it.comment"
+            @input="theInput(it.requiredComment)" type="textarea" maxlength="100" />
         </div>
       </div>
     </div>
     <!-- ---------- -->
     <div class="bnts" v-if="allData.title && tableCode !== 'psqi'">
       <van-button round block type="primary" :disabled="allData.id === 0" @click="prev">上一题</van-button>
-      <van-button round block type="primary" v-if="(allData.id + 1) !== allData.questionTotal" :disabled="!end" @click="next">下一题</van-button>
+      <van-button round block type="primary" v-if="(allData.id + 1) !== allData.questionTotal" :disabled="!end"
+        @click="next">下一题</van-button>
       <van-button round block type="primary" v-else @click="finished" :disabled="!end">完成</van-button>
     </div>
     <div class="bnts" v-else>
       <van-button round block type="primary" :disabled="allData.id === 0" @click="prev">上一题</van-button>
       <van-button round block type="primary" v-if="psqiFinish" :disabled="!end" @click="finished">完成</van-button>
-      <van-button round block type="primary" v-else :disabled="!end"  @click="next">下一题</van-button>
+      <van-button round block type="primary" v-else :disabled="!end" @click="next">下一题</van-button>
     </div>
     <!-- <FadiRoleDialog ref="FadiRoleDialog" @confirm="$router.replace(routerPath)"></FadiRoleDialog> -->
     <FadiRoleDialog ref="FadiRoleDialog" @confirm="goNext(false)"></FadiRoleDialog>
@@ -491,44 +497,54 @@ export default {
 
 <style lang="less" scoped>
 @import '../../../assets/style/reset-vant.less';
-.container{
+
+.container {
   background-color: #F6F6F6;
-  max-height: 100vh;
-  min-height: 100vh;
+  max-height: calc(100 * var(--vh));
+  min-height: calc(100 * var(--vh));
   padding: 0 .533333rem;
-  .test{
+
+  .test {
     text-align: center;
-    .psqi-padding{
+
+    .psqi-padding {
       height: .4267rem;
     }
-    .progress{
+
+    .progress {
       color: #000000;
       height: 1.627rem;
       padding: .426667rem .32rem;
       box-sizing: border-box;
-      .text{
+
+      .text {
         margin-bottom: .266667rem;
       }
     }
-    .question-box-psqi{
-      height: calc(100vh - 2.85rem) !important;
+
+    .question-box-psqi {
+      height: calc(100 * var(--vh) - 2.85rem) !important;
     }
-    .question-box{
+
+    .question-box {
       background-color: #FFFFFF;
-      height: calc(100vh - 4rem);
+      height: calc(100 * var(--vh) - 4rem);
       overflow: hidden;
       overflow-y: scroll;
       border-radius: .266667rem;
+
       &::-webkit-scrollbar {
         display: none;
       }
-      .question{
+
+      .question {
         font-size: .533333rem;
         padding: .426667rem .32rem;
         color: #000000;
         font-weight: 600;
         text-align: left;
       }
+
       .commentHint {
         display: block;
         width: 5.75rem;
@@ -541,10 +557,12 @@ export default {
         font-weight: 500;
         color: #D5D5D5;
       }
-      .each-choice-active{
+
+      .each-choice-active {
         border: 1px solid #34B7B9 !important;
       }
-      .isCommentIsNecessary{
+
+      .isCommentIsNecessary {
         width: 7.066667rem;
         height: 1.6rem;
         margin-left: auto;
@@ -553,18 +571,21 @@ export default {
         margin-bottom: .426667rem;
         border-radius: 0.426667rem;
         overflow: hidden;
-        .van-cell{
+
+        .van-cell {
           padding: 0;
           height: 100%;
           background-color: #F6F6F6;
-          /deep/.van-field__body{
+
+          /deep/.van-field__body {
             height: 100%;
             padding-left: 1em;
             padding-right: 1em;
           }
         }
       }
-      .each-choice{
+
+      .each-choice {
         width: 7.066667rem;
         min-height: 1.6rem;
         border: 1px solid #D5D5D5;
@@ -577,7 +598,8 @@ export default {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        .left-title{
+
+        .left-title {
           width: 70%;
           word-break: break-all;
           word-wrap: break-word;
@@ -585,20 +607,24 @@ export default {
           text-align: left;
           font-size: .373333rem;
         }
-        .right-choice{
+
+        .right-choice {
           width: .746667rem;
           height: .746667rem;
-          .uncheck{
+
+          .uncheck {
             width: .48rem;
             height: .48rem;
           }
-          .check{
+
+          .check {
             width: .746667rem;
             height: .746667rem;
           }
         }
       }
-      .each-comment{
+
+      .each-comment {
         width: 7.066667rem;
         height: 1.6rem;
         border: 1px solid #F6F6F6;
@@ -609,19 +635,23 @@ export default {
         margin-left: auto;
         margin-right: auto;
       }
-      .checked{
+
+      .checked {
         border: 1px solid @green;
       }
-      .psqi{
+
+      .psqi {
         display: flex;
         padding: 0 .32rem;
         color: #333333;
         font-size: .5333rem;
         flex-wrap: wrap;
-        .items{
+
+        .items {
           display: flex;
           font-weight: 600;
-          .select{
+
+          .select {
             width: .96rem;
             height: .6933rem;
             padding-top: 2px;
@@ -632,30 +662,33 @@ export default {
             justify-content: center;
             align-items: center;
           }
-          /deep/.van-overlay{
+
+          /deep/.van-overlay {
             background-color: rgba(0, 0, 0, 0.3);
           }
         }
       }
     }
   }
-  .bnts{
+
+  .bnts {
     width: calc(100% - 1rem);
     position: fixed;
     bottom: .8rem;
     display: flex;
     justify-content: center;
-    .van-button{
+
+    .van-button {
       width: 2.88rem;
       height: 1.066667rem;
       background-color: @green;
       border-color: @green;
       margin: 0 .24rem;
     }
-    .van-button--disabled{
+
+    .van-button--disabled {
       background-color: #D5D5D5;
       border-color: #D5D5D5;
     }
   }
-}
-</style>
+}</style>
