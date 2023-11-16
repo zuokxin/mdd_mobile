@@ -8,10 +8,11 @@
             <input @keyup.13="search(keyWord)" ref="myInput" type="search" v-model="keyWord" />
           </form>
         </div>
-        <div class="right" v-show="keyWord" @click="clear"><img src="@/assets/img/my/clear.png" alt=""></div></div>
+        <div class="right" v-show="keyWord" @click="clear"><img src="@/assets/img/my/clear.png" alt=""></div>
+      </div>
       <span @click="$router.push('/home')">取消</span>
     </div>
-    <div class="everyone same-style"  v-if="!searched">
+    <div class="everyone same-style" v-if="!searched">
       <div class="everyone-title">大家都在搜</div>
       <div class="container">
         <div class="block" @click="search('抑郁')">抑郁</div>
@@ -23,34 +24,39 @@
       </div>
     </div>
     <div class="history same-style" v-if="historyList.length > 0 && !searched">
-      <div class="history-title"><span>历史搜索</span> <span @click="popout = true"><img src="../../assets/img/my/delete.png" alt=""></span></div>
+      <div class="history-title"><span>历史搜索</span> <span @click="popout = true"><img src="../../assets/img/my/delete.png"
+            alt=""></span></div>
       <div class="container">
-        <div class="block" @click="search(it)" v-for="(it,index) in historyList" :key="index">{{it}}</div>
+        <div class="block" @click="search(it)" v-for="(it, index) in historyList" :key="index">{{ it }}</div>
       </div>
     </div>
-    <div class="searched" v-if="searched && (list && list.length >0)">
+    <div class="searched" v-if="searched && (list && list.length > 0)">
       <div class="title">测试</div>
       <div class="card">
-        <div class="card-block" v-for="(it,index) in list" :key="index" @click="$router.push({ path: '/test-detail', query:{ tableCode: it.tableCode } })">
-        <div class="left"> <img :src="it.tableLogo" alt=""></div>
-        <div class="right">
-          <div class="name">{{it.tableName}}</div>
-          <div class="intr">{{it.tableIntroduction}}</div>
-          <div class="price">
-            <div class="price-left">￥ {{it.price}}</div>
-            <div class="price-right"><img src="@/assets/img/my/fire.png" alt="">{{it.evalRecordCount}}人已测试</div>
+        <div class="card-block" v-for="(it, index) in list" :key="index"
+          @click="$router.push({ path: '/test-detail', query: { tableCode: it.tableCode } })">
+          <div class="left"> <img :src="it.tableLogo" alt=""></div>
+          <div class="right">
+            <div class="name">{{ it.tableName }}</div>
+            <div class="intr">{{ it.tableIntroduction }}</div>
+            <div class="price">
+              <div class="price-left">￥ {{ it.price }}</div>
+              <div class="price-right"><img src="@/assets/img/my/fire.png" alt="">{{ it.evalRecordCount }}人已测试</div>
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
-    <div class="none-list" v-if="searched && (list && list.length <= 0)"><img src="../../assets/img/my/none-list.png" alt=""> <div class="text">暂无搜索结果</div></div>
+    <div class="none-list" v-if="searched && (list && list.length <= 0)"><img src="../../assets/img/my/none-list.png"
+        alt="">
+      <div class="text">暂无搜索结果</div>
+    </div>
     <div class="popout" v-if="popout">
       <div class="popout_box">
         <div class="popout_body">
           <div class="text">确定删除全部历史记录？</div>
           <div class="btns">
-            <van-button type="default" size="small" class="cancel" @click="popout = false" >取消</van-button>
+            <van-button type="default" size="small" class="cancel" @click="popout = false">取消</van-button>
             <van-button type="primary" size="small" class="sure" @click="onConfirm">确认</van-button>
           </div>
         </div>
@@ -133,33 +139,38 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.search{
-  height: 100vh;
+.search {
+  height: calc(100 * var(--vh));
   background: #F4F4F4;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   padding: 10px 20px;
-  .search-head{
+
+  .search-head {
     height: .89rem;
     display: flex;
     margin-bottom: .43rem;
-    .bg{
+
+    .bg {
       background: #FFFFFF;
       display: flex;
       border-radius: .46rem;
       width: 7.89rem;
       padding: .22rem;
-      .left{
+
+      .left {
         display: flex;
         justify-content: center;
         align-items: center;
-        img{
+
+        img {
           width: .46rem;
           height: .46rem;
         }
       }
-      .center{
+
+      .center {
         overflow: hidden;
         padding-left: 5px;
         padding-right: 5px;
@@ -167,32 +178,38 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        form{
+
+        form {
           width: 100%;
           height: 100%;
         }
-        input{
+
+        input {
           border: none;
           width: 100%;
           height: 100%;
           background: #FFFFFF;
           -webkit-appearance: none;
         }
-        input[type=search]::-webkit-search-cancel-button{
+
+        input[type=search]::-webkit-search-cancel-button {
           -webkit-appearance: none;
         }
       }
-      .right{
+
+      .right {
         display: flex;
         justify-content: center;
         align-items: center;
-        img{
+
+        img {
           width: .46rem;
           height: .46rem;
         }
       }
     }
-    span{
+
+    span {
       width: 1.62rem;
       text-align: right;
       color: #333333;
@@ -201,20 +218,24 @@ export default {
       justify-content: center;
     }
   }
-  .everyone{
+
+  .everyone {
     padding-bottom: .27rem;
-    .everyone-title{
+
+    .everyone-title {
       font-size: 14px;
       color: #333333;
       font-weight: 700;
       margin-bottom: .16rem;
     }
   }
-  .same-style{
-    .container{
+
+  .same-style {
+    .container {
       display: flex;
       flex-wrap: wrap;
-      .block{
+
+      .block {
         padding: .11rem .27rem;
         margin-right: .16rem;
         margin-bottom: .27rem;
@@ -231,70 +252,83 @@ export default {
       }
     }
   }
-  .history{
-    .history-title{
+
+  .history {
+    .history-title {
       height: .54rem;
       display: flex;
       justify-content: space-between;
       margin-bottom: .16rem;
-      span:first-child{
+
+      span:first-child {
         font-size: 14px;
         font-weight: 700;
         color: #333333;
       }
-      span:last-child{
+
+      span:last-child {
         display: flex;
         justify-content: center;
         align-items: center;
-        img{
+
+        img {
           width: .43rem;
           height: .43rem;
         }
       }
     }
   }
+
   .searched::-webkit-scrollbar {
     display: none;
   }
-  .searched{
+
+  .searched {
     overflow-y: scroll;
     padding-bottom: 1rem;
     height: 100%;
-    .title{
+
+    .title {
       color: #333333;
       font-size: 14px;
       font-weight: 700;
       margin-bottom: .27rem;
     }
-    .card{
+
+    .card {
       padding: 0 .27rem 0rem;
       background: #FFFFFF;
       overflow: hidden;
       border-radius: .32rem;
-      .card-block{
+
+      .card-block {
         display: flex;
         padding-bottom: .27rem;
         margin-top: .27rem;
         border-bottom: 1px solid #E5E5E5;
         overflow: hidden;
-        .left{
+
+        .left {
           border-radius: .11rem;
           min-width: 1.84rem;
           max-width: 1.84rem;
           min-height: 1.84rem;
           max-height: 1.84rem;
           overflow: hidden;
-          img{
+
+          img {
             width: 1.84rem;
             height: 1.84rem;
           }
         }
-        .right{
+
+        .right {
           padding-left: .27rem;
           position: relative;
           overflow: hidden;
           flex: 1;
-          .name{
+
+          .name {
             color: #333333;
             font-weight: 700;
             font-size: 14px;
@@ -303,14 +337,16 @@ export default {
             text-overflow: ellipsis;
             margin-bottom: .11rem;
           }
-          .intr{
+
+          .intr {
             color: #666666;
             font-size: 14px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
           }
-          .price{
+
+          .price {
             position: absolute;
             width: 100%;
             bottom: 0;
@@ -318,20 +354,23 @@ export default {
             display: flex;
             overflow: hidden;
             justify-content: space-between;
-            .price-left{
+
+            .price-left {
               color: #333333;
               font-weight: 700;
               font-size: 14px;
               width: 2.7rem;
             }
-            .price-right{
+
+            .price-right {
               color: #666666;
               font-size: 14px;
               overflow: hidden;
               flex: 1;
               text-align: right;
               padding-right: .27rem;
-              img{
+
+              img {
                 width: .3rem;
                 height: .38rem;
                 margin-right: .14rem;
@@ -340,65 +379,76 @@ export default {
           }
         }
       }
-      .card-block:last-child{
+
+      .card-block:last-child {
         border: none;
         margin-bottom: .27rem;
       }
     }
   }
-  .none-list{
+
+  .none-list {
     height: 100%;
     padding-top: 4.38rem;
     text-align: center;
-    img{
+
+    img {
       width: 3.78rem;
       height: 3.78rem;
     }
-    .text{
+
+    .text {
       color: #999999;
       font-size: 18px;
       text-align: center;
     }
   }
-  .popout{
+
+  .popout {
     z-index: 999;
     width: 100vw;
-    height: 100vh;
+    height: calc(100 * var(--vh));
     background-color: rgba(0, 0, 0, 0.5);
     position: fixed;
     left: 0;
     top: 0;
     display: flex;
     justify-content: center;
-    .popout_box{
-      margin-top: 30vh;
+
+    .popout_box {
+      margin-top: calc(30 * var(--vh));
       width: 8.76rem;
       height: 6.57rem;
       border-radius: .54rem;
       background-color: #FFFFFF;
-      .popout_body{
+
+      .popout_body {
         height: 100%;
         position: relative;
         overflow: hidden;
-        .text{
+
+        .text {
           text-align: center;
           color: #000000;
           font-weight: 700;
           font-size: 16px;
           margin-top: 1.7rem;
         }
-        .btns{
+
+        .btns {
           position: absolute;
           width: 100%;
           bottom: 24px;
           left: 0;
           padding-top: 14px;
           text-align: center;
-          .cancel{
+
+          .cancel {
             color: #34B7B9;
             border-color: #34B7B9;
           }
-          .van-button{
+
+          .van-button {
             width: 2.92rem;
             height: 1.08rem;
             margin: 0 .27rem;
@@ -409,5 +459,4 @@ export default {
       }
     }
   }
-}
-</style>
+}</style>

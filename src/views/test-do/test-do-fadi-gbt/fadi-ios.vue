@@ -1,6 +1,6 @@
 <template>
   <div id="tableFadi" class="ques-counselling">
-    <WaitPrompt :show="waitTipsShow"/>
+    <WaitPrompt :show="waitTipsShow" />
     <!-- 答题区 -->
     <div class="ques-counselling-wrap">
       <div class="top">
@@ -11,25 +11,16 @@
           <TimeShow class="time-show" :type="true"></TimeShow>
           <div v-if="historRecods.length > 0">
             <div v-for="item in historRecods" :key="item.index">
-              <DialogBoxLeft
-                :textLeft="item.title"
-                :isHistory="true"
-              ></DialogBoxLeft>
+              <DialogBoxLeft :textLeft="item.title" :isHistory="true"></DialogBoxLeft>
               <DialogBoxRight :textRight="item.audioDuration"></DialogBoxRight>
             </div>
           </div>
           <div v-for="(record, index) in chatRecords" :key="record + index">
             <!-- <TimeShow class="mt-4 mb-2" v-if="record.timeShow && historRecods.length === 0" :type="record.timeType"></TimeShow> -->
             <!-- @openStartPrompt="openStartPrompt" -->
-            <DialogBoxLeft
-              :ref="'DialogBoxLeft' + index"
-              v-if="record.component === 'left' && record.status === false"
-              :url="record.url"
-              :textLeft="record.text"
-              :index="index"
-              @palyAudio="e => palyAudio(e, index)"
-              @openStartPrompt="openStartPrompt"
-            ></DialogBoxLeft>
+            <DialogBoxLeft :ref="'DialogBoxLeft' + index" v-if="record.component === 'left' && record.status === false"
+              :url="record.url" :textLeft="record.text" :index="index" @palyAudio="e => palyAudio(e, index)"
+              @openStartPrompt="openStartPrompt"></DialogBoxLeft>
             <DialogBoxRight v-if="record.component === 'right'" :textRight="record.audioDuration"></DialogBoxRight>
           </div>
           <div v-show="queLoading" style="margin-left: 26px;">
@@ -37,16 +28,9 @@
           </div>
         </div>
       </div>
-      <div v-show="recorderShow" class="bottom" :class="{'isEnd': isEnd}">
-        <recordControl
-          v-if="!isEnd"
-          :title="btnText"
-          :message="btnText2"
-          :volumeVal="volumeVal"
-          :volumeShow="!loading"
-          :disabled="loading || !btnShow"
-          @recordClick="toNext()"
-        ></recordControl>
+      <div v-show="recorderShow" class="bottom" :class="{ 'isEnd': isEnd }">
+        <recordControl v-if="!isEnd" :title="btnText" :message="btnText2" :volumeVal="volumeVal" :volumeShow="!loading"
+          :disabled="loading || !btnShow" @recordClick="toNext()"></recordControl>
         <!-- <div v-if="!isEnd" class="bot_box">
           <p class="tips-01">{{ btnText }}</p>
           <p class="tips-02">{{ btnText2 }}</p>
@@ -56,39 +40,19 @@
             <VolumeIcon class="ml-3" v-show="!loading" :value="volumeVal" style="margin-bottom: -5px;"></VolumeIcon>
           </div>
         </div> -->
-        <van-button
-          v-if="isEnd"
-          class="main-btn-dark mx-auto my-5"
-          type="primary"
-          size="large"
-          round
-          block
-          :disabled="finishBtnDisable"
-          @click="submit"
-          style="width: 76.8%;"
-        >
+        <van-button v-if="isEnd" class="main-btn-dark mx-auto my-5" type="primary" size="large" round block
+          :disabled="finishBtnDisable" @click="submit" style="width: 76.8%;">
           完成
         </van-button>
       </div>
       <!-- <div v-show="!recorderShow" class="bottom" style="background-color: #F4F4F4;"></div> -->
     </div>
     <!-- 人脸 -->
-    <DragVideo
-      v-if="aiEvalCamEnabled"
-      ref="dragVideo"
-      @getFace="getFace"
-      :location="{ right: 10, top: 23 }"
-    >
+    <DragVideo v-if="aiEvalCamEnabled" ref="dragVideo" @getFace="getFace" :location="{ right: 10, top: 23 }">
     </DragVideo>
     <!-- 开始提示 -->
-    <van-dialog
-      v-model="startShow"
-      theme="round-button"
-      className="detail-dialog"
-      confirmButtonText="好的"
-      confirmButtonColor="#34B7B9"
-      @close="colseStartTips"
-    >
+    <van-dialog v-model="startShow" theme="round-button" className="detail-dialog" confirmButtonText="好的"
+      confirmButtonColor="#34B7B9" @close="colseStartTips">
       <div class="fadi-start-box">
         <p class="title">测试即将开始</p>
         <p class="content">
@@ -98,16 +62,8 @@
       </div>
     </van-dialog>
     <!-- 弹窗提示 -->
-    <van-dialog
-      v-if="aiEvalCamEnabled"
-      v-model="faceShow"
-      message="未识别到全部人脸，请重做本题"
-      theme="round-button"
-      className="detail-dialog"
-      confirmButtonText="确定"
-      confirmButtonColor="#34B7B9"
-      @close="colseFaceTips"
-    ></van-dialog>
+    <van-dialog v-if="aiEvalCamEnabled" v-model="faceShow" message="未识别到全部人脸，请重做本题" theme="round-button"
+      className="detail-dialog" confirmButtonText="确定" confirmButtonColor="#34B7B9" @close="colseFaceTips"></van-dialog>
   </div>
 </template>
 
@@ -312,7 +268,7 @@ export default {
       try {
         const stream = await navigator.mediaDevices.getUserMedia(params)
         window.mediaStream = stream
-        // this.closeMedia()
+        this.closeMedia()
         await this.getBatchInfo()
       } catch (err) {
         console.log(`错误:${err}`)
@@ -814,71 +770,81 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .ques-counselling {
-    width: 100%;
-    height: 100vh;
-    box-sizing: border-box;
-    background-color: #F4F4F4;
-    .top {
-      height: 110px;
-      img{
-        width: 100%;
-        height: 100%;
-      }
-    }
-    .tips {
-      margin-top: 5vh;
-      font-size: 14px;
-      color: #999;
-    }
-    .ques-counselling-wrap {
-      position: relative;
+.ques-counselling {
+  width: 100%;
+  height: calc(100 * var(--vh));
+  box-sizing: border-box;
+  background-color: #F4F4F4;
+
+  .top {
+    height: 110px;
+
+    img {
       width: 100%;
       height: 100%;
-      margin: 0 auto 0 auto;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      .main {
-        // flex: 1;
-        // position: fixed;
-        // bottom: 0;
-        width: 100%;
-        height: calc(100vh - 275px);
-        overflow-x: hidden;
-        overflow-y: scroll;
-        // z-index: 2;
-        .main-in {
-          min-height: 100%;
-          display: flex;
-          flex-direction: column;
-          padding-bottom: 15px;
-          box-sizing: border-box;
-        }
-        .time-show {
-          margin: 16px 0 6px 0;
-        }
-      }
-      .bottom {
-        height: 150px;
-        padding-top: 16px;
+    }
+  }
+
+  .tips {
+    margin-top: calc(5 * var(--vh));
+    font-size: 14px;
+    color: #999;
+  }
+
+  .ques-counselling-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .main {
+      // flex: 1;
+      // position: fixed;
+      // bottom: 0;
+      width: 100%;
+      height: calc(100 * var(--vh) - 275px);
+      overflow-x: hidden;
+      overflow-y: scroll;
+
+      // z-index: 2;
+      .main-in {
+        min-height: 100%;
         display: flex;
-        justify-content: center;
-        background-color: #fff;
-        position: fixed;
-        width: 100%;
-        bottom: 0;
-        z-index: 3;
-        // 与fadi样式不同
-        &.isEnd {
-          height: auto;
-          padding: 10px 0 40px 0;
-          align-items: flex-end;
-          background-color: rgba(255, 255, 255, 0);
-        }
+        flex-direction: column;
+        padding-bottom: 15px;
+        box-sizing: border-box;
+      }
+
+      .time-show {
+        margin: 16px 0 6px 0;
+      }
+    }
+
+    .bottom {
+      height: 150px;
+      padding-top: 16px;
+      display: flex;
+      justify-content: center;
+      background-color: #fff;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      z-index: 3;
+
+      // 与fadi样式不同
+      &.isEnd {
+        height: auto;
+        padding: 10px 0 40px 0;
+        align-items: flex-end;
+        background-color: rgba(255, 255, 255, 0);
       }
     }
   }
+}
+
 .main-in::-webkit-scrollbar {
   /*滚动条整体样式*/
   width: 0;
@@ -886,21 +852,24 @@ export default {
 }
 </style>
 <style lang="less">
-.messageBox{
+.messageBox {
   width: 360px;
   height: 246px;
   border-radius: 8px;
-  .el-message-box__content{
+
+  .el-message-box__content {
     padding: 0;
     margin-top: 60px;
     font-size: 20px;
     color: #666;
     text-align: center;
   }
-  .el-message-box__btns{
+
+  .el-message-box__btns {
     text-align: center;
     margin-top: 50px;
   }
+
   .other-message {
     width: 78px;
     height: 32px;
@@ -910,16 +879,20 @@ export default {
     background: #34B7B9;
   }
 }
+
 .el-dialog {
   border-radius: 20px;
 }
+
 .el-dialog.is-fullscreen {
   border-radius: 0;
 }
+
 .el-dialog.is-fullscreen.other-dialg {
-  height: calc(100vh - 50px);
+  height: calc(100 * var(--vh) - 50px);
   margin-top: 50px;
 }
+
 .fadi-start-box {
   .title {
     margin: 1.68rem 0 0 0;
@@ -927,6 +900,7 @@ export default {
     color: #000000;
     text-align: center;
   }
+
   .content {
     padding: 0 1rem;
     margin-top: 2px;

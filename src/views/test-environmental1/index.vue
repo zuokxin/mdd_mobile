@@ -9,17 +9,12 @@
         <p>请将人脸放置在图像框内3秒</p>
         <p class="subtitle test-error" :class="{ 'hidden': faceSuccess || face }">未识别到人脸，请保持人脸在图像框内。</p>
         <div class="text-center">
-          <video-box
-            ref="thisVideo"
-            :faceDetection="true"
-            @getFace="getFace"
-            :icon="true"
-            size="160px"
-          >
+          <video-box ref="thisVideo" :faceDetection="true" @getFace="getFace" :icon="true" size="160px">
           </video-box>
         </div>
         <p class="tips first">
-          <span v-if="!faceSuccess"><span class="test-success" style="font-size:0.8rem;margin-right: 7px;">{{ faceIndex }}</span>秒</span>
+          <span v-if="!faceSuccess"><span class="test-success" style="font-size:0.8rem;margin-right: 7px;">{{ faceIndex
+          }}</span>秒</span>
           <span v-if="faceSuccess" class="test-success">答题时始终保持人脸在图像框内</span>
         </p>
       </div>
@@ -33,7 +28,8 @@
         <b :style="{ color: volumeColor }">{{ db }}</b>
       </p>
     </div>
-    <van-button round type="primary" :disabled="!(!volumeWarn && faceSuccess)" @click="start" style="display: block; width: 80%; margin: 20px auto 0;">开始答题</van-button>
+    <van-button round type="primary" :disabled="!(!volumeWarn && faceSuccess)" @click="start"
+      style="display: block; width: 80%; margin: 20px auto 0;">开始答题</van-button>
   </div>
 </template>
 
@@ -324,15 +320,18 @@ export default {
     font-weight: 700;
     color: #000000;
   }
+
   .van-dialog__confirm {
     color: #34b7b9 !important;
     border-radius: 999px;
-    border:1px solid #34b7b9 !important;
+    border: 1px solid #34b7b9 !important;
   }
+
   .van-dialog__cancel {
     border-radius: 999px;
     margin-left: 20px;
   }
+
   // .van-dialog__confirm {
   //   border-radius: 999px;
   //   margin-right: 20px;
@@ -345,42 +344,50 @@ export default {
 </style>
 <style lang="less" scoped>
 @w: 37.5;
+
 .test {
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh));
   background-color: #F6F6F6;
   padding: 16px 20px;
   font-size: 14rem / @w;
   box-sizing: border-box;
+
   p {
     margin-top: 0;
     margin-bottom: 0;
   }
+
   .test-wrap {
     background-color: #fff;
-    min-height: calc(100vh - 3rem);
+    min-height: calc(100 * var(--vh) - 3rem);
     border-radius: 10px;
     padding: 16px 12px;
     box-sizing: border-box;
   }
+
   .icon {
     color: #DDD;
   }
+
   .title {
     display: flex;
     align-items: center;
     font-weight: 600;
     color: #333333;
+
     // margin: 0;
     img {
       margin-left: 12rem / @w;
     }
   }
+
   .subtitle {
-    // margin-bottom: 1.5vh;
+    // margin-bottom: 1.5 * var(--vh);
     height: 38rem / @w;
     line-height: 38rem / @w;
     text-align: left;
   }
+
   .tips {
     height: 86rem / @w;
     margin: 0;
@@ -389,10 +396,12 @@ export default {
     justify-content: center;
     color: #BBB;
     text-align: center;
+
     &.first {
       align-items: flex-start;
       line-height: 80rem / @w;
     }
+
     b {
       position: relative;
       width: 80rem / @w;
@@ -404,6 +413,7 @@ export default {
       border-radius: 50%;
       margin-right: 8px;
       text-align: center;
+
       &::after {
         content: "分贝";
         position: absolute;
@@ -416,13 +426,15 @@ export default {
     }
   }
 }
+
 .hidden {
   visibility: hidden;
 }
+
 .test-error {
   color: #FFB56B;
 }
+
 .test-success {
-  color:#34B7B9;
-}
-</style>
+  color: #34B7B9;
+}</style>

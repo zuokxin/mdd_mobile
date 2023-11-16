@@ -1,23 +1,35 @@
 <template>
   <div id="tableFadi" class="ques-counselling">
+    <WaitPrompt :show="waitTipsShow"/>
+    <!-- 答题区 -->
     <div class="ques-counselling-wrap">
       <div class="top">
-        <img src="@/assets/img/test/lamp.png" alt="lamp" height="18">
-        <span>小愈是智能虚拟人物，可以辅助评估你的心理状态。</span>
+        <img src="@/assets/img/test/fadi-logo.png" alt="fadi-logo">
       </div>
       <div class="main" ref="mainIn">
         <div class="main-in">
+          <TimeShow class="time-show" :type="true"></TimeShow>
           <div v-if="historRecods.length > 0">
             <div v-for="item in historRecods" :key="item.index">
-              <DialogBoxLeft :textLeft="item.title" :isHistory="true"></DialogBoxLeft>
+              <DialogBoxLeft
+                :textLeft="item.title"
+                :isHistory="true"
+              ></DialogBoxLeft>
               <DialogBoxRight :textRight="item.audioDuration"></DialogBoxRight>
             </div>
           </div>
           <div v-for="(record, index) in chatRecords" :key="record + index">
-            <!-- :needAnswer="record.needAnswer" -->
-            <DialogBoxLeft :ref="'DialogBoxLeft' + index" v-if="record.component === 'left' && record.status === false"
-              :url="record.url" :textLeft="record.text" @playVideo="e => playVideo(e, index)"
-              @openStartPrompt="openStartPrompt"></DialogBoxLeft>
+            <!-- <TimeShow class="mt-4 mb-2" v-if="record.timeShow && historRecods.length === 0" :type="record.timeType"></TimeShow> -->
+            <!-- @openStartPrompt="openStartPrompt" -->
+            <DialogBoxLeft
+              :ref="'DialogBoxLeft' + index"
+              v-if="record.component === 'left' && record.status === false"
+              :url="record.url"
+              :textLeft="record.text"
+              :index="index"
+              @palyAudio="e => palyAudio(e, index)"
+              @openStartPrompt="openStartPrompt"
+            ></DialogBoxLeft>
             <DialogBoxRight v-if="record.component === 'right'" :textRight="record.audioDuration"></DialogBoxRight>
           </div>
           <div v-show="queLoading" style="margin-left: 26px;">
@@ -25,50 +37,88 @@
           </div>
         </div>
       </div>
-      <div v-show="recorderShow" class="bottom" :class="{ 'isEnd': isEnd }">
-        <div v-if="!isEnd" class="bot_box">
+      <div v-show="recorderShow" class="bottom" :class="{'isEnd': isEnd}">
+        <recordControl
+          v-if="!isEnd"
+          :title="btnText"
+          :message="btnText2"
+          :volumeVal="volumeVal"
+          :volumeShow="!loading"
+          :disabled="loading || !btnShow"
+          @recordClick="toNext()"
+        ></recordControl>
+        <!-- <div v-if="!isEnd" class="bot_box">
           <p class="tips-01">{{ btnText }}</p>
           <p class="tips-02">{{ btnText2 }}</p>
           <div class="submit-btn">
-            <VolumeIcon class="mr-3" v-show="!loading" :value="volumeVal" style="transform: rotateZ(180deg);">
-            </VolumeIcon>
+            <VolumeIcon class="mr-3" v-show="!loading" :value="volumeVal" style="transform: rotateZ(180deg);"></VolumeIcon>
             <XyButton :disabled="loading || !btnShow" @click.native="toNext()"></XyButton>
             <VolumeIcon class="ml-3" v-show="!loading" :value="volumeVal" style="margin-bottom: -5px;"></VolumeIcon>
           </div>
-        </div>
-        <van-button v-if="isEnd" class="main-btn-dark mx-auto my-5" type="primary" size="large" round block
-          :disabled="finishBtnDisable" @click="submit" style="width: 76.8%;">
+        </div> -->
+        <van-button
+          v-if="isEnd"
+          class="main-btn-dark mx-auto my-5"
+          type="primary"
+          size="large"
+          round
+          block
+          :disabled="finishBtnDisable"
+          @click="submit"
+          style="width: 76.8%;"
+        >
           完成
         </van-button>
       </div>
       <!-- <div v-show="!recorderShow" class="bottom" style="background-color: #F4F4F4;"></div> -->
     </div>
     <!-- 人脸 -->
-    <DragVideo v-if="aiEvalCamEnabled" ref="dragVideo" @getFace="getFace" :location="{ right: 10, top: 50 }">
+    <DragVideo
+      v-if="aiEvalCamEnabled"
+      ref="dragVideo"
+      @getFace="getFace"
+      :location="{ right: 10, top: 23 }"
+    >
     </DragVideo>
     <!-- 开始提示 -->
-    <van-dialog v-model="startShow" theme="round-button" className="detail-dialog" confirmButtonText="好的"
-      confirmButtonColor="#34B7B9" @close="colseStartTips">
+    <van-dialog
+      v-model="startShow"
+      theme="round-button"
+      className="detail-dialog"
+      confirmButtonText="好的"
+      confirmButtonColor="#34B7B9"
+      @close="colseStartTips"
+    >
       <div class="fadi-start-box">
         <p class="title">测试即将开始</p>
         <p class="content">
           <van-icon name="info" color="#EB5940" style="margin-left: -1.1em" />
-          部分手机自带浏览器可能无法正常播放视频画面，您可以尝试切换浏览器测评
+          请保持周围环境安静，以确保您的测评结果更加准确
         </p>
       </div>
     </van-dialog>
     <!-- 弹窗提示 -->
-    <van-dialog v-if="aiEvalCamEnabled" v-model="faceShow" message="未识别到全部人脸，请重做本题" theme="round-button"
-      className="detail-dialog" confirmButtonText="确定" confirmButtonColor="#34B7B9" @close="colseFaceTips"></van-dialog>
+    <van-dialog
+      v-if="aiEvalCamEnabled"
+      v-model="faceShow"
+      message="未识别到全部人脸，请重做本题"
+      theme="round-button"
+      className="detail-dialog"
+      confirmButtonText="确定"
+      confirmButtonColor="#34B7B9"
+      @close="colseFaceTips"
+    ></van-dialog>
   </div>
 </template>
 
 <script>
 import DialogBoxLeft from './dialog-box-left'
 import DialogBoxRight from './dialog-box-right'
-import XyButton from './xy-button'
-import VolumeIcon from './volume-icon'
+import WaitPrompt from './wait-prompt'
+// import VolumeIcon from './volume-icon'
+import TimeShow from './time-show'
 import DragVideo from '@/components/DragVideo'
+import recordControl from './record-control'
 import { Notify, Dialog } from 'vant'
 import { getTableQues, batchInfo, posTableQues, postTableRes } from '@/api/modules/user'
 import { uploader } from '@/utils/uploader'
@@ -78,23 +128,16 @@ import { mediaErrorTypes } from '@/utils/types'
 import Recorder from '@/utils/media/recorder'
 // import { mapGetters } from 'vuex'
 import { testMiXin } from '@/mixin/test-mixin'
-document.addEventListener('visibilitychange', function () {
-  if (document.visibilityState === 'hidden') {
-    // window.location.reload()
-    // 隐藏就不刷新了
-  } else {
-    // 可见刷新
-    window.location.reload()
-  }
-})
 export default {
   name: 'test-do-fadi',
   mixins: [testMiXin],
   components: {
     DialogBoxLeft,
     DialogBoxRight,
-    XyButton,
-    VolumeIcon,
+    WaitPrompt,
+    // VolumeIcon,
+    TimeShow,
+    recordControl,
     DragVideo
   },
   data () {
@@ -109,7 +152,9 @@ export default {
       volumeVal: 0,
       queLoading: false,
       midwayBackBool: true, // true代表着中途返回
-      error: true,
+      // quesUrl: '',
+      error: false,
+      mediaStream: null,
       audioFiles: [],
       audioUrls: [],
       videoFiles: [],
@@ -120,18 +165,21 @@ export default {
       timer: null,
       isEnd: false,
       queObj: {},
+      // titleIndex: 0,
       videoFile: null,
       audioFile: null,
       loading: false,
       init: true,
-      finishBtnDisable: true,
+      finishBtnDisable: true, // 完成按钮禁用状态
       lastTime: 0,
       audioDuration: 0, // 音频时长，类型为int，单位是秒
       videoPlayer: null, // 摄像头对象
       faceTimer: null, // 人脸识别计时器
       canUpload: false,
       aiEvalCamEnabled: false,
-      btnShow: false
+      btnShow: false,
+      timeover: false,
+      waitTipsShow: false // 等待gbt时间
     }
   },
   computed: {
@@ -150,7 +198,7 @@ export default {
     // // 当前表名
     // thisTable () {
     //   return this.$route.query.tableCode
-    // }
+    // },
     // ...mapGetters([
     //   'nextTable'
     // ]),
@@ -169,8 +217,8 @@ export default {
     // }
   },
   created () {
-    console.log('Android')
-    this.getBatchInfo()
+    this.closeMedia()
+    this.mediaInitFirst()
   },
   methods: {
     /******************************************
@@ -191,13 +239,7 @@ export default {
       //   // console.log('不能上传了-有弹窗被开启了')
       //   return
       // }
-      // if (this.loading) {
-      //   // console.log('不能检测了-在提交答案')
-      //   return
-      // }
-      // console.log('开始检测')
       if (!e) {
-        // console.log('检测到')
         // 未检出人脸1S
         if (this.faceTimer) return
         this.unFaceTime = (new Date()).getTime()
@@ -210,7 +252,6 @@ export default {
           }
         }, 1)
       } else {
-        // console.log('未检测到')
         clear()
       }
     },
@@ -226,7 +267,9 @@ export default {
       this.$refs.dragVideo.pauseVideo()
       this.mediaRecorder.stop()
       this.recorder.pause(() => {
+        // this.closeMedia()
         this.faceShow = true
+        console.log('人脸识别暂停，打开提示窗口')
       })
     },
     // 关闭人脸提示
@@ -245,90 +288,46 @@ export default {
     /******************************************
      * 媒体设备
     ******************************************/
-    // 获取媒体
-    initUserMedia () {
+    // 设备参数
+    getDevicesParams () {
       const params = {
         audio: true
       }
       if (this.aiEvalCamEnabled) {
         params.video = { facingMode: 'user', width: 1280, height: 720 }
       }
-      // 使用前置摄像头
-      navigator.mediaDevices.getUserMedia(params)
-        .then(stream => this.startUserMedia(stream))
-        .catch(err => {
-          this.error = true
-          console.log(`错误:${err}`)
-          Notify({ type: 'danger', message: mediaErrorTypes(err.name) })
-        })
+      return params
     },
-    // 音视频控件初始化
-    startUserMedia (stream) {
-      window.mediaStream = stream
-      this.getCurQue()
-
-      console.log('Media stream created.')
-      this.recorder = new Recorder({ stream })
-      console.log('录音初始化。。。')
-      // if (!this.init) {
-      //   this.init = true
-      // }
-
-      // 监听录音
-      let bufferArray = []
-      this.recorder.process.onaudioprocess = e => {
-        const buffer = e.inputBuffer.getChannelData(0)
-        bufferArray = [...bufferArray, new Float32Array(buffer)]
-        console.log('录音中。。。')
-        var maxVal = 0
-        for (var i = 0; i < buffer.length; i++) {
-          if (maxVal < buffer[i]) {
-            maxVal = buffer[i]
-          }
-        }
-        // 显示音量值
-        this.volumeVal = Math.round(maxVal * 100)
-        this.recorder.audioBuffers.push(new Float32Array(buffer))
+    // 关闭媒体
+    closeMedia () {
+      if (window.mediaStream) {
+        window.mediaStream.getTracks().forEach((track) => {
+          track.stop()
+        })
       }
-
-      // 不开启摄像头
-      if (!this.aiEvalCamEnabled) return
-
-      this.$refs.dragVideo.setSteam(stream)
-      this.mediaRecorder = new MediaRecorder(stream)
-      console.log('录像初始化。。。')
-      // 监听录像
-      this.mediaRecorder.onstart = e => {
-        console.log(e, '开始录像。。。')
-      }
-      this.videoChunk = null
-      this.mediaRecorder.onstop = e => {
-        console.log(e, '停止录像。。。')
-        // 上传文件
-        // 可上传：答题环节，可上传标志位（人脸时标志位不见）
-        if (!this.isEnd && this.canUpload) {
-          // 视频文件处理
-          this.videoCreate()
-          // 音频文件处理
-          this.audioCreate()
-          bufferArray = []
-          this.postQueRes()
-        } else {
-          bufferArray = []
-          this.recorder.audioBuffers = []
-        }
-      }
-      this.mediaRecorder.ondataavailable = e => {
-        console.log('视频生成。。。')
-        this.videoChunk = e.data
+    },
+    // 第一次获取权限
+    async mediaInitFirst () {
+      const params = this.getDevicesParams()
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(params)
+        window.mediaStream = stream
+        // this.closeMedia()
+        await this.getBatchInfo()
+      } catch (err) {
+        console.log(`错误:${err}`)
+        Notify({ type: 'danger', message: mediaErrorTypes(err.name) })
       }
     },
     // 是否需要打开摄像头&&需要做哪些量表的信息
     async getBatchInfo () {
       try {
         const res = await batchInfo({ sessionId: this.sessionId })
+        console.log(res)
         this.aiEvalCamEnabled = res.data.aiEvalCamEnabled
-        this.initUserMedia()
+        // this.openStartPrompt()
+        this.getCurQue()
+        // this.initUserMedia()
       } catch (err) {
         console.log(err)
       }
@@ -338,6 +337,11 @@ export default {
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       this.queLoading = true
+      this.recorderShow = false
+      // 设置6S等待计时器
+      const gbtWaitTimer = setTimeout(() => {
+        this.waitTipsShow = true
+      }, 6000)
       getTableQues({
         sessionId: this.sessionId,
         tableCode: this.tableCode,
@@ -345,19 +349,29 @@ export default {
         virtualPortrait: sessionStorage.fadiGender
       }).then(
         res => {
+          // 等待计时器未触发删除，触发关闭提示窗口
+          if (!this.waitTipsShow) clearTimeout(gbtWaitTimer)
+          else this.waitTipsShow = false
+          // 数据初始化
           this.queLoading = false
-          this.midwayBackBool = false
+          // 参数初始化
           this.canUpload = false
+          this.btnShow = false
+          // this.recorderShow = false
+          this.loading = false
+          // 后面就不是中途返回了
+          this.midwayBackBool = false
           const {
             isEnd,
             qiniuToken,
             title,
-            qVideoUrl,
+            // qVideoUrl,
             hintsTitle
           } = res.data
           this.isEnd = isEnd
           this.queObj = res.data
           this.token = qiniuToken
+          const qVideoUrl = require('@/assets/guide-audio.mp3')
           // setTimeout(() => {
           // 判断是否已经完成所有题目
           if (!isEnd) {
@@ -374,7 +388,8 @@ export default {
                   this.chatRecords.push({
                     component: 'left',
                     text: v.title,
-                    url: v.qVideoUrl,
+                    // url: v.qVideoUrl,
+                    url: qVideoUrl,
                     status: false
                   })
                 }
@@ -389,17 +404,21 @@ export default {
               })
             }
           } else {
+            // 在这里显示还是在读好后显示？
             this.recorderShow = true
             this.finishBtnDisable = false
             if (hintsTitle && hintsTitle.length > 0) {
               hintsTitle.forEach((v, index) => {
                 // const timeJson = this.setTime()
+                // 第一条显示开始读逐条读完
                 const status = !!index
                 this.chatRecords.push({
                   component: 'left',
+                  // needAnswer: false,
                   text: v.title,
                   url: v.qVideoUrl,
                   status
+                  // ...timeJson
                 })
               })
             }
@@ -412,19 +431,22 @@ export default {
         }
       )
     },
-    // 视频播放开始提示用户
+    // 开始提示用户
     openStartPrompt () {
+      console.log('opentips')
       this.startShow = true
     },
     // 视频播放初始获取用户点击行为
     colseStartTips () {
-      const { setTimer, play } = this.$refs.DialogBoxLeft0[0]
-      setTimer()
+      const { play } = this.$refs.DialogBoxLeft0[0]
+      // // setTimer()
       play()
+      console.log('closeTips')
+      // this.getCurQue()
       this.startShow = false
     },
     // 音频播放结束
-    playVideo (data, index) {
+    async palyAudio (data, index) {
       if (index + 1 !== this.chatRecords.length) {
         // 缓冲下一题
         setTimeout(() => {
@@ -437,30 +459,74 @@ export default {
       } else if (!this.queObj.isNeedAnswer && !this.isEnd) {
         // 无需回答
         this.notAnswer()
+      } else if (this.isEnd) {
+        this.finishBtnDisable = false
       } else {
         // 打开录音
-        // if (this.isEnd) {
-        //   this.finishBtnDisable = false
-        //   return
-        // }
-        if (this.error) this.error = false
-        this.recorder.start()
-        if (this.aiEvalCamEnabled) {
-          this.mediaRecorder.start()
+        await this.initUserMedia()
+      }
+    },
+    // 再次获取媒体
+    async initUserMedia () {
+      const params = this.getDevicesParams()
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(params)
+        this.startUserMedia(stream)
+      } catch (err) {
+        this.error = true
+        console.log(`错误:${err}`)
+        Notify({ type: 'danger', message: mediaErrorTypes(err.name) })
+      }
+    },
+    // 音视频控件初始化
+    startUserMedia (stream) {
+      window.mediaStream = stream
+      console.log('Media stream created.')
+      // 显示录音答题
+      this.recorderShow = true
+      this.btnShow = false
+      // 开启摄像头
+      if (this.aiEvalCamEnabled) {
+        this.$refs.dragVideo.setSteam(stream)
+        console.log('录像初始化。。。')
+        this.mediaRecorder = new MediaRecorder(stream)
+        this.mediaRecorder.start()
+        // 监听录像
+        this.mediaRecorder.onstart = e => {
+          this.canFace = true
           this.$refs.dragVideo.restartVideo()
+          console.log(e, '开始录像。。。')
         }
-        // 显示录音答题，过1.5S可提交
-        this.canFace = true
-        this.btnShow = false
-        this.recorderShow = true
+      }
+      console.log('录音初始化。。。')
+      this.recorder = new Recorder({ stream })
+
+      // 监听录音
+      this.bufferArray = []
+      this.recorder.process.onaudioprocess = e => {
+        const buffer = e.inputBuffer.getChannelData(0)
+        this.bufferArray = [...this.bufferArray, new Float32Array(buffer)]
+        console.log('录音中。。。')
+        var maxVal = 0
+        for (var i = 0; i < buffer.length; i++) {
+          if (maxVal < buffer[i]) {
+            maxVal = buffer[i]
+          }
+        }
+        // 显示音量值
+        this.volumeVal = Math.round(maxVal * 100)
+        this.recorder.audioBuffers.push(new Float32Array(buffer))
+      }
+      this.recorder.start(() => {
         this.canUpload = true
+        // 过1.5S可提交
         setTimeout(() => {
           this.btnShow = true
         }, 1500)
-      }
+      })
     },
-    // 下一题
-    toNext (cb) {
+    // 下一题-停止录音录像
+    toNext () {
       // 禁用无法进入
       if (this.loading || !this.canUpload || !this.btnShow) return
       if (this.error) {
@@ -470,46 +536,62 @@ export default {
       if (this.mediaRecorder && this.mediaRecorder.state === 'inactive') {
         return
       }
-      if (cb) cb()
+      // 按钮禁用，文字改变，音频视频可上传
       this.canFace = false
+      this.loading = true
+      this.btnShow = false
+      this.canUpload = true
       // 是否用摄像头
       if (this.aiEvalCamEnabled) {
         this.$refs.dragVideo.pauseVideo()
-        this.mediaRecorder.stop()
-        this.recorder.pause()
-        // 避免提交过程中摄像头检出
-        if (this.faceTimer) {
-          clearInterval(this.faceTimer)
-          this.faceTimer = null
+        this.videoChunk = null
+        this.mediaRecorder.onstop = e => {
+          console.log(e, '停止录像。。。')
+          // 上传文件
+          // 可上传：答题环节，可上传标志位（人脸时标志位不见）
+          if (this.canUpload) {
+            // 视频文件处理
+            this.videoCreate()
+            // 音频文件处理
+            this.audioCreate()
+            this.postQueRes()
+            // 关闭权限
+            // this.closeMedia()
+            this.bufferArray = []
+          }
         }
+        this.mediaRecorder.ondataavailable = e => {
+          console.log('视频生成。。。')
+          this.videoChunk = e.data
+        }
+        this.recorder.pause()
+        this.mediaRecorder.stop()
       } else {
         this.recorder.pause(() => {
-          this.audioCreate()
-          // 上传文件
+          // 上传文件(this.isEnd是否有必要)
           if (!this.isEnd && this.canUpload) {
+            this.audioCreate()
             this.postQueResAudio()
-          } else {
-            this.recorder.audioBuffers = []
           }
+          // // 关闭权限
+          // this.closeMedia()
         })
       }
     },
     // 无须回答
     async notAnswer () {
-      // 加一层返回保护
-      if (!this.sessionId || !this.tableCode) return
-      const data = {
-        sessionId: this.sessionId,
-        tableCode: this.tableCode,
-        ...this.queObj
-      }
-      await posTableQues(data)
-      this.midwayBackBool = false
+      // 加一层返回保护--与fadi不同，获取无需回答题后直接完成不需要手动提交
+      // if (!this.sessionId || !this.tableCode) return
+      // const data = {
+      //   sessionId: this.sessionId,
+      //   tableCode: this.tableCode,
+      //   ...this.queObj
+      // }
+      // await posTableQues(data)
       this.getCurQue()
     },
     // 提交回答-纯音频
     async postQueResAudio () {
-      this.loading = true
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       const curData = {
@@ -534,19 +616,23 @@ export default {
             audioDuration: this.audioDuration,
             ...this.queObj
           })
-          this.loading = false
           // 添加回答
           const answer = queRes.data || ''
           // const timeJson = this.setTime()
+          // this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration, ...timeJson })
           this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration })
-          this.getCurQue()
-          this.recorderShow = false
           // 让滚动条始终在最底部
           this.$nextTick(() => {
             this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
           })
+          // 关闭权限
+          // this.closeMedia()
+          this.getCurQue()
         } catch (err) {
+          // 关闭权限
+          // this.closeMedia()
           if (err.code === 546) {
+            // 参数初始化
             this.canUpload = false
             this.btnShow = false
             this.recorderShow = false
@@ -566,6 +652,8 @@ export default {
           }
         }
       } catch (err) {
+        // 关闭权限
+        // this.closeMedia()
         let message = ''
         if (err.includes('xhr request failed')) {
           message = '网络异常'
@@ -577,7 +665,6 @@ export default {
     },
     // 提交回答-音频视频
     postQueRes () {
-      this.loading = true
       // 加一层返回保护
       if (!this.sessionId || !this.tableCode) return
       const curData = {
@@ -610,25 +697,27 @@ export default {
           }
           posTableQues(data).then(
             queRes => {
-              this.midwayBackBool = false
-              this.loading = false
               // 清除提问高亮
-              const len = this.chatRecords.length
-              const { needAnswer, component } = this.chatRecords[len - 1] || {}
-              if (component === 'left' && needAnswer) this.chatRecords[len - 1].needAnswer = false
+              // const len = this.chatRecords.length
+              // const { needAnswer, component } = this.chatRecords[len - 1] || {}
+              // if (component === 'left' && needAnswer) this.chatRecords[len - 1].needAnswer = false
               // 添加回答
               const answer = queRes.data || ''
               // const timeJson = this.setTime()
+              // this.chatRecords.push({ component: 'right', text: answer, time: this.audioDuration, ...timeJson })
               this.chatRecords.push({ component: 'right', text: answer, audioDuration: this.audioDuration })
-              this.getCurQue()
-              this.recorderShow = false
               // 让滚动条始终在最底部
               this.$nextTick(() => {
                 this.$refs.mainIn.scrollTop = this.$refs.mainIn.scrollHeight
               })
+              // 关闭权限
+              // this.closeMedia()
+              this.getCurQue()
             }
           ).catch(
             err => {
+              // 关闭权限
+              // this.closeMedia()
               if (err.code === 546) {
                 // 参数初始化
                 this.canUpload = false
@@ -653,6 +742,8 @@ export default {
         }
       ).catch(
         err => {
+          // 关闭权限
+          // this.closeMedia()
           let message = ''
           if (err.includes('xhr request failed')) {
             message = '网络异常'
@@ -710,170 +801,106 @@ export default {
     }
   },
   beforeDestroy () {
+    if (this.recorder) this.recorder.close()
     console.log(this.recorder)
   }
   // beforeRouteLeave (to, from, next) {
+  //   console.log('beforeRouteLeave', this)
   //   // 离开后摄像头红点消失
-  //   if (window.mediaStream) {
-  //     const [media01, media02] = window.mediaStream.getTracks()
-  //     if (media01) media01.stop()
-  //     if (media02) media02.stop()
-  //   }
+  //   this.closeMedia()
   //   next()
   // }
 }
 </script>
 
 <style lang="less" scoped>
-.ques-counselling {
-  width: 100%;
-  height: calc(100 * var(--vh));
-  box-sizing: border-box;
-  background-color: #D1CDCD;
-
-  .top {
-    padding: 0 16px;
-    height: 34px;
-    line-height: 34px;
-    color: #fff;
-    background: linear-gradient(90deg, rgba(0, 203, 255, 0.21) 0%, rgba(0, 203, 255, 0.1) 51%, rgba(0, 203, 255, 0.01) 100%);
-    z-index: 2;
-
-    img {
-      width: 18px;
-      height: 18px;
-      vertical-align: text-bottom;
-      margin-right: 6px;
-    }
-  }
-
-  .tips {
-    margin-top: calc(5 * var(--vh));
-    font-size: 14px;
-    color: #999;
-  }
-
-  .ques-counselling-wrap {
-    position: relative;
+  .ques-counselling {
     width: 100%;
-    height: 100%;
-    margin: 0 auto 0 auto;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    .main {
-      position: fixed;
-      bottom: 15px;
-      width: 100%;
-      height: calc(40 * var(--vh));
-      // margin-top: 16px;
-      padding-bottom: 15px;
-      overflow-x: hidden;
-      overflow-y: scroll;
-      z-index: 2;
-
-      .main-in {
-        // position: absolute;
-        // width: 100%;
-        min-height: 100%;
-        // left: 0;
-        // bottom: 0;
-        // height: 100%;
-        // overflow-y: auto;
-        // padding-bottom: 30px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
+    height: 100vh;
+    box-sizing: border-box;
+    background-color: #F4F4F4;
+    .top {
+      height: 110px;
+      img{
+        width: 100%;
+        height: 100%;
       }
     }
-
-    .bottom {
-      height: 150px;
-      padding-top: 16px;
-      display: flex;
-      justify-content: center;
-      background-color: #fff;
-      position: fixed;
+    .tips {
+      margin-top: 5vh;
+      font-size: 14px;
+      color: #999;
+    }
+    .ques-counselling-wrap {
+      position: relative;
       width: 100%;
-      bottom: 0;
-      z-index: 3;
-
-      &.isEnd {
-        height: auto;
-        padding: 10px 0;
-        align-items: flex-end;
-        background-color: rgba(255, 255, 255, .8);
+      height: 100%;
+      margin: 0 auto 0 auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      .main {
+        // flex: 1;
+        // position: fixed;
+        // bottom: 0;
+        width: 100%;
+        height: calc(100vh - 275px);
+        overflow-x: hidden;
+        overflow-y: scroll;
+        // z-index: 2;
+        .main-in {
+          min-height: 100%;
+          display: flex;
+          flex-direction: column;
+          padding-bottom: 15px;
+          box-sizing: border-box;
+        }
+        .time-show {
+          margin: 16px 0 6px 0;
+        }
       }
-
-      .bot_box {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .tips-01 {
-        line-height: 1;
-        font-size: 14px;
-        font-weight: 600;
-        color: #000000;
-        margin-bottom: 0;
-      }
-
-      .tips-02 {
-        margin: 10px 0;
-        font-size: 12px;
-        color: #313131;
-      }
-
-      .submit-btn {
+      .bottom {
+        height: 150px;
+        padding-top: 16px;
         display: flex;
         justify-content: center;
-        align-items: center;
+        background-color: #fff;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        z-index: 3;
+        // 与fadi样式不同
+        &.isEnd {
+          height: auto;
+          padding: 10px 0 40px 0;
+          align-items: flex-end;
+          background-color: rgba(255, 255, 255, 0);
+        }
       }
     }
   }
-}
-
 .main-in::-webkit-scrollbar {
   /*滚动条整体样式*/
   width: 0;
   height: 0;
 }
-
-// .main-in::-webkit-scrollbar-thumb {
-//   /*滚动条里面小方块*/
-//   border-radius: 12px;
-//   box-shadow: 8px 0 0 #DFDFDF inset !important;
-//   border: 6px solid rgba(0, 0, 0, 0);
-//   background-color: rgba(0, 0, 0, 0) !important;
-// }
-// .main-in::-webkit-scrollbar-track {
-//   /*滚动条里面轨道*/
-//   // box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
-//   border-radius: 10px;
-//   background: rgba(0, 0, 0, 0);
-// }
 </style>
 <style lang="less">
-.messageBox {
+.messageBox{
   width: 360px;
   height: 246px;
   border-radius: 8px;
-
-  .el-message-box__content {
+  .el-message-box__content{
     padding: 0;
     margin-top: 60px;
     font-size: 20px;
     color: #666;
     text-align: center;
   }
-
-  .el-message-box__btns {
+  .el-message-box__btns{
     text-align: center;
     margin-top: 50px;
   }
-
   .other-message {
     width: 78px;
     height: 32px;
@@ -883,20 +910,16 @@ export default {
     background: #34B7B9;
   }
 }
-
 .el-dialog {
   border-radius: 20px;
 }
-
 .el-dialog.is-fullscreen {
   border-radius: 0;
 }
-
 .el-dialog.is-fullscreen.other-dialg {
-  height: calc(100 * var(--vh) - 50px);
+  height: calc(100vh - 50px);
   margin-top: 50px;
 }
-
 .fadi-start-box {
   .title {
     margin: 1.68rem 0 0 0;
@@ -904,7 +927,6 @@ export default {
     color: #000000;
     text-align: center;
   }
-
   .content {
     padding: 0 1rem;
     margin-top: 2px;

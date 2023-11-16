@@ -7,15 +7,11 @@
         </p>
         <p>请将人脸放置在图像框内</p>
         <div class="text-center">
-          <video-box
-            ref="thisVideo"
-            size="160px"
-            :icon="true"
-          >
+          <video-box ref="thisVideo" size="160px" :icon="true">
           </video-box>
         </div>
       </div>
-      <p class="title" style="margin-top: 5vh">
+      <p class="title" :style="{marginTop: 'calc(5 * var(--vh))'}">
         语音测试
       </p>
       <p>进行环境语音检测</p>
@@ -239,29 +235,34 @@ export default {
 
 <style lang="less" scoped>
 .test {
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh));
   background-color: #F6F6F6;
   padding: 16px 20px;
   box-sizing: border-box;
+
   .test-wrap {
     background-color: #fff;
-    min-height: calc(100vh - 3rem);
+    min-height: calc(100 * var(--vh) - 3rem);
     border-radius: 10px;
     padding: 16px 12px;
     box-sizing: border-box;
   }
+
   .icon {
     color: #DDD;
   }
+
   .title {
     font-size: 14px;
     font-weight: 600;
     color: #333333;
     margin: 0;
   }
+
   .tips {
     display: flex;
     justify-content: center;
+
     b {
       position: relative;
       width: 80px;
@@ -272,6 +273,7 @@ export default {
       font-size: 36px;
       border-radius: 50%;
       text-align: center;
+
       &::after {
         content: "分贝";
         position: absolute;
@@ -283,15 +285,17 @@ export default {
       }
     }
   }
+
   .message {
     text-align: center;
     padding: 0 2em;
   }
 }
+
 .hidden {
   visibility: hidden;
 }
+
 .test-success {
-  color:#34B7B9;
-}
-</style>
+  color: #34B7B9;
+}</style>
