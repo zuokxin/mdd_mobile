@@ -18,6 +18,7 @@
 // import Music from '@/utils/music'
 import CryptoJS from 'CryptoJS'
 import Base64 from 'Base64'
+import browser from '@/utils/browser'
 // import io from 'socket.io'
 export default {
   name: 'dialog-box-left',
@@ -51,7 +52,8 @@ export default {
         pitch: 50,
         bgs: 1,
         tte: 'UTF8'
-      }
+      },
+      ios: browser().ios
     }
   },
   mounted () {
@@ -92,7 +94,8 @@ export default {
     played () {
       // this.isPlay = true
       this.isPlay = false
-      this.audioEle = null
+      // this.audioEle = null
+      this.audioEle.src = ''
       this.$emit('palyAudio', true)
       // const interval = setInterval(() => {
       //   if (this.audioEle.source.playStatus !== 2) {
@@ -103,14 +106,15 @@ export default {
       //     console.log('end')
       //   }
       // }, 0)
-      // this.audioEle.src = ''
       this.audioEle.removeEventListener('ended', this.played)
+      this.audioEle = null
     },
     loaded () {
       if (this.index === 0) {
         this.$emit('openStartPrompt')
       } else {
-        this.audioEle.play()
+        // this.audioEle.play()
+        console.log('played')
       }
       this.audioEle.removeEventListener('canplaythrough', this.loaded)
     },
@@ -193,9 +197,12 @@ export default {
             this.audioEle.crossOrigin = 'anonymous'
             this.audioEle.preload = 'auto'
             this.audioEle.src = src
-            document.body.appendChild(this.audioEle)
+            this.audioEle.style = 'display:none'
+            document.getElementById('tableFadi').appendChild(this.audioEle)
+            if (this.ios) this.audioEle.load()
           } else {
             this.audioEle = document.getElementById('gbtAudio')
+            this.audioEle.autoplay = true
             this.audioEle.src = src
           }
           // this.audioEle = new Music(this.base64ToUrl(jsonData.data.audio, 'mp3'))
@@ -203,9 +210,11 @@ export default {
           this.audioEle.addEventListener('playing', this.playing)
           this.audioEle.addEventListener('ended', this.played)
           this.$once('hook:beforeDestroy', () => {
-            this.audioEle.removeEventListener('canplaythrough', this.loaded)
-            this.audioEle.removeEventListener('playing', this.playing)
-            this.audioEle.removeEventListener('ended', this.played)
+            if (this.audioEle) {
+              this.audioEle.removeEventListener('canplaythrough', this.loaded)
+              this.audioEle.removeEventListener('playing', this.playing)
+              this.audioEle.removeEventListener('ended', this.played)
+            }
           })
           // console.log(this.audioEle.src)
           this.ttsWS.close()
