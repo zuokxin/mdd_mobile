@@ -106,8 +106,8 @@ export default {
       //     console.log('end')
       //   }
       // }, 0)
-      this.audioEle = null
       this.audioEle.removeEventListener('ended', this.played)
+      this.audioEle = null
     },
     loaded () {
       if (this.index === 0) {
@@ -210,9 +210,11 @@ export default {
           this.audioEle.addEventListener('playing', this.playing)
           this.audioEle.addEventListener('ended', this.played)
           this.$once('hook:beforeDestroy', () => {
-            this.audioEle.removeEventListener('canplaythrough', this.loaded)
-            this.audioEle.removeEventListener('playing', this.playing)
-            this.audioEle.removeEventListener('ended', this.played)
+            if (this.audioEle) {
+              this.audioEle.removeEventListener('canplaythrough', this.loaded)
+              this.audioEle.removeEventListener('playing', this.playing)
+              this.audioEle.removeEventListener('ended', this.played)
+            }
           })
           // console.log(this.audioEle.src)
           this.ttsWS.close()
