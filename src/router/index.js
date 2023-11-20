@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store'
+import jingwei from './jingwei'
 
 Vue.use(VueRouter)
 
@@ -180,7 +181,14 @@ const routes = [
     name: 'cbt课程详情',
     meta: { title: '课程详情' },
     component: resolve => require(['../views/cbt-detail/index.vue'], resolve)
-  }
+  },
+  {
+    path: '/cbt-detail',
+    name: 'cbt课程详情',
+    meta: { title: '课程详情' },
+    component: resolve => require(['../views/cbt-detail/index.vue'], resolve)
+  },
+  ...jingwei
 ]
 
 const router = new VueRouter({
